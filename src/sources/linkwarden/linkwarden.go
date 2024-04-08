@@ -14,12 +14,12 @@ import (
 	"github.com/diogovalentte/homarr-iframes/src/sources"
 )
 
+var backgroundImageURL = "https://avatars.githubusercontent.com/u/135248736?s=280&v=4"
+
 type Linkwarden struct {
 	Address string
 	Token   string
 }
-
-var backgroundImageURL = "https://avatars.githubusercontent.com/u/135248736?s=280&v=4"
 
 func (l *Linkwarden) Init() error {
 	address := config.GlobalConfigs.LinkwardenConfigs.Address
@@ -86,7 +86,7 @@ func (l *Linkwarden) GetiFrame(c *gin.Context) {
 
 	var html []byte
 	if len(res) < 1 {
-		html = sources.GetBaseNoItemsToShowiFrame("links", "#555", backgroundImageURL, theme)
+		html = sources.GetBaseNothingToShowiFrame("No links to show", "#555", backgroundImageURL, theme)
 	} else {
 		html, err = getLinksiFrame(l.Address, res, theme)
 		if err != nil {

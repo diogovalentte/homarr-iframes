@@ -2,7 +2,9 @@ package sources
 
 import "fmt"
 
-func GetBaseNoItemsToShowiFrame(itemName, textColor, backgroundImageURL, theme string) []byte {
+// GetBaseNothingToShowiFrame returns an HTML code for when there is nothing to show
+// The template is a background image with some message
+func GetBaseNothingToShowiFrame(textContent, textColor, backgroundImageURL, theme string) []byte {
 	html := `
 <!DOCTYPE html>
 <html lang="en">
@@ -17,6 +19,7 @@ func GetBaseNoItemsToShowiFrame(itemName, textColor, backgroundImageURL, theme s
         display: flex;
         justify-content: center;
         align-items: center;
+        text-align: center;
         height: 100vh;
         background-color: %s;
     }
@@ -40,12 +43,13 @@ func GetBaseNoItemsToShowiFrame(itemName, textColor, backgroundImageURL, theme s
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
         font-weight: bold;
         font-size: 3rem;
+        margin: 30px;
     }
 </style>
 </head>
 <body>
     <div class="background-image"></div>
-    <div class="text">No %s to show</div>
+    <div class="text">%s</div>
 </body>
 </html>
     `
@@ -53,7 +57,7 @@ func GetBaseNoItemsToShowiFrame(itemName, textColor, backgroundImageURL, theme s
 	if theme == "dark" {
 		backgroundColor = "#25262b"
 	}
-	html = fmt.Sprintf(html, backgroundColor, backgroundImageURL, textColor, itemName)
+	html = fmt.Sprintf(html, backgroundColor, backgroundImageURL, textColor, textContent)
 
 	return []byte(html)
 }
