@@ -1,0 +1,146 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/health": {
+            "get": {
+                "description": "Returns status OK",
+                "produces": [
+                    "text/plain"
+                ],
+                "summary": "Health check route",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/iframe/cinemark": {
+            "get": {
+                "description": "Returns an iFrame with the Cinemark movies in theaters for a city from Brazil.",
+                "produces": [
+                    "text/html"
+                ],
+                "summary": "Cinemark Brazil iFrame",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "sao-paulo",
+                        "description": "City to get movies from. First, check if the Cinemark site has a page for this city, if it doesn't, it'll return the page of São Paulo by default. Go to https://cinemark.com.br/rio-de-janeiro/filmes/em-cartaz and select your city. Then grab the city name on the URL.",
+                        "name": "city",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "716%2C690%2C699",
+                        "description": "Thaters' IDs to get movies from. You can find the filter keywords by going to your city page, like https://cinemark.com.br/sao-paulo/filmes/em-cartaz, clicking to filter by theater, and then grabbing the filters in the URL. The filter is the theaters' IDs separated by **%2C**. For example, in the URL https://cinemark.com.br/sao-paulo/filmes/em-cartaz?cinema=716%2C690%2C699 we have the IDs 716, 690, and 699. You have to pass the text `716%2C690%2C699` to the API!",
+                        "name": "theaters",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "light",
+                        "description": "Homarr theme, defaults to light.",
+                        "name": "theme",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 5,
+                        "description": "Limits the number of items in the iFrame.",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/iframe/linkwarden": {
+            "get": {
+                "description": "Returns an iFrame with Linkwarden bookmarks.",
+                "produces": [
+                    "text/html"
+                ],
+                "summary": "Linkwarden  bookmarks iFrame",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "description": "Get bookmarks only from this collection. You can get the collection ID by going to the collection page. The ID should be on the URL. The ID of the default collection **Unorganized** is 1 because the URL is https://domain.com/collections/1.",
+                        "name": "collectionId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "light",
+                        "description": "Homarr theme, defaults to light.",
+                        "name": "theme",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 5,
+                        "description": "Limits the number of items in the iFrame.",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/iframe/vikunja": {
+            "get": {
+                "description": "Returns an iFrame with Vikunja tasks.",
+                "produces": [
+                    "text/html"
+                ],
+                "summary": "Vikunja tasks iFrame",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "light",
+                        "description": "Homarr theme, defaults to light.",
+                        "name": "theme",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 5,
+                        "description": "Limits the number of items in the iFrame.",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
