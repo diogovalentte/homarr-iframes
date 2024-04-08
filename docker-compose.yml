@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  homarr-iframes:
+    container_name: homarr-iframes
+    image: ghcr.io/diogovalentte/homarr-iframes:latest
+    user: 1000:1000
+    environment:
+      - LINKWARDEN_ADDRESS=${LINKWARDEN_ADDRESS:-}
+      - LINKWARDEN_TOKEN=${LINKWARDEN_TOKEN:-}
+
+      - VIKUNJA_ADDRESS=${VIKUNJA_ADDRESS:-}
+      - VIKUNJA_USERNAME=${VIKUNJA_USERNAME:-}
+      - VIKUNJA_PASSWORD=${VIKUNJA_PASSWORD:-}
+    ports:
+      - 8080:8080
+    restart: on-failure
