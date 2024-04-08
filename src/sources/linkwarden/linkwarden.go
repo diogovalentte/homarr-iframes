@@ -152,7 +152,7 @@ func getLinksiFrame(linkwardenAddress string, links []*Link, theme string) ([]by
         }
 
         .background-image {
-            background-position: 50% 47%;
+            background-position: 50% 47.2%;
             background-size: cover;
             position: absolute;
             filter: brightness(0.3);
@@ -191,14 +191,6 @@ func getLinksiFrame(linkwardenAddress string, links []*Link, theme string) ([]by
 
         .link-name:hover {
             text-decoration: underline;
-        }
-
-        .more-info-container {
-            display: flex;
-            flex-direction: column;
-            margin-left: auto;
-            margin-right: 10px;
-            width: 160px;
         }
 
         .info-label {
