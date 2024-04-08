@@ -56,7 +56,7 @@ func (_ *Cinemark) GetiFrame(c *gin.Context) {
 
 	var html []byte
 	if len(movies) < 1 {
-		html = sources.GetBaseNothingToShowiFrame("Nenhum filme para mostrar", "rgb(230, 101, 101)", backgroundImageURL, theme)
+		html = sources.GetBaseNothingToShowiFrame(theme, backgroundImageURL, "center", "cover", "0.3")
 	} else {
 		html, err = getMoviesiFrame(movies, theme)
 		if err != nil {

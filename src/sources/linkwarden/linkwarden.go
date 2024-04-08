@@ -86,7 +86,7 @@ func (l *Linkwarden) GetiFrame(c *gin.Context) {
 
 	var html []byte
 	if len(res) < 1 {
-		html = sources.GetBaseNothingToShowiFrame("No links to show", "#555", backgroundImageURL, theme)
+		html = sources.GetBaseNothingToShowiFrame(theme, backgroundImageURL, "center", "cover", "0.3")
 	} else {
 		html, err = getLinksiFrame(l.Address, res, theme)
 		if err != nil {
