@@ -43,7 +43,7 @@ func (l *Linkwarden) GetiFrame(c *gin.Context) {
 	if theme == "" {
 		theme = "light"
 	} else if theme != "dark" && theme != "light" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "theme must be 'dark' or 'light'"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "theme must be 'dark' or 'light'"})
 		return
 	}
 
@@ -55,7 +55,7 @@ func (l *Linkwarden) GetiFrame(c *gin.Context) {
 	} else {
 		limit, err = strconv.Atoi(queryLimit)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "limit must be a number"})
+			c.JSON(http.StatusBadRequest, gin.H{"message": "limit must be a number"})
 		}
 	}
 
@@ -70,13 +70,13 @@ func (l *Linkwarden) GetiFrame(c *gin.Context) {
 	links := map[string][]*Link{}
 	err = baseRequest(url, &links)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, fmt.Errorf("Error while doing API request: %s", err.Error()))
+		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("Error while doing API request: %s", err.Error())})
 		return
 	}
 
 	res, exists := links["response"]
 	if !exists {
-		c.JSON(http.StatusInternalServerError, fmt.Errorf("No 'reponse' field in API response"))
+		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("No 'reponse' field in API response")})
 		return
 	}
 
@@ -90,7 +90,7 @@ func (l *Linkwarden) GetiFrame(c *gin.Context) {
 	} else {
 		html, err = getLinksiFrame(l.Address, res, theme)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, fmt.Errorf("Couldn't create HTML code: %s", err.Error()))
+			c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("Couldn't create HTML code: %s", err.Error())})
 			return
 		}
 	}

@@ -21,7 +21,7 @@ type Cinemark struct{}
 func (_ *Cinemark) GetiFrame(c *gin.Context) {
 	city := c.Query("city")
 	if city == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "city is required"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "city is required"})
 		return
 	}
 
@@ -33,7 +33,7 @@ func (_ *Cinemark) GetiFrame(c *gin.Context) {
 	} else {
 		limit, err = strconv.Atoi(queryLimit)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "limit must be a number"})
+			c.JSON(http.StatusBadRequest, gin.H{"message": "limit must be a number"})
 		}
 	}
 
@@ -43,14 +43,14 @@ func (_ *Cinemark) GetiFrame(c *gin.Context) {
 	if theme == "" {
 		theme = "light"
 	} else if theme != "dark" && theme != "light" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "theme must be 'dark' or 'light'"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "theme must be 'dark' or 'light'"})
 		return
 	}
 
 	scraper := Scraper{}
 	movies, err := scraper.GetInTheatersMovies(city, limit, theaters)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -60,7 +60,7 @@ func (_ *Cinemark) GetiFrame(c *gin.Context) {
 	} else {
 		html, err = getMoviesiFrame(movies, theme)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, fmt.Errorf("Couldn't create HTML code: %s", err.Error()))
+			c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("Couldn't create HTML code: %s", err.Error())})
 			return
 		}
 	}

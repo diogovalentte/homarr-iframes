@@ -22,7 +22,7 @@ func LinkwardenHandler(c *gin.Context) {
 	l := linkwarden.Linkwarden{}
 	err := l.Init()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"response": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 	}
 	l.GetiFrame(c)
 }
