@@ -19,9 +19,8 @@ type linkwardenConfigs struct {
 }
 
 type vikunjaConfigs struct {
-	Address  string
-	Username string
-	Password string
+	Address string
+	Token   string
 }
 
 func SetConfigs(filePath string) error {
@@ -36,8 +35,7 @@ func SetConfigs(filePath string) error {
 	GlobalConfigs.LinkwardenConfigs.Token = os.Getenv("LINKWARDEN_TOKEN")
 
 	GlobalConfigs.VikunjaConfigs.Address = os.Getenv("VIKUNJA_ADDRESS")
-	GlobalConfigs.VikunjaConfigs.Username = os.Getenv("VIKUNJA_USERNAME")
-	GlobalConfigs.VikunjaConfigs.Password = os.Getenv("VIKUNJA_PASSWORD")
+	GlobalConfigs.VikunjaConfigs.Token = os.Getenv("VIKUNJA_TOKEN")
 
 	return nil
 }

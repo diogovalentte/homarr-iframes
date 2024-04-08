@@ -17,17 +17,15 @@ import (
 var backgroundImageURL = "https://vikunja.io/images/vikunja.png"
 
 type Vikunja struct {
-	Address  string
-	Username string
-	Password string
+	Address string
+	Token   string
 }
 
 func (v *Vikunja) Init() error {
 	address := config.GlobalConfigs.VikunjaConfigs.Address
-	username := config.GlobalConfigs.VikunjaConfigs.Username
-	password := config.GlobalConfigs.VikunjaConfigs.Password
-	if address == "" || username == "" || password == "" {
-		return fmt.Errorf("VIKUNJA_ADDRESS, VIKUNJA_USERNAME, and VIKUNJA_PASSWORD variables should be set")
+	token := config.GlobalConfigs.VikunjaConfigs.Token
+	if address == "" || token == "" {
+		return fmt.Errorf("VIKUNJA_ADDRESS and VIKUNJA_TOKEN variables should be set")
 	}
 
 	if strings.HasSuffix(address, "/") {
@@ -35,8 +33,7 @@ func (v *Vikunja) Init() error {
 	}
 
 	v.Address = address
-	v.Username = username
-	v.Password = password
+	v.Token = token
 
 	return nil
 }
