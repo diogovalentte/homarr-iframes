@@ -64,4 +64,4 @@ go run main.go
 
 # IMPORTANT!
 
-- This API doesn't have any authentication system, so anyone who can access the API will be able to get all information from all sources, links your Vikunja tasks, Linkwarden bookmarks, etc. You can add an authentication portal like [Authelia](https://github.com/authelia/authelia) or [Authentik}(https://github.com/goauthentik/authentik) in front of the API to secure it, this is how I do it.
+- This API doesn't have any authentication system, so anyone who can access the API will be able to get all information from all sources, like your Vikunja tasks, Linkwarden bookmarks, etc. You can add an authentication portal like [Authelia](https://github.com/authelia/authelia) or [Authentik](https://github.com/goauthentik/authentik) in front of the API to secure it, this is how I do it.
