@@ -229,10 +229,10 @@ func getLinksiFrame(linkwardenAddress string, links []*Link, theme string) ([]by
             {{ end }}
 
             <div>
+                <span style="margin-right: 7px;" class="info-label"><i class="fa-solid fa-calendar-days"></i> {{ .CreatedAt.Format "Jan 2, 2006" }}</span>
                 {{ if .CollectionID }}
-                    <a href="LINKWARDEN-ADDRESS/collections/{{ .CollectionID }}" target="_blank" class="info-label" style="margin-right: 7px;"><i style="color: {{ .Collection.Color }};" class="fa-solid fa-folder-closed"></i> {{ .Collection.Name }}</a>
+                    <a href="LINKWARDEN-ADDRESS/collections/{{ .CollectionID }}" target="_blank" class="info-label"><i style="color: {{ .Collection.Color }};" class="fa-solid fa-folder-closed"></i> {{ .Collection.Name }}</a>
                 {{ end }}
-                <span class="info-label"><i class="fa-solid fa-calendar-days"></i> {{ .CreatedAt.Format "Jan 2, 2006" }}</span>
             </div>
         </div>
 
