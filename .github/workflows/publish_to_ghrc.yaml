@@ -1,0 +1,14 @@
+name: Docker Image CI for GHCR
+
+on: push
+
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build and push image
+        run: |
+          docker login --username diogovalentte --password ${{ secrets.GH_TOKEN }} ghcr.io
+          docker build . --tag ghcr.io/diogovalentte/homarr-iframes:latest
+          docker push ghcr.io/diogovalentte/homarr-iframes:latest
