@@ -243,7 +243,9 @@ func getMoviesiFrame(movies []Movie, theme string) ([]byte, error) {
                     <div class="movie-label">{{ .Label }}</div>
                 {{end}}
 
-                <div style="background-color: {{ .AgeRatingColor }}" class="movie-age-rating">{{ .AgeRating }}</div>
+                {{ if .AgeRating }}
+                    <div style="background-color: {{ .AgeRatingColor }}" class="movie-age-rating">{{ .AgeRating }}</div>
+                {{ end }}
             </div>
 
         </div>
