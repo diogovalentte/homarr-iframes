@@ -131,10 +131,10 @@ func getLinksiFrame(linkwardenAddress string, links []*Link, theme string) ([]by
             background-color: LINKS-CONTAINER-BACKGROUND-COLOR;
             margin: 0;
             padding: 0;
+            width: calc(100% - 3px);
         }
 
         .links-container {
-            width: calc(100% - LINKS-CONTAINER-WIDTHpx);
             height: 84px;
 
             position: relative;
@@ -236,18 +236,11 @@ func getLinksiFrame(linkwardenAddress string, links []*Link, theme string) ([]by
             </div>
         </div>
 
-
     </div>
 {{ end }}
 </body>
 </html>
 	`
-	// Set the container width based on the number of links for better fitting with Homarr
-	containerWidth := "1.6"
-	if len(links) > 3 {
-		containerWidth = "8"
-	}
-
 	// Homarr theme
 	containerBackgroundColor := "#ffffff"
 	scrollbarThumbBackgroundColor := "rgba(209, 219, 227, 1)"
@@ -259,7 +252,6 @@ func getLinksiFrame(linkwardenAddress string, links []*Link, theme string) ([]by
 	}
 
 	html = strings.Replace(html, "LINKWARDEN-ADDRESS", linkwardenAddress, -1)
-	html = strings.Replace(html, "LINKS-CONTAINER-WIDTH", containerWidth, -1)
 	html = strings.Replace(html, "LINKS-CONTAINER-BACKGROUND-COLOR", containerBackgroundColor, -1)
 	html = strings.Replace(html, "LINKS-CONTAINER-BACKGROUND-IMAGE", backgroundImageURL, -1)
 	html = strings.Replace(html, "SCROLLBAR-THUMB-BACKGROUND-COLOR", scrollbarThumbBackgroundColor, -1)

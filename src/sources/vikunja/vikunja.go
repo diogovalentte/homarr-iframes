@@ -115,10 +115,10 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme string) ([]byte,
             background-color: TASKS-CONTAINER-BACKGROUND-COLOR;
             margin: 0;
             padding: 0;
+            width: calc(100% - 3px);
         }
 
         .tasks-container {
-            width: calc(100% - TASKS-CONTAINER-WIDTHpx);
             height: 84px;
 
             position: relative;
@@ -233,12 +233,6 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme string) ([]byte,
 </body>
 </html>
 	`
-	// Set the container width based on the number of tasks for better fitting with Homarr
-	containerWidth := "1.6"
-	if len(tasks) > 3 {
-		containerWidth = "8"
-	}
-
 	// Homarr theme
 	containerBackgroundColor := "#ffffff"
 	scrollbarThumbBackgroundColor := "rgba(209, 219, 227, 1)"
@@ -250,7 +244,6 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme string) ([]byte,
 	}
 
 	html = strings.Replace(html, "VIKUNJA-ADDRESS", vikunjaAddress, -1)
-	html = strings.Replace(html, "TASKS-CONTAINER-WIDTH", containerWidth, -1)
 	html = strings.Replace(html, "TASKS-CONTAINER-BACKGROUND-COLOR", containerBackgroundColor, -1)
 	html = strings.Replace(html, "TASKS-CONTAINER-BACKGROUND-IMAGE", backgroundImageURL, -1)
 	html = strings.Replace(html, "SCROLLBAR-THUMB-BACKGROUND-COLOR", scrollbarThumbBackgroundColor, -1)

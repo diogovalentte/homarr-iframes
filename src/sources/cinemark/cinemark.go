@@ -100,10 +100,10 @@ func getMoviesiFrame(movies []Movie, theme string) ([]byte, error) {
             background-color: MOVIES-CONTAINER-BACKGROUND-COLOR;
             margin: 0;
             padding: 0;
+            width: calc(100% - 3px);
         }
 
         .movies-container {
-            width: calc(100% - MOVIES-CONTAINER-WIDTHpx);
             height: 84px;
 
             position: relative;
@@ -253,12 +253,6 @@ func getMoviesiFrame(movies []Movie, theme string) ([]byte, error) {
 </body>
 </html>
     `
-	// Set the container width based on the number of movies for better fitting with Homarr
-	containerWidth := "1.6"
-	if len(movies) > 3 {
-		containerWidth = "8"
-	}
-
 	// Homarr theme
 	containerBackgroundColor := "#ffffff"
 	scrollbarThumbBackgroundColor := "rgba(209, 219, 227, 1)"
@@ -269,7 +263,6 @@ func getMoviesiFrame(movies []Movie, theme string) ([]byte, error) {
 		scrollbarTrackBackgroundColor = "rgba(37, 40, 53, 1)"
 	}
 
-	html = strings.Replace(html, "MOVIES-CONTAINER-WIDTH", containerWidth, -1)
 	html = strings.Replace(html, "MOVIES-CONTAINER-BACKGROUND-COLOR", containerBackgroundColor, -1)
 	html = strings.Replace(html, "MOVIES-CONTAINER-BACKGROUND-IMAGE", backgroundImageURL, -1)
 	html = strings.Replace(html, "SCROLLBAR-THUMB-BACKGROUND-COLOR", scrollbarThumbBackgroundColor, -1)
