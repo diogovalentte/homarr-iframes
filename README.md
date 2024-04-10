@@ -23,6 +23,11 @@ After starting the API, you can find the API docs under the path `/v1/swagger/in
 
 # How to run:
 
+**For Docker and Docker Compose**: by default, the API will be available on port `8080` and is not accessible by other machines. To be accessible by other machines, you need to run the container in [host network mode](https://docs.docker.com/network/drivers/host/).
+
+- You can change the API port using the environment variable `PORT`.
+  - Depending on the port you choose, you need to run the container with user `root` instead of the user `1000` used in the examples and the `docker-compose.yml` file.
+
 ## Using Docker:
 
 1. Run the latest version:
@@ -64,4 +69,4 @@ go run main.go
 
 # IMPORTANT!
 
-- This API doesn't have any authentication system, so anyone who can access the API will be able to get all information from all sources, like your Vikunja tasks, Linkwarden bookmarks, etc. You can add an authentication portal like [Authelia](https://github.com/authelia/authelia) or [Authentik](https://github.com/goauthentik/authentik) in front of the API to secure it, this is how I do it.
+- This API doesn't have any authentication system, so anyone who can access the API will be able to get all information from the API routes, like your Vikunja tasks, Linkwarden bookmarks, etc. You can add an authentication portal like [Authelia](https://github.com/authelia/authelia) or [Authentik](https://github.com/goauthentik/authentik) in front of the API to secure it, this is how I do it.
