@@ -16,11 +16,13 @@ import (
 
 var backgroundImageURL = "https://vikunja.io/images/vikunja.png"
 
+// Vikunja is the a source
 type Vikunja struct {
 	Address string
 	Token   string
 }
 
+// Init sets the Vikunja properties from the configs
 func (v *Vikunja) Init() error {
 	address := config.GlobalConfigs.VikunjaConfigs.Address
 	token := config.GlobalConfigs.VikunjaConfigs.Token
@@ -38,6 +40,7 @@ func (v *Vikunja) Init() error {
 	return nil
 }
 
+// GetiFrame returns an HTML/CSS code to be used as an iFrame
 func (v *Vikunja) GetiFrame(c *gin.Context) {
 	theme := c.Query("theme")
 	if theme == "" {
@@ -214,6 +217,12 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme string) ([]byte,
                     <span class="info-label"><i class="fa-solid fa-calendar-days"></i> Due: {{ .DueDate.Format "Jan 2, 2006" }}</span>
                 {{ else if not .EndDate.IsZero }}
                     <span class="info-label"><i class="fa-solid fa-calendar-days"></i> End: {{ .EndDate.Format "Jan 2, 2006" }}</span>
+                {{ else if or (ne .RepeatAfter 0) (ne .RepeatMode 0) }}
+                    {{ if or (eq .RepeatMode 0) (eq .RepeatMode 2) }}
+                        <span class="info-label"><i class="fa-solid fa-calendar-days"></i> Repeats every {{ getRepeatAfter .RepeatAfter }}</span>
+                    {{ else if eq .RepeatMode 1 }}
+                        <span class="info-label"><i class="fa-solid fa-calendar-days"></i> Repeats monthly</span>
+                    {{ end }}
                 {{ end }}
 
                 {{ if eq .Priority 3 }}
@@ -249,7 +258,25 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme string) ([]byte,
 	html = strings.Replace(html, "SCROLLBAR-THUMB-BACKGROUND-COLOR", scrollbarThumbBackgroundColor, -1)
 	html = strings.Replace(html, "SCROLLBAR-TRACK-BACKGROUND-COLOR", scrollbarTrackBackgroundColor, -1)
 
-	tmpl := template.Must(template.New("tasks").Parse(html))
+	divideFunc := template.FuncMap{"getRepeatAfter": func(a int) string {
+		hours := float64(a) / 3600
+		if hours != float64(int(hours)) {
+			return fmt.Sprintf("%.1f hours", hours)
+		}
+
+		if hours < 24 {
+			return fmt.Sprintf("%d hours", int(hours))
+		}
+
+		days := hours / 24
+		if days != float64(int(days)) {
+			return fmt.Sprintf("%d hours", int(hours))
+		}
+
+		return fmt.Sprintf("%d days", int(days))
+	}}
+
+	tmpl := template.Must(template.New("tasks").Funcs(divideFunc).Parse(html))
 
 	var buf bytes.Buffer
 	err := tmpl.Execute(&buf, tasks)
