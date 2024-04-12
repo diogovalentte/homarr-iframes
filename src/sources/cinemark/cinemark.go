@@ -208,8 +208,8 @@ func getMoviesiFrame(movies []Movie, theme string) ([]byte, error) {
             display: inline-block;
             padding: 7px 10px;
             margin-right: 20px;
-            width: 42.08px;
-            height: 42.08px;
+            min-width: 42.08px;
+            min-height: 42.08px;
             border-radius: 5px;
             box-sizing: border-box;
 

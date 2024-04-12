@@ -1,6 +1,8 @@
 package cinemark
 
 import (
+	"strings"
+
 	"github.com/gocolly/colly/v2"
 )
 
@@ -30,16 +32,17 @@ func (s *Scraper) resetCollector() {
 }
 
 func getMovieAgeRatingColor(rating string) string {
+	rating = strings.ToUpper(rating)
 	switch rating {
 	case "L":
 		return "#00bb22"
-	case "12":
+	case "12", "A12":
 		return "#edcb0c"
-	case "14":
+	case "14", "A14":
 		return "#f6962d"
-	case "16":
+	case "16", "A16":
 		return "#dd021c"
-	case "18":
+	case "18", "A18":
 		return "#000"
 	default:
 		return "gray"
