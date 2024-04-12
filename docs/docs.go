@@ -58,7 +58,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "example": "light",
-                        "description": "Homarr theme, defaults to light.",
+                        "description": "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white",
                         "name": "theme",
                         "in": "query"
                     },
@@ -98,7 +98,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "example": "light",
-                        "description": "Homarr theme, defaults to light.",
+                        "description": "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white",
                         "name": "theme",
                         "in": "query"
                     },
@@ -131,7 +131,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "example": "light",
-                        "description": "Homarr theme, defaults to light.",
+                        "description": "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white",
                         "name": "theme",
                         "in": "query"
                     },

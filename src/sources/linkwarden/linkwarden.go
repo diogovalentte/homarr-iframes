@@ -76,7 +76,7 @@ func (l *Linkwarden) GetiFrame(c *gin.Context) {
 
 	res, exists := links["response"]
 	if !exists {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("No 'reponse' field in API response")})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("No 'response' field in API response")})
 		return
 	}
 
@@ -106,6 +106,7 @@ func getLinksiFrame(linkwardenAddress string, links []*Link, theme string) ([]by
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="referrer" content="no-referrer"> <!-- If not set, can't load some images when behind a domain or reverse proxy -->
+    <meta name="color-scheme" content="LINKS-CONTAINER-BACKGROUND-COLOR">
     <script src="https://kit.fontawesome.com/3f763b063a.js" crossorigin="anonymous"></script>
     <title>Movie Display Template</title>
     <style>
@@ -128,7 +129,7 @@ func getLinksiFrame(linkwardenAddress string, links []*Link, theme string) ([]by
     </style>
     <style>
         body {
-            background-color: LINKS-CONTAINER-BACKGROUND-COLOR;
+            background: transparent !important;
             margin: 0;
             padding: 0;
             width: calc(100% - 3px);
@@ -242,17 +243,15 @@ func getLinksiFrame(linkwardenAddress string, links []*Link, theme string) ([]by
 </html>
 	`
 	// Homarr theme
-	containerBackgroundColor := "#ffffff"
 	scrollbarThumbBackgroundColor := "rgba(209, 219, 227, 1)"
 	scrollbarTrackBackgroundColor := "#ffffff"
 	if theme == "dark" {
-		containerBackgroundColor = "#25262b"
 		scrollbarThumbBackgroundColor = "#484d64"
 		scrollbarTrackBackgroundColor = "rgba(37, 40, 53, 1)"
 	}
 
 	html = strings.Replace(html, "LINKWARDEN-ADDRESS", linkwardenAddress, -1)
-	html = strings.Replace(html, "LINKS-CONTAINER-BACKGROUND-COLOR", containerBackgroundColor, -1)
+	html = strings.Replace(html, "LINKS-CONTAINER-BACKGROUND-COLOR", theme, -1)
 	html = strings.Replace(html, "LINKS-CONTAINER-BACKGROUND-IMAGE", backgroundImageURL, -1)
 	html = strings.Replace(html, "SCROLLBAR-THUMB-BACKGROUND-COLOR", scrollbarThumbBackgroundColor, -1)
 	html = strings.Replace(html, "SCROLLBAR-TRACK-BACKGROUND-COLOR", scrollbarTrackBackgroundColor, -1)

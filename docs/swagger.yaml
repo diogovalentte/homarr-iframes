@@ -37,7 +37,8 @@ paths:
         in: query
         name: theaters
         type: string
-      - description: Homarr theme, defaults to light.
+      - description: Homarr theme, defaults to light. If it's different from your
+          Homarr theme, the background turns white
         example: light
         in: query
         name: theme
@@ -66,7 +67,8 @@ paths:
         in: query
         name: collectionId
         type: integer
-      - description: Homarr theme, defaults to light.
+      - description: Homarr theme, defaults to light. If it's different from your
+          Homarr theme, the background turns white
         example: light
         in: query
         name: theme
@@ -88,7 +90,8 @@ paths:
     get:
       description: Returns an iFrame with Vikunja tasks.
       parameters:
-      - description: Homarr theme, defaults to light.
+      - description: Homarr theme, defaults to light. If it's different from your
+          Homarr theme, the background turns white
         example: light
         in: query
         name: theme

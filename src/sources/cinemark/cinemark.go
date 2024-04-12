@@ -76,6 +76,7 @@ func getMoviesiFrame(movies []Movie, theme string) ([]byte, error) {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="referrer" content="no-referrer"> <!-- If not set, can't load some images when behind a domain or reverse proxy -->
+    <meta name="color-scheme" content="MOVIES-CONTAINER-BACKGROUND-COLOR">
     <title>Movie Display Template</title>
     <style>
       ::-webkit-scrollbar {
@@ -97,7 +98,7 @@ func getMoviesiFrame(movies []Movie, theme string) ([]byte, error) {
     </style>
     <style>
         body {
-            background-color: MOVIES-CONTAINER-BACKGROUND-COLOR;
+            background: transparent !important;
             margin: 0;
             padding: 0;
             width: calc(100% - 3px);
@@ -256,16 +257,14 @@ func getMoviesiFrame(movies []Movie, theme string) ([]byte, error) {
 </html>
     `
 	// Homarr theme
-	containerBackgroundColor := "#ffffff"
 	scrollbarThumbBackgroundColor := "rgba(209, 219, 227, 1)"
 	scrollbarTrackBackgroundColor := "#ffffff"
 	if theme == "dark" {
-		containerBackgroundColor = "#25262b"
 		scrollbarThumbBackgroundColor = "#484d64"
 		scrollbarTrackBackgroundColor = "rgba(37, 40, 53, 1)"
 	}
 
-	html = strings.Replace(html, "MOVIES-CONTAINER-BACKGROUND-COLOR", containerBackgroundColor, -1)
+	html = strings.Replace(html, "MOVIES-CONTAINER-BACKGROUND-COLOR", theme, -1)
 	html = strings.Replace(html, "MOVIES-CONTAINER-BACKGROUND-IMAGE", backgroundImageURL, -1)
 	html = strings.Replace(html, "SCROLLBAR-THUMB-BACKGROUND-COLOR", scrollbarThumbBackgroundColor, -1)
 	html = strings.Replace(html, "SCROLLBAR-TRACK-BACKGROUND-COLOR", scrollbarTrackBackgroundColor, -1)
