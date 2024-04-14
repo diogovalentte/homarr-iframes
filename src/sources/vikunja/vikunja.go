@@ -59,6 +59,7 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 		limit, err = strconv.Atoi(queryLimit)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"message": "limit must be a number"})
+			return
 		}
 	}
 
