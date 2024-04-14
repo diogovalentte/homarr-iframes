@@ -2,7 +2,8 @@
 
 An API that gets data from multiple sources and creates a nice HTML code to be used in an iFrame (designed to be used in [Homarr](https://github.com/ajnart/homarr)).
 
-The iFrames will be available under the API routes, like `/v1/iframes/linkwarden`. These routes also accept query parameters to change the iFrame HTML, like limiting the number of items or selecting the iFrame theme (light or dark) to match your Homarr dashboard theme.
+The iFrames will be available under the API routes, like `/v1/iframes/linkwarden`. These routes also accept query parameters to change the iFrame HTML, like limiting the number of items or specifing if you want the iFrames to automatically check and update if the source contents change, like adding new bookmarks on Linkwarden.
+
 - You can check all query parameters in the API docs.
 
 # Sources
@@ -23,6 +24,7 @@ The way you provide these environment variables depends on how you run the API.
 After starting the API, you can find the API docs under the path `/v1/swagger/index.html`, like `http://192.168.1.44/v1/swagger/index.html` or `https://sub.domain.com/v1/swagger/index.html`, depending on how you access the API.
 
 # Notes
+
 When you add an iFrame widget in your Homarr dashboard, it's **>your<** web browser that fetches the HTML content from the API and shows it to you, not Homarr. So your browser needs to be able to access the API, that's how an iFrame works.
 
 - **Examples**:
