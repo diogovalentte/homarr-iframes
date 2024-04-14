@@ -12,9 +12,9 @@ import (
 
 func IFrameRoutes(group *gin.RouterGroup) {
 	group = group.Group("/iframe")
-	group.GET("/linkwarden", LinkwardenHandler)
-	group.GET("/cinemark", CinemarkHandler)
-	group.GET("/vikunja", VikunjaHandler)
+	group.GET("/linkwarden", LinkwardeniFrameHandler)
+	group.GET("/cinemark", CinemarkiFrameHandler)
+	group.GET("/vikunja", VikunjaiFrameHandler)
 }
 
 // @Summary Linkwarden  bookmarks iFrame
@@ -24,8 +24,9 @@ func IFrameRoutes(group *gin.RouterGroup) {
 // @Param collectionId query int false "Get bookmarks only from this collection. You can get the collection ID by going to the collection page. The ID should be on the URL. The ID of the default collection **Unorganized** is 1 because the URL is https://domain.com/collections/1." Example(1)
 // @Param theme query string false "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white" Example(light)
 // @Param limit query int false "Limits the number of items in the iFrame." Example(5)
+// @Param api_url query string true "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload." Example(https://sub.domain.com)
 // @Router /iframe/linkwarden [get]
-func LinkwardenHandler(c *gin.Context) {
+func LinkwardeniFrameHandler(c *gin.Context) {
 	l := linkwarden.Linkwarden{}
 	err := l.Init()
 	if err != nil {
@@ -42,8 +43,9 @@ func LinkwardenHandler(c *gin.Context) {
 // @Param theaters query string false "Thaters' IDs to get movies from. You can find the filter keywords by going to your city page, like https://cinemark.com.br/sao-paulo/filmes/em-cartaz, clicking to filter by theater, and then grabbing the filters in the URL. The filter is the theaters' IDs separated by **%2C**. For example, in the URL https://cinemark.com.br/sao-paulo/filmes/em-cartaz?cinema=716%2C690%2C699 we have the IDs 716, 690, and 699. You have to pass the text `716%2C690%2C699` to the API!" Example(716%2C690%2C699)
 // @Param theme query string false "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white" Example(light)
 // @Param limit query int false "Limits the number of items in the iFrame." Example(5)
+// @Param api_url query string true "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload." Example(https://sub.domain.com)
 // @Router /iframe/cinemark [get]
-func CinemarkHandler(c *gin.Context) {
+func CinemarkiFrameHandler(c *gin.Context) {
 	cin := cinemark.Cinemark{}
 	cin.GetiFrame(c)
 }
@@ -54,8 +56,9 @@ func CinemarkHandler(c *gin.Context) {
 // @Produce html
 // @Param theme query string false "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white" Example(light)
 // @Param limit query int false "Limits the number of items in the iFrame." Example(5)
+// @Param api_url query string true "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload." Example(https://sub.domain.com)
 // @Router /iframe/vikunja [get]
-func VikunjaHandler(c *gin.Context) {
+func VikunjaiFrameHandler(c *gin.Context) {
 	v := vikunja.Vikunja{}
 	err := v.Init()
 	if err != nil {

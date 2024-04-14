@@ -12,6 +12,10 @@ type loginResponseBody struct {
 }
 
 // Task represents a Vikunja task
+// ! IMPORTANT !
+// If you add a filed where the value is a pointer,
+// you have to update the Vikunja.GetHash method
+// to set it to nil.
 type Task struct {
 	ID          int       `json:"id"`
 	Title       string    `json:"title"`

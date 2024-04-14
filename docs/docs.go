@@ -15,6 +15,106 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/hash/cinemark": {
+            "get": {
+                "description": "Get the hash of the Cinemark movies. Used by the iFrames to check updates and reload the iframe.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get the hash of the Cinemark movies",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "sao-paulo",
+                        "description": "City to get movies from. First, check if the Cinemark site has a page for this city, if it doesn't, it'll return the page of São Paulo by default. Go to https://cinemark.com.br/rio-de-janeiro/filmes/em-cartaz and select your city. Then grab the city name on the URL.",
+                        "name": "city",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "716%2C690%2C699",
+                        "description": "Thaters' IDs to get movies from. You can find the filter keywords by going to your city page, like https://cinemark.com.br/sao-paulo/filmes/em-cartaz, clicking to filter by theater, and then grabbing the filters in the URL. The filter is the theaters' IDs separated by **%2C**. For example, in the URL https://cinemark.com.br/sao-paulo/filmes/em-cartaz?cinema=716%2C690%2C699 we have the IDs 716, 690, and 699. You have to pass the text ` + "`" + `716%2C690%2C699` + "`" + ` to the API!",
+                        "name": "theaters",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 5,
+                        "description": "Limits the number of items in the iFrame.",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/routes.hashResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/hash/linkwarden": {
+            "get": {
+                "description": "Get the hash of the Linkwarden bookmarks. Used by the iFrames to check updates and reload the iframe.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get the hash of the Linkwarden bookmarks",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "description": "Get bookmarks only from this collection. You can get the collection ID by going to the collection page. The ID should be on the URL. The ID of the default collection **Unorganized** is 1 because the URL is https://domain.com/collections/1.",
+                        "name": "collectionId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 5,
+                        "description": "Limits the number of items in the iFrame.",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/routes.hashResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/hash/vikunja": {
+            "get": {
+                "description": "Get the hash of the Vikunja tasks. Used by the iFrames to check updates and reload the iframe.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get the hash of the Vikunja tasks",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 5,
+                        "description": "Limits the number of items in the iFrame.",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/routes.hashResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/health": {
             "get": {
                 "description": "Returns status OK",
@@ -68,6 +168,14 @@ const docTemplate = `{
                         "description": "Limits the number of items in the iFrame.",
                         "name": "limit",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "https://sub.domain.com",
+                        "description": "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload.",
+                        "name": "api_url",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -108,6 +216,14 @@ const docTemplate = `{
                         "description": "Limits the number of items in the iFrame.",
                         "name": "limit",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "https://sub.domain.com",
+                        "description": "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload.",
+                        "name": "api_url",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -141,6 +257,14 @@ const docTemplate = `{
                         "description": "Limits the number of items in the iFrame.",
                         "name": "limit",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "https://sub.domain.com",
+                        "description": "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload.",
+                        "name": "api_url",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -150,6 +274,16 @@ const docTemplate = `{
                             "type": "string"
                         }
                     }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "routes.hashResponse": {
+            "type": "object",
+            "properties": {
+                "hash": {
+                    "type": "string"
                 }
             }
         }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -63,6 +64,15 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 		}
 	}
 
+	apiURL := c.Query("api_url")
+	if apiURL != "" {
+		_, err = url.ParseRequestURI(apiURL)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "api_url must be a valid URL like 'http://192.168.1.46:8080' or 'https://sub.domain.com'"})
+			return
+		}
+	}
+
 	tasks := []*Task{}
 	if limit != 0 {
 		tasks, err = v.GetTasks(limit)
@@ -76,7 +86,7 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 	if len(tasks) < 1 {
 		html = sources.GetBaseNothingToShowiFrame("#226fff", backgroundImageURL, "center", "cover", "0.3")
 	} else {
-		html, err = getTasksiFrame(v.Address, tasks, theme)
+		html, err = getTasksiFrame(v.Address, tasks, theme, apiURL, limit)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, fmt.Errorf("Couldn't create HTML code: %s", err.Error()))
 			return
@@ -86,7 +96,7 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme string) ([]byte, error) {
+func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, limit int) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -201,6 +211,38 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme string) ([]byte,
             text-decoration: underline;
         }
     </style>
+
+    <script>
+        let lastHash = null;
+
+        async function fetchData() {
+            try {
+                var url = 'API-URL/v1/hash/vikunja?limit=API-LIMIT';
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (lastHash === null) {
+                    lastHash = data.hash;
+                } else {
+                    if (data.hash !== lastHash) {
+                        lastHash = data.hash;
+                        location.reload();
+                    }
+                }
+            } catch (error) {
+                console.error('Error getting last update from the API:', error);
+            }
+        }
+
+        function fetchAndUpdate() {
+            fetchData();
+            setTimeout(fetchAndUpdate, 10000); // 10 seconds
+        }
+
+        fetchAndUpdate();
+        
+    </script>
+
 </head>
 <body>
 {{ range . }}
@@ -252,6 +294,13 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme string) ([]byte,
 		scrollbarTrackBackgroundColor = "rgba(37, 40, 53, 1)"
 	}
 
+	if apiURL != "" {
+		html = strings.Replace(html, "API-URL", apiURL, -1)
+		html = strings.Replace(html, "API-LIMIT", strconv.Itoa(limit), -1)
+	} else {
+		html = strings.Replace(html, "fetchAndUpdate();", "// fetchAndUpdate", -1)
+	}
+
 	html = strings.Replace(html, "VIKUNJA-ADDRESS", vikunjaAddress, -1)
 	html = strings.Replace(html, "TASKS-CONTAINER-BACKGROUND-COLOR", theme, -1)
 	html = strings.Replace(html, "TASKS-CONTAINER-BACKGROUND-IMAGE", backgroundImageURL, -1)
@@ -285,4 +334,47 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme string) ([]byte,
 	}
 
 	return buf.Bytes(), nil
+}
+
+// GetHash returns the hash of the tasks
+func (v *Vikunja) GetHash(c *gin.Context) {
+	queryLimit := c.Query("limit")
+	var limit int
+	var err error
+	if queryLimit == "" {
+		limit = -1
+	} else {
+		limit, err = strconv.Atoi(queryLimit)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "limit must be a number"})
+			return
+		}
+	}
+
+	apiURL := c.Query("api_url")
+	if apiURL != "" {
+		_, err = url.ParseRequestURI(apiURL)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "api_url must be a valid URL like 'http://192.168.1.46:8080' or 'https://sub.domain.com'"})
+			return
+		}
+	}
+
+	pTasks := []*Task{}
+	if limit != 0 {
+		pTasks, err = v.GetTasks(limit)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+			return
+		}
+	}
+
+	var tasks []Task
+	for _, task := range pTasks {
+		tasks = append(tasks, *task)
+	}
+
+	hash := sources.GetHash(tasks)
+
+	c.JSON(http.StatusOK, gin.H{"hash": fmt.Sprintf("%x", hash)})
 }

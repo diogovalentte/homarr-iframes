@@ -1,6 +1,9 @@
 package sources
 
-import "fmt"
+import (
+	"crypto/sha256"
+	"fmt"
+)
 
 // GetBaseNothingToShowiFrame returns an HTML code for when there is nothing to show
 // The template is a background image with some message
@@ -51,4 +54,10 @@ func GetBaseNothingToShowiFrame(backgroundColor, backgroundImageURL, backgroundP
 	html = fmt.Sprintf(html, backgroundColor, backgroundImageURL, backgroundPosition, backgroundSize, brightness)
 
 	return []byte(html)
+}
+
+// GetHash returns a SHA256 hash of a object
+func GetHash(s interface{}) [32]byte {
+	structString := fmt.Sprintf("%v", s)
+	return sha256.Sum256([]byte(structString))
 }

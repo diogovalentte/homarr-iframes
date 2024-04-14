@@ -26,6 +26,9 @@ func SetupRouter() *gin.Engine {
 	{
 		routes.IFrameRoutes(v1)
 	}
+	{
+		routes.HashRoutes(v1)
+	}
 
 	v1.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 

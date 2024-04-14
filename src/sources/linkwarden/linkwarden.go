@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -61,15 +62,24 @@ func (l *Linkwarden) GetiFrame(c *gin.Context) {
 	}
 
 	collectionID := c.Query("collectionId")
-	var url string
+	var linkwardenURL string
 	if collectionID != "" {
-		url = l.Address + "/api/v1/links?collectionId=" + collectionID
+		linkwardenURL = l.Address + "/api/v1/links?collectionId=" + collectionID
 	} else {
-		url = l.Address + "/api/v1/links"
+		linkwardenURL = l.Address + "/api/v1/links"
+	}
+
+	apiURL := c.Query("api_url")
+	if apiURL != "" {
+		_, err = url.ParseRequestURI(apiURL)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "api_url must be a valid URL like 'http://192.168.1.46:8080' or 'https://sub.domain.com'"})
+			return
+		}
 	}
 
 	links := map[string][]*Link{}
-	err = baseRequest(url, &links)
+	err = baseRequest(linkwardenURL, &links)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("Error while doing API request: %s", err.Error())})
 		return
@@ -89,7 +99,7 @@ func (l *Linkwarden) GetiFrame(c *gin.Context) {
 	if len(res) < 1 {
 		html = sources.GetBaseNothingToShowiFrame(theme, backgroundImageURL, "center", "cover", "0.3")
 	} else {
-		html, err = getLinksiFrame(l.Address, res, theme)
+		html, err = getLinksiFrame(l.Address, res, theme, apiURL, collectionID, limit)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("Couldn't create HTML code: %s", err.Error())})
 			return
@@ -99,7 +109,7 @@ func (l *Linkwarden) GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func getLinksiFrame(linkwardenAddress string, links []*Link, theme string) ([]byte, error) {
+func getLinksiFrame(linkwardenAddress string, links []*Link, theme, apiURL, collectionId string, limit int) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -212,6 +222,38 @@ func getLinksiFrame(linkwardenAddress string, links []*Link, theme string) ([]by
             text-decoration: underline;
         }
     </style>
+
+    <script>
+        let lastHash = null;
+
+        async function fetchData() {
+            try {
+                var url = 'API-URL/v1/hash/linkwarden?limit=API-LIMIT&collectionId=API-COLLECTION-ID';
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (lastHash === null) {
+                    lastHash = data.hash;
+                } else {
+                    if (data.hash !== lastHash) {
+                        lastHash = data.hash;
+                        location.reload();
+                    }
+                }
+            } catch (error) {
+                console.error('Error getting last update from the API:', error);
+            }
+        }
+
+        function fetchAndUpdate() {
+            fetchData();
+            setTimeout(fetchAndUpdate, 10000); // 10 seconds
+        }
+
+        fetchAndUpdate();
+        
+    </script>
+
 </head>
 <body>
 {{ range . }}
@@ -251,6 +293,14 @@ func getLinksiFrame(linkwardenAddress string, links []*Link, theme string) ([]by
 		scrollbarTrackBackgroundColor = "rgba(37, 40, 53, 1)"
 	}
 
+	if apiURL != "" {
+		html = strings.Replace(html, "API-URL", apiURL, -1)
+		html = strings.Replace(html, "API-LIMIT", strconv.Itoa(limit), -1)
+		html = strings.Replace(html, "API-COLLECTION-ID", collectionId, -1)
+	} else {
+		html = strings.Replace(html, "fetchAndUpdate();", "// fetchAndUpdate", -1)
+	}
+
 	html = strings.Replace(html, "LINKWARDEN-ADDRESS", linkwardenAddress, -1)
 	html = strings.Replace(html, "LINKS-CONTAINER-BACKGROUND-COLOR", theme, -1)
 	html = strings.Replace(html, "LINKS-CONTAINER-BACKGROUND-IMAGE", backgroundImageURL, -1)
@@ -266,4 +316,58 @@ func getLinksiFrame(linkwardenAddress string, links []*Link, theme string) ([]by
 	}
 
 	return buf.Bytes(), nil
+}
+
+// GetHash returns the hash of the bookmarks
+func (l *Linkwarden) GetHash(c *gin.Context) {
+	queryLimit := c.Query("limit")
+	var limit int
+	var err error
+	if queryLimit == "" {
+		limit = -1
+	} else {
+		limit, err = strconv.Atoi(queryLimit)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "limit must be a number"})
+			return
+		}
+	}
+
+	collectionID := c.Query("collectionId")
+	var url string
+	if collectionID != "" {
+		url = l.Address + "/api/v1/links?collectionId=" + collectionID
+	} else {
+		url = l.Address + "/api/v1/links"
+	}
+
+	linksMap := map[string][]*Link{}
+	err = baseRequest(url, &linksMap)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("Error while doing API request: %s", err.Error())})
+		return
+	}
+
+	res, exists := linksMap["response"]
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("No 'response' field in API response")})
+		return
+	}
+
+	if limit >= 0 {
+		res = res[:limit]
+	}
+
+	var links []Link
+	for _, link := range res {
+		// Set all fields where the value is a pointer to nil
+		link.Description = nil
+		link.CollectionID = nil
+		link.Collection = nil
+		links = append(links, *link)
+	}
+
+	hash := sources.GetHash(links)
+
+	c.JSON(http.StatusOK, gin.H{"hash": fmt.Sprintf("%x", hash)})
 }
