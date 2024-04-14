@@ -13,6 +13,11 @@ services:
       - VIKUNJA_ADDRESS=${VIKUNJA_ADDRESS:-}
       - VIKUNJA_USERNAME=${VIKUNJA_USERNAME:-}
       - VIKUNJA_PASSWORD=${VIKUNJA_PASSWORD:-}
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
     ports:
       - 8080:8080
     restart: on-failure
