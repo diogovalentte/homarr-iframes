@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -258,9 +259,9 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
                 <span class="info-label"><i class="fa-solid fa-calendar-days"></i> Created: {{ .CreatedAt.Format "Jan 2, 2006" }}</span>
 
                 {{ if not .DueDate.IsZero }}
-                    <span class="info-label"><i class="fa-solid fa-calendar-days"></i> Due: {{ .DueDate.Format "Jan 2, 2006" }}</span>
+                    <span class="info-label" style="color: {{ getTimeColor .DueDate }};"><i class="fa-solid fa-calendar-days"></i> Due: {{ .DueDate.Format "Jan 2, 2006" }}</span>
                 {{ else if not .EndDate.IsZero }}
-                    <span class="info-label"><i class="fa-solid fa-calendar-days"></i> End: {{ .EndDate.Format "Jan 2, 2006" }}</span>
+                    <span class="info-label" style="color: {{ getTimeColor .EndDate }};"><i class="fa-solid fa-calendar-days"></i> End: {{ .EndDate.Format "Jan 2, 2006" }}</span>
                 {{ else if or (ne .RepeatAfter 0) (ne .RepeatMode 0) }}
                     {{ if or (eq .RepeatMode 0) (eq .RepeatMode 2) }}
                         <span class="info-label"><i class="fa-solid fa-calendar-days"></i> Repeats every {{ getRepeatAfter .RepeatAfter }}</span>
@@ -307,23 +308,35 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
 	html = strings.Replace(html, "SCROLLBAR-THUMB-BACKGROUND-COLOR", scrollbarThumbBackgroundColor, -1)
 	html = strings.Replace(html, "SCROLLBAR-TRACK-BACKGROUND-COLOR", scrollbarTrackBackgroundColor, -1)
 
-	divideFunc := template.FuncMap{"getRepeatAfter": func(a int) string {
-		hours := float64(a) / 3600
-		if hours != float64(int(hours)) {
-			return fmt.Sprintf("%.1f hours", hours)
-		}
+	divideFunc := template.FuncMap{
+		"getRepeatAfter": func(a int) string {
+			hours := float64(a) / 3600
+			if hours != float64(int(hours)) {
+				return fmt.Sprintf("%.1f hours", hours)
+			}
 
-		if hours < 24 {
-			return fmt.Sprintf("%d hours", int(hours))
-		}
+			if hours < 24 {
+				return fmt.Sprintf("%d hours", int(hours))
+			}
 
-		days := hours / 24
-		if days != float64(int(days)) {
-			return fmt.Sprintf("%d hours", int(hours))
-		}
+			days := hours / 24
+			if days != float64(int(days)) {
+				return fmt.Sprintf("%d hours", int(hours))
+			}
 
-		return fmt.Sprintf("%d days", int(days))
-	}}
+			return fmt.Sprintf("%d days", int(days))
+		},
+		"getTimeColor": func(t time.Time) string {
+			if t.Before(time.Now()) {
+				return "#ff4136"
+			}
+			if sources.IsToday(t) {
+				return "#ff851b"
+			}
+
+			return "#99b6bb"
+		},
+	}
 
 	tmpl := template.Must(template.New("tasks").Funcs(divideFunc).Parse(html))
 

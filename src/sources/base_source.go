@@ -3,6 +3,7 @@ package sources
 import (
 	"crypto/sha256"
 	"fmt"
+	"time"
 )
 
 // GetBaseNothingToShowiFrame returns an HTML code for when there is nothing to show
@@ -60,4 +61,11 @@ func GetBaseNothingToShowiFrame(backgroundColor, backgroundImageURL, backgroundP
 func GetHash(s interface{}) [32]byte {
 	structString := fmt.Sprintf("%v", s)
 	return sha256.Sum256([]byte(structString))
+}
+
+// IsToday returns true if the date is today
+func IsToday(date time.Time) bool {
+	now := time.Now()
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	return date.After(today) && date.Before(today.Add(24*time.Hour))
 }
