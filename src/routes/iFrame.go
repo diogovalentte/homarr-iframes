@@ -7,6 +7,7 @@ import (
 
 	"github.com/diogovalentte/homarr-iframes/src/sources/cinemark"
 	"github.com/diogovalentte/homarr-iframes/src/sources/linkwarden"
+	uptimekuma "github.com/diogovalentte/homarr-iframes/src/sources/uptime-kuma"
 	"github.com/diogovalentte/homarr-iframes/src/sources/vikunja"
 )
 
@@ -15,6 +16,7 @@ func IFrameRoutes(group *gin.RouterGroup) {
 	group.GET("/linkwarden", LinkwardeniFrameHandler)
 	group.GET("/cinemark", CinemarkiFrameHandler)
 	group.GET("/vikunja", VikunjaiFrameHandler)
+	group.GET("/uptimekuma", UptimeKumaiFrameHandler)
 }
 
 // @Summary Linkwarden  bookmarks iFrame
@@ -65,4 +67,21 @@ func VikunjaiFrameHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 	}
 	v.GetiFrame(c)
+}
+
+// @Summary Uptime Kuma iFrame
+// @Description Returns an iFrame with Uptime Kuma sites overview.
+// @Success 200 {string} string "HTML content"
+// @Produce html
+// @Param slug query string true "You need to create a status page in Uptime Kuma and select which sites/services this status page will show. While creating the status page, it'll request **you** to create a slug, after creating the status page, provide this slug here. This iFrame will show data only of the sites/services of this specific status page!" Example(uptime-kuma-slug)
+// @Param theme query string false "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white" Example(light)
+// @Param api_url query string true "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload." Example(https://sub.domain.com)
+// @Router /iframe/uptimekuma [get]
+func UptimeKumaiFrameHandler(c *gin.Context) {
+	u := uptimekuma.UptimeKuma{}
+	err := u.Init()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+	}
+	u.GetiFrame(c)
 }

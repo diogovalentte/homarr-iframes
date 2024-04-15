@@ -236,6 +236,48 @@ const docTemplate = `{
                 }
             }
         },
+        "/iframe/uptimekuma": {
+            "get": {
+                "description": "Returns an iFrame with Uptime Kuma sites overview.",
+                "produces": [
+                    "text/html"
+                ],
+                "summary": "Uptime Kuma iFrame",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "uptime-kuma-slug",
+                        "description": "You need to create a status page in Uptime Kuma and select which sites/services this status page will show. While creating the status page, it'll request **you** to create a slug, after creating the status page, provide this slug here. This iFrame will show data only of the sites/services of this specific status page!",
+                        "name": "slug",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "light",
+                        "description": "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white",
+                        "name": "theme",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "https://sub.domain.com",
+                        "description": "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload.",
+                        "name": "api_url",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/iframe/vikunja": {
             "get": {
                 "description": "Returns an iFrame with Vikunja tasks.",

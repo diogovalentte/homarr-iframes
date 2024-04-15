@@ -11,6 +11,7 @@ var GlobalConfigs Configs
 type Configs struct {
 	LinkwardenConfigs linkwardenConfigs
 	VikunjaConfigs    vikunjaConfigs
+	UptimeKumaConfigs uptimeKumaConfigs
 }
 
 type linkwardenConfigs struct {
@@ -21,6 +22,10 @@ type linkwardenConfigs struct {
 type vikunjaConfigs struct {
 	Address string
 	Token   string
+}
+
+type uptimeKumaConfigs struct {
+	Address string
 }
 
 func SetConfigs(filePath string) error {
@@ -36,6 +41,8 @@ func SetConfigs(filePath string) error {
 
 	GlobalConfigs.VikunjaConfigs.Address = os.Getenv("VIKUNJA_ADDRESS")
 	GlobalConfigs.VikunjaConfigs.Token = os.Getenv("VIKUNJA_TOKEN")
+
+	GlobalConfigs.UptimeKumaConfigs.Address = os.Getenv("UPTIMEKUMA_ADDRESS")
 
 	return nil
 }
