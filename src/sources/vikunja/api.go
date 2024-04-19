@@ -1,10 +1,12 @@
 package vikunja
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 )
 
 // GetTasks get not done tasks with using a custom ordering.
@@ -16,7 +18,7 @@ func (v *Vikunja) GetTasks(limit int) ([]*Task, error) {
 	if limit > 0 {
 		path = path + fmt.Sprintf("&per_page=%d", limit)
 	}
-	err := v.baseRequest(v.Address+path, &target)
+	err := v.baseRequest("GET", v.Address+path, nil, &target)
 	if err != nil {
 		return nil, err
 	}
@@ -24,14 +26,32 @@ func (v *Vikunja) GetTasks(limit int) ([]*Task, error) {
 	return target, err
 }
 
-func (v *Vikunja) baseRequest(url string, target interface{}) error {
+func (v *Vikunja) SetTaskDone(taskId int) error {
+	path := "/api/v1/tasks/" + strconv.Itoa(taskId)
+	body := []byte(`{"done": true}`)
+	task := &Task{}
+
+	err := v.baseRequest("POST", v.Address+path, bytes.NewBuffer(body), task)
+	if err != nil {
+		return err
+	}
+
+	if task.Done != true {
+		return fmt.Errorf("task not done")
+	}
+
+	return nil
+}
+
+func (v *Vikunja) baseRequest(method, url string, body io.Reader, target interface{}) error {
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return fmt.Errorf("error creating request: %w", err)
 	}
 
 	req.Header.Set("Authorization", "Bearer "+v.Token)
+	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -43,13 +63,13 @@ func (v *Vikunja) baseRequest(url string, target interface{}) error {
 		return fmt.Errorf("error: %s", resp.Status)
 	}
 
-	body, err := io.ReadAll(resp.Body)
+	resBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("error reading response body: %w", err)
 	}
 
-	if err := json.Unmarshal(body, target); err != nil {
-		return fmt.Errorf("error unmarshaling JSON: %s\nreponse text: %s", err.Error(), string(body))
+	if err := json.Unmarshal(resBody, target); err != nil {
+		return fmt.Errorf("error unmarshaling JSON: %s\nreponse text: %s", err.Error(), string(resBody))
 	}
 
 	return nil

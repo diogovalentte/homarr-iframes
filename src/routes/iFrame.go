@@ -2,6 +2,7 @@ package routes
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 
@@ -15,6 +16,7 @@ func IFrameRoutes(group *gin.RouterGroup) {
 	group.GET("/linkwarden", LinkwardeniFrameHandler)
 	group.GET("/cinemark", CinemarkiFrameHandler)
 	group.GET("/vikunja", VikunjaiFrameHandler)
+	group.PATCH("/vikunja/set_task_done", VikunjaSetTaskDoneHandler)
 }
 
 // @Summary Linkwarden  bookmarks iFrame
@@ -56,7 +58,7 @@ func CinemarkiFrameHandler(c *gin.Context) {
 // @Produce html
 // @Param theme query string false "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white" Example(light)
 // @Param limit query int false "Limits the number of items in the iFrame." Example(5)
-// @Param api_url query string true "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload." Example(https://sub.domain.com)
+// @Param api_url query string true "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload. Also used by the button to set the task done, if not provided, the button will not appear." Example(https://sub.domain.com)
 // @Router /iframe/vikunja [get]
 func VikunjaiFrameHandler(c *gin.Context) {
 	v := vikunja.Vikunja{}
@@ -65,4 +67,39 @@ func VikunjaiFrameHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 	}
 	v.GetiFrame(c)
+}
+
+// @Summary Set Vikunja task done
+// @Description Set a Vikunja task as done.
+// @Success 200 {object} messsageResponse "Task done"
+// @Produce json
+// @Param task_id query int true "The task ID." Example(1)
+// @Router /iframe/vikunja/set_task_done [patch]
+func VikunjaSetTaskDoneHandler(c *gin.Context) {
+	taskIdStr := c.Query("taskId")
+	if taskIdStr == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "task_id is required"})
+		return
+	}
+
+	taskId, err := strconv.Atoi(taskIdStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "task_id must be an integer"})
+	}
+
+	v := vikunja.Vikunja{}
+	err = v.Init()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+	}
+	err = v.SetTaskDone(taskId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Task done"})
+}
+
+type messsageResponse struct {
+	Message string `json:"message"`
 }

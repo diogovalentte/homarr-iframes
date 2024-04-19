@@ -18,6 +18,7 @@ type loginResponseBody struct {
 // to set it to nil.
 type Task struct {
 	ID          int       `json:"id"`
+	Done        bool      `json:"done"`
 	Title       string    `json:"title"`
 	CreatedAt   time.Time `json:"created"`
 	DueDate     time.Time `json:"due_date"`

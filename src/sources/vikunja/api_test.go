@@ -50,3 +50,20 @@ func TestGetTasks(t *testing.T) {
 		}
 	})
 }
+
+func TestSetTaskDone(t *testing.T) {
+	configs := config.GlobalConfigs
+	v := Vikunja{
+		Address: configs.VikunjaConfigs.Address,
+		Token:   configs.VikunjaConfigs.Token,
+	}
+	taskId := 0
+
+	t.Run("set task done (need to manually set a valid task ID!!!)", func(t *testing.T) {
+		err := v.SetTaskDone(taskId)
+		if err != nil {
+			t.Fatal(err)
+			return
+		}
+	})
+}

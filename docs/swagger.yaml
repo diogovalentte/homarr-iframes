@@ -4,6 +4,11 @@ definitions:
       hash:
         type: string
     type: object
+  routes.messsageResponse:
+    properties:
+      message:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
@@ -206,7 +211,8 @@ paths:
         type: integer
       - description: API URL used by your browser. Use by the iFrames to check any
           update, if there is an update, the iFrame reloads. If not specified, the
-          iFrames will never try to reload.
+          iFrames will never try to reload. Also used by the button to set the task
+          done, if not provided, the button will not appear.
         example: https://sub.domain.com
         in: query
         name: api_url
@@ -220,4 +226,22 @@ paths:
           schema:
             type: string
       summary: Vikunja tasks iFrame
+  /iframe/vikunja/set_task_done:
+    patch:
+      description: Set a Vikunja task as done.
+      parameters:
+      - description: The task ID.
+        example: 1
+        in: query
+        name: task_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Task done
+          schema:
+            $ref: '#/definitions/routes.messsageResponse'
+      summary: Set Vikunja task done
 swagger: "2.0"

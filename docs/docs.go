@@ -261,7 +261,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "example": "https://sub.domain.com",
-                        "description": "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload.",
+                        "description": "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload. Also used by the button to set the task done, if not provided, the button will not appear.",
                         "name": "api_url",
                         "in": "query",
                         "required": true
@@ -276,6 +276,33 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/iframe/vikunja/set_task_done": {
+            "patch": {
+                "description": "Set a Vikunja task as done.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Set Vikunja task done",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "description": "The task ID.",
+                        "name": "task_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Task done",
+                        "schema": {
+                            "$ref": "#/definitions/routes.messsageResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -283,6 +310,14 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "hash": {
+                    "type": "string"
+                }
+            }
+        },
+        "routes.messsageResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
                     "type": "string"
                 }
             }

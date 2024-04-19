@@ -185,14 +185,6 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
             text-decoration: underline;
         }
 
-        .more-info-container {
-            display: flex;
-            flex-direction: column;
-            margin-left: auto;
-            margin-right: 10px;
-            width: 160px;
-        }
-
         .info-label {
             text-decoration: none;
             font-family: ui-sans-serif, system-ui, -apple-system, BtaskMacSystemFont,
@@ -210,6 +202,28 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
 
         a.info-label:hover {
             text-decoration: underline;
+        }
+
+        .set-task-done-container {
+            display: inline-block;
+            background-color: transparent;
+            margin: 20px 20px 20px 10px;
+            border-radius: 5px;
+            width: 70px;
+            text-align: center;
+        }
+
+        .set-task-done-button {
+            color: white;
+            background-color: #04c9b7;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid rgb(4, 201, 183);
+            font-weight: bold;
+        }
+
+        button.set-task-done-button:hover {
+            filter: brightness(0.9)
         }
     </style>
 
@@ -241,7 +255,44 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
         }
 
         fetchAndUpdate();
-        
+    </script>
+
+    <script>
+      function setTaskDone(taskId) {
+        try {
+            var xhr = new XMLHttpRequest();
+            var url = 'API-URL/v1/iframe/vikunja/set_task_done?taskId=' + encodeURIComponent(taskId);
+            xhr.open('PATCH', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+
+            xhr.onload = function () {
+              if (xhr.status >= 200 && xhr.status < 300) {
+                console.log('Request to set task ', taskId, ' as done finished with success:', xhr.responseText);
+                location.reload();
+              } else {
+                console.log('Request to set task ', taskId, ' as done failed:', xhr.responseText);
+                handleSetTaskDoneError("task-" + taskId)
+              }
+            };
+
+            xhr.onerror = function () {
+              console.log('Request to set task ', taskId, ' as done failed:', xhr.responseText);
+              handleSetTaskDoneError("task-" + taskId)
+            };
+
+            xhr.send(null);
+        } catch (error) {
+            console.log('Request to set task ', taskId, ' as done failed:', xhr.responseText);
+            handleSetTaskDoneError("task-" + taskId)
+        }
+      }
+
+      function handleSetTaskDoneError(buttonId) {
+        var button = document.getElementById(buttonId);
+        button.textContent = "ERROR";
+        button.style.backgroundColor = "red";
+        button.style.borderColor = "red";
+      }
     </script>
 
 </head>
@@ -282,6 +333,8 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
 
         </div>
 
+TASK-DONE-BUTTON
+
     </div>
 {{ end }}
 </body>
@@ -298,8 +351,15 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
 	if apiURL != "" {
 		html = strings.Replace(html, "API-URL", apiURL, -1)
 		html = strings.Replace(html, "API-LIMIT", strconv.Itoa(limit), -1)
+		taskDoneButtonHTML := `
+        <div class="set-task-done-container">
+            <button id="task-{{ .ID }}" onclick="setTaskDone('{{ .ID }}')" class="set-task-done-button" onmouseenter="this.style.cursor='pointer';">Done</button>
+        </div>
+        `
+		html = strings.Replace(html, "TASK-DONE-BUTTON", taskDoneButtonHTML, -1)
 	} else {
 		html = strings.Replace(html, "fetchAndUpdate();", "// fetchAndUpdate", -1)
+		html = strings.Replace(html, "TASK-DONE-BUTTON", "", -1)
 	}
 
 	html = strings.Replace(html, "VIKUNJA-ADDRESS", vikunjaAddress, -1)
