@@ -424,15 +424,6 @@ func (v *Vikunja) GetHash(c *gin.Context) {
 		}
 	}
 
-	apiURL := c.Query("api_url")
-	if apiURL != "" {
-		_, err = url.ParseRequestURI(apiURL)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"message": "api_url must be a valid URL like 'http://192.168.1.46:8080' or 'https://sub.domain.com'"})
-			return
-		}
-	}
-
 	pTasks := []*Task{}
 	if limit != 0 {
 		pTasks, err = v.GetTasks(limit)

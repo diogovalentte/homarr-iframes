@@ -7,6 +7,7 @@ import (
 
 	"github.com/diogovalentte/homarr-iframes/src/sources/cinemark"
 	"github.com/diogovalentte/homarr-iframes/src/sources/linkwarden"
+	uptimekuma "github.com/diogovalentte/homarr-iframes/src/sources/uptime-kuma"
 	"github.com/diogovalentte/homarr-iframes/src/sources/vikunja"
 )
 
@@ -15,6 +16,7 @@ func HashRoutes(group *gin.RouterGroup) {
 	group.GET("/linkwarden", LinkwardenHashHandler)
 	group.GET("/cinemark", CinemarkHashHandler)
 	group.GET("/vikunja", VikunjaHashHandler)
+	group.GET("/uptimekuma", UptimeKumaHashHandler)
 }
 
 // @Summary Get the hash of the Linkwarden bookmarks
@@ -63,4 +65,19 @@ func VikunjaHashHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 	}
 	v.GetHash(c)
+}
+
+// @Summary Get the hash of the Uptime Kuma sites status
+// @Description Get the hash of the Uptime Kuma sites status. Used by the iFrames to check updates and reload the iframe.
+// @Success 200 {object} hashResponse
+// @Produce json
+// @Param slug query string true "You need to create a status page in Uptime Kuma and select which sites/services this status page will show. While creating the status page, it'll request **you** to create a slug, after creating the status page, provide this slug here. This iFrame will show data only of the sites/services of this specific status page!" Example(uptime-kuma-slug)
+// @Router /hash/uptimekuma [get]
+func UptimeKumaHashHandler(c *gin.Context) {
+	u := uptimekuma.UptimeKuma{}
+	err := u.Init()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+	}
+	u.GetHash(c)
 }
