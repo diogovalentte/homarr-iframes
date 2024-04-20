@@ -282,6 +282,20 @@
                         "name": "api_url",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Show the title 'Uptime Kuma' on the iFrame.",
+                        "name": "showTitle",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "vertical",
+                        "description": "Orientation of the containers, defaults to horizontal.",
+                        "name": "orientation",
+                        "in": "query"
                     }
                 ],
                 "responses": {

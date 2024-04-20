@@ -245,6 +245,16 @@ paths:
         name: api_url
         required: true
         type: string
+      - description: Show the title 'Uptime Kuma' on the iFrame.
+        example: true
+        in: query
+        name: showTitle
+        type: boolean
+      - description: Orientation of the containers, defaults to horizontal.
+        example: vertical
+        in: query
+        name: orientation
+        type: string
       produces:
       - text/html
       responses:

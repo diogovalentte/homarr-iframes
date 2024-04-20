@@ -109,6 +109,8 @@ func VikunjaSetTaskDoneHandler(c *gin.Context) {
 // @Param slug query string true "You need to create a status page in Uptime Kuma and select which sites/services this status page will show. While creating the status page, it'll request **you** to create a slug, after creating the status page, provide this slug here. This iFrame will show data only of the sites/services of this specific status page!" Example(uptime-kuma-slug)
 // @Param theme query string false "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white" Example(light)
 // @Param api_url query string true "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload." Example(https://sub.domain.com)
+// @Param showTitle query bool false "Show the title 'Uptime Kuma' on the iFrame." Example(true)
+// @Param orientation query string false "Orientation of the containers, defaults to horizontal." Example(vertical)
 // @Router /iframe/uptimekuma [get]
 func UptimeKumaiFrameHandler(c *gin.Context) {
 	u := uptimekuma.UptimeKuma{}
