@@ -39,7 +39,7 @@ To use this source, you'll need to provide the following environment variables:
 
 This source creates an iFrame with the number of UP and DOWN sites from a [Uptime Kuma]() status page.
 
-![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/46f1a07b-0953-44a9-9c1a-5af29d1458e0)
+![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/7b0e2cfc-2edc-41d4-9551-72df189591d4)
 
 To use this source, you'll need to provide the following environment variables:
 
