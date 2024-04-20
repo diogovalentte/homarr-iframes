@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+// GetStatusPageLastUpDownCount returns the number of up and down sites for the last heartbeat of a status page
 func (u *UptimeKuma) GetStatusPageLastUpDownCount(slug string) (*UpDownSites, error) {
 	target := HeartbeatResponse{}
 
@@ -22,9 +23,9 @@ func (u *UptimeKuma) GetStatusPageLastUpDownCount(slug string) (*UpDownSites, er
 	for _, site := range target.HeartbeatList {
 		lastHeartbeat := site[len(site)-1]
 		if lastHeartbeat.Status == 1 {
-			upDownSites.Up += 1
+			upDownSites.Up++
 		} else {
-			upDownSites.Down += 1
+			upDownSites.Down++
 		}
 	}
 

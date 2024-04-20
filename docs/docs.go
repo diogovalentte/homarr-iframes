@@ -89,6 +89,33 @@ const docTemplate = `{
                 }
             }
         },
+        "/hash/uptimekuma": {
+            "get": {
+                "description": "Get the hash of the Uptime Kuma sites status. Used by the iFrames to check updates and reload the iframe.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get the hash of the Uptime Kuma sites status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "uptime-kuma-slug",
+                        "description": "You need to create a status page in Uptime Kuma and select which sites/services this status page will show. While creating the status page, it'll request **you** to create a slug, after creating the status page, provide this slug here. This iFrame will show data only of the sites/services of this specific status page!",
+                        "name": "slug",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/routes.hashResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/hash/vikunja": {
             "get": {
                 "description": "Get the hash of the Vikunja tasks. Used by the iFrames to check updates and reload the iframe.",
