@@ -2,6 +2,7 @@
 
 - Each source has an API route to return an iFrame.
 - Some sources need some environment variables to work, if you do not specify them, the source will not work, and when you try to request this source, it'll return an error.
+- Some sources need some query arguments to work, you can check the [API docs](https://github.com/diogovalentte/homarr-iframes/tree/main?tab=readme-ov-file#api-docs) to see which arguments are obligatory.
 - This API doesn't have any authentication system, so anyone who can access the API will be able to get all information from all sources, like your Vikunja tasks, Linkwarden bookmarks, etc. You can add an authentication portal like Authelia or [Authentik](https://github.com/goauthentik/authentik) in front of the API to secure it, this is how I do it.
 - The iFrames design is based on the Homarr widget to show media requests from apps like [Jellyseerr](https://github.com/Fallenbagel/jellyseerr) and [Overseerr](https://github.com/sct/overseerr):
 
@@ -33,6 +34,16 @@ To use this source, you'll need to provide the following environment variables:
 - `VIKUNJA_ADDRESS`: your Vikunja instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `VIKUNJA_TOKEN`: an access token used to access your Vikunja instance API to get your tasks. You can get it by going to **Settings -> API Tokens -> Create a Token -> In Tasks, select Read All -> Create Token**.
   - If you want to add a button to set task as done in the iframe, also add the permission **Update**.
+
+# Uptime Kuma
+
+This source creates an iFrame with the number of UP and DOWN sites from a [Uptime Kuma]() status page.
+
+![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/46f1a07b-0953-44a9-9c1a-5af29d1458e0)
+
+To use this source, you'll need to provide the following environment variables:
+
+- `UPTIMEKUMA_ADDRESS`: your Uptime Kuma instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 
 # Cinemark Brasil
 
