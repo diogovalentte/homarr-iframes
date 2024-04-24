@@ -1,17 +1,17 @@
 # Homarr iFrames
 
-An API that gets data from multiple sources and creates a nice HTML code to be used in an iFrame (designed to be used in [Homarr](https://github.com/ajnart/homarr)).
+![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/8df579cb-9cc9-4bad-a1da-f0cf015e741b)
 
-The iFrames will be available under the API routes, like `/v1/iframes/linkwarden`. These routes also accept query parameters to change the iFrame HTML, like limiting the number of items or specifing if you want the iFrames to automatically check and update if the source contents change, like adding new bookmarks on Linkwarden.
+
+An API that connects with multiple sources and creates a nice HTML code to be used in an iFrame (designed to be used in [Homarr](https://github.com/ajnart/homarr)).
+
+The iFrames will be available under the API routes, like `/v1/iframe/linkwarden`. These routes also accept query parameters to change the iFrame HTML, like limiting the number of items or specifying if you want the iFrames to automatically check and update if the source contents change, like adding new bookmarks on Linkwarden.
 
 - You can check all query parameters in the API docs.
 
 # Sources
 
-The API can create iFrames for multiple sources. Examples:
-
-- The **Vikunja** source creates an iFrame with your tasks.
-- The **Linkwarden** source creates an iFrame with your bookmarks.
+The API can create iFrames for multiple sources, like the **Vikunja** source that creates an iFrame with your tasks, or the **Linkwarden** source that creates an iFrame with your bookmarks.
 
 Some sources require specific information to work, like a service address or credentials. You need to provide this information using environment variables.
 
