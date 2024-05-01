@@ -6,6 +6,7 @@ COPY . .
 
 ENV GIN_MODE=release
 ENV PORT=8080
+ENV TZ=UTC
 
 WORKDIR /app
 

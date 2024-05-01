@@ -6,6 +6,7 @@ services:
     image: ghcr.io/diogovalentte/homarr-iframes:latest
     user: 1000:1000
     environment:
+      - TZ=${TZ:-UTC} # uses UTC if not specified
       - PORT=${PORT:-8080} # uses port 8080 if not specified
       - LINKWARDEN_ADDRESS=${LINKWARDEN_ADDRESS:-}
       - LINKWARDEN_TOKEN=${LINKWARDEN_TOKEN:-}

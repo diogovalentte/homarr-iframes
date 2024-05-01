@@ -4,6 +4,7 @@
 - Some sources need some environment variables to work, if you do not specify them, the source will not work, and when you try to request this source, it'll return an error.
 - Some sources need some query arguments to work, you can check the [API docs](https://github.com/diogovalentte/homarr-iframes/tree/main?tab=readme-ov-file#api-docs) to see which arguments are obligatory.
 - This API doesn't have any authentication system, so anyone who can access the API will be able to get all information from all sources, like your Vikunja tasks, Linkwarden bookmarks, etc. You can add an authentication portal like Authelia or [Authentik](https://github.com/goauthentik/authentik) in front of the API to secure it, this is how I do it.
+- Some iFrames display date information, set the Docker container timezone to get a better result.
 - The iFrames design is based on the Homarr widget to show media requests from apps like [Jellyseerr](https://github.com/Fallenbagel/jellyseerr) and [Overseerr](https://github.com/sct/overseerr):
 
 ![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/9083c67a-9bbf-4430-8ba9-929cd9b0d0ab)
