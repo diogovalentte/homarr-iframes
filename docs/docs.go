@@ -348,6 +348,27 @@ const docTemplate = `{
                         "name": "api_url",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "example": false,
+                        "description": "Shows the tasks' created date. Defaults to true.",
+                        "name": "showCreated",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": false,
+                        "description": "Shows the tasks' due/end date and repeating dates. Defaults to true.",
+                        "name": "showDue",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": false,
+                        "description": "Shows the tasks' priority. Defaults to true.",
+                        "name": "showPriority",
+                        "in": "query"
                     }
                 ],
                 "responses": {

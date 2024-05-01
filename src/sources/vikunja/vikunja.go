@@ -74,6 +74,42 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 		}
 	}
 
+	var (
+		showCreated  bool
+		showDue      bool
+		showPriority bool
+	)
+	showCreatedStr := c.Query("showCreated")
+	if showCreatedStr == "" {
+		showCreated = true
+	} else {
+		showCreated, err = strconv.ParseBool(showCreatedStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "showCreated must be a boolean"})
+			return
+		}
+	}
+	showDueStr := c.Query("showDue")
+	if showDueStr == "" {
+		showDue = true
+	} else {
+		showDue, err = strconv.ParseBool(showDueStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "showDue must be a boolean"})
+			return
+		}
+	}
+	showPriorityStr := c.Query("showPriority")
+	if showPriorityStr == "" {
+		showPriority = true
+	} else {
+		showPriority, err = strconv.ParseBool(showPriorityStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "showPriority must be a boolean"})
+			return
+		}
+	}
+
 	tasks := []*Task{}
 	if limit != 0 {
 		tasks, err = v.GetTasks(limit)
@@ -87,7 +123,7 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 	if len(tasks) < 1 {
 		html = sources.GetBaseNothingToShowiFrame("#226fff", backgroundImageURL, "center", "cover", "0.3")
 	} else {
-		html, err = getTasksiFrame(v.Address, tasks, theme, apiURL, limit)
+		html, err = getTasksiFrame(v.Address, tasks, theme, apiURL, limit, showCreated, showDue, showPriority)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, fmt.Errorf("Couldn't create HTML code: %s", err.Error()))
 			return
@@ -97,7 +133,7 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, limit int) ([]byte, error) {
+func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, limit int, showCreated, showDue, showPriority bool) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -105,7 +141,7 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="referrer" content="no-referrer"> <!-- If not set, can't load some images when behind a domain or reverse proxy -->
-    <meta name="color-scheme" content="TASKS-CONTAINER-BACKGROUND-COLOR">
+    <meta name="color-scheme" content="{{ .Theme }}">
     <script src="https://kit.fontawesome.com/3f763b063a.js" crossorigin="anonymous"></script>
     <title>Movie Display Template</title>
     <style>
@@ -114,7 +150,7 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
       }
 
       ::-webkit-scrollbar-thumb {
-        background-color: SCROLLBAR-THUMB-BACKGROUND-COLOR;
+        background-color: {{ .ScrollbarThumbBackgroundColor }};
         border-radius: 2.3px;
       }
 
@@ -123,7 +159,7 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
       }
 
       ::-webkit-scrollbar-track:hover {
-        background-color: SCROLLBAR-TRACK-BACKGROUND-COLOR;
+        background-color: {{ .ScrollbarTrackBackgroundColor }};
       }
     </style>
     <style>
@@ -148,7 +184,7 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
         }
 
         .background-image {
-            background-image: url('TASKS-CONTAINER-BACKGROUND-IMAGE');
+            background-image: url('{{ .BackgroundImageURL }}');
             background-position: 50% 49.5%;
             background-size: 105%;
             position: absolute;
@@ -232,7 +268,7 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
 
         async function fetchData() {
             try {
-                var url = 'API-URL/v1/hash/vikunja?limit=API-LIMIT';
+                var url = '{{ .APIURL }}/v1/hash/vikunja?limit={{ .APILimit }}';
                 const response = await fetch(url);
                 const data = await response.json();
 
@@ -254,14 +290,16 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
             setTimeout(fetchAndUpdate, 10000); // 10 seconds
         }
 
-        fetchAndUpdate();
+        {{ if .APIURL }}
+            fetchAndUpdate();
+        {{ end }}
     </script>
 
     <script>
       function setTaskDone(taskId) {
         try {
             var xhr = new XMLHttpRequest();
-            var url = 'API-URL/v1/iframe/vikunja/set_task_done?taskId=' + encodeURIComponent(taskId);
+            var url = '{{ .APIURL }}/v1/iframe/vikunja/set_task_done?taskId=' + encodeURIComponent(taskId);
             xhr.open('PATCH', url, true);
             xhr.setRequestHeader('Content-Type', 'application/json');
 
@@ -297,43 +335,54 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
 
 </head>
 <body>
-{{ range . }}
+{{ range .Tasks }}
     <div class="tasks-container">
 
         <div class="background-image"></div>
 
         <div style="padding-left: 20px;" class="text-wrap">
-            <a href="VIKUNJA-ADDRESS/tasks/{{ .ID }}" target="_blank" class="task-title">{{ .Title }}</a>
+
+            <a href="{{ with . }}{{ $.VikunjaAddress }}{{ end }}/tasks/{{ .ID }}" target="_blank" class="task-title">{{ .Title }}</a>
 
             <div>
 
-                <span class="info-label"><i class="fa-solid fa-calendar-days"></i> Created: {{ .CreatedAt.Format "Jan 2, 2006" }}</span>
-
-                {{ if not .DueDate.IsZero }}
-                    <span class="info-label" style="color: {{ getTimeColor .DueDate }};"><i class="fa-solid fa-calendar-days"></i> Due: {{ .DueDate.Format "Jan 2, 2006" }}</span>
-                {{ else if not .EndDate.IsZero }}
-                    <span class="info-label" style="color: {{ getTimeColor .EndDate }};"><i class="fa-solid fa-calendar-days"></i> End: {{ .EndDate.Format "Jan 2, 2006" }}</span>
-                {{ else if or (ne .RepeatAfter 0) (ne .RepeatMode 0) }}
-                    {{ if or (eq .RepeatMode 0) (eq .RepeatMode 2) }}
-                        <span class="info-label"><i class="fa-solid fa-calendar-days"></i> Repeats every {{ getRepeatAfter .RepeatAfter }}</span>
-                    {{ else if eq .RepeatMode 1 }}
-                        <span class="info-label"><i class="fa-solid fa-calendar-days"></i> Repeats monthly</span>
+                {{ with . }}{{ if $.ShowCreated }}
+                    <span class="info-label"><i class="fa-solid fa-calendar-days"></i> Created: {{ .CreatedAt.Format "Jan 2, 2006" }}</span>
+                {{ end }}{{ end }}
+            
+                {{ with . }}{{ if $.ShowDue }}
+                    {{ if not .DueDate.IsZero }}
+                        <span class="info-label" style="color: {{ getTimeColor .DueDate }};"><i class="fa-solid fa-calendar-days"></i> Due: {{ .DueDate.Format "Jan 2, 2006" }}</span>
+                    {{ else if not .EndDate.IsZero }}
+                        <span class="info-label" style="color: {{ getTimeColor .EndDate }};"><i class="fa-solid fa-calendar-days"></i> End: {{ .EndDate.Format "Jan 2, 2006" }}</span>
+                    {{ else if or (ne .RepeatAfter 0) (ne .RepeatMode 0) }}
+                        {{ if or (eq .RepeatMode 0) (eq .RepeatMode 2) }}
+                            <span class="info-label"><i class="fa-solid fa-calendar-days"></i> Repeats every {{ getRepeatAfter .RepeatAfter }}</span>
+                        {{ else if eq .RepeatMode 1 }}
+                            <span class="info-label"><i class="fa-solid fa-calendar-days"></i> Repeats monthly</span>
+                        {{ end }}
                     {{ end }}
-                {{ end }}
+                {{ end }}{{ end }}
 
-                {{ if eq .Priority 3 }}
-                    <span style="color: #ff851b;" class="info-label">! High</span>
-                {{ else if eq .Priority 4 }}
-                    <span style="color: #ff4136;" class="info-label">! Urgent</span>
-                {{ else if eq .Priority 5 }}
-                    <span style="color: #ff4136;" class="info-label">! DO NOW !</span>
-                {{ end }}
+                {{ with . }}{{ if $.ShowPriority }}
+                    {{ if eq .Priority 3 }}
+                        <span style="color: #ff851b;" class="info-label">! High</span>
+                    {{ else if eq .Priority 4 }}
+                        <span style="color: #ff4136;" class="info-label">! Urgent</span>
+                    {{ else if eq .Priority 5 }}
+                        <span style="color: #ff4136;" class="info-label">! DO NOW !</span>
+                    {{ end }}
+                {{ end }}{{ end }}
 
             </div>
 
         </div>
 
-TASK-DONE-BUTTON
+        {{ with . }}{{ if $.APIURL }}
+            <div class="set-task-done-container">
+                <button id="task-{{ .ID }}" onclick="setTaskDone('{{ .ID }}')" class="set-task-done-button" onmouseenter="this.style.cursor='pointer';">Done</button>
+            </div>
+        {{ end }}{{ end }}
 
     </div>
 {{ end }}
@@ -348,27 +397,21 @@ TASK-DONE-BUTTON
 		scrollbarTrackBackgroundColor = "rgba(37, 40, 53, 1)"
 	}
 
-	if apiURL != "" {
-		html = strings.Replace(html, "API-URL", apiURL, -1)
-		html = strings.Replace(html, "API-LIMIT", strconv.Itoa(limit), -1)
-		taskDoneButtonHTML := `
-        <div class="set-task-done-container">
-            <button id="task-{{ .ID }}" onclick="setTaskDone('{{ .ID }}')" class="set-task-done-button" onmouseenter="this.style.cursor='pointer';">Done</button>
-        </div>
-        `
-		html = strings.Replace(html, "TASK-DONE-BUTTON", taskDoneButtonHTML, -1)
-	} else {
-		html = strings.Replace(html, "fetchAndUpdate();", "// fetchAndUpdate", -1)
-		html = strings.Replace(html, "TASK-DONE-BUTTON", "", -1)
+	templateData := iframeTemplateData{
+		Tasks:                         tasks,
+		Theme:                         theme,
+		APIURL:                        apiURL,
+		APILimit:                      limit,
+		VikunjaAddress:                vikunjaAddress,
+		BackgroundImageURL:            backgroundImageURL,
+		ScrollbarThumbBackgroundColor: scrollbarThumbBackgroundColor,
+		ScrollbarTrackBackgroundColor: scrollbarTrackBackgroundColor,
+		ShowCreated:                   showCreated,
+		ShowDue:                       showDue,
+		ShowPriority:                  showPriority,
 	}
 
-	html = strings.Replace(html, "VIKUNJA-ADDRESS", vikunjaAddress, -1)
-	html = strings.Replace(html, "TASKS-CONTAINER-BACKGROUND-COLOR", theme, -1)
-	html = strings.Replace(html, "TASKS-CONTAINER-BACKGROUND-IMAGE", backgroundImageURL, -1)
-	html = strings.Replace(html, "SCROLLBAR-THUMB-BACKGROUND-COLOR", scrollbarThumbBackgroundColor, -1)
-	html = strings.Replace(html, "SCROLLBAR-TRACK-BACKGROUND-COLOR", scrollbarTrackBackgroundColor, -1)
-
-	divideFunc := template.FuncMap{
+	templateFuncs := template.FuncMap{
 		"getRepeatAfter": func(a int) string {
 			hours := float64(a) / 3600
 			if hours != float64(int(hours)) {
@@ -398,15 +441,30 @@ TASK-DONE-BUTTON
 		},
 	}
 
-	tmpl := template.Must(template.New("tasks").Funcs(divideFunc).Parse(html))
+	tmpl := template.Must(template.New("tasks").Funcs(templateFuncs).Parse(html))
 
 	var buf bytes.Buffer
-	err := tmpl.Execute(&buf, tasks)
+	err := tmpl.Execute(&buf, &templateData)
 	if err != nil {
 		return []byte{}, err
 	}
 
 	return buf.Bytes(), nil
+}
+
+type iframeTemplateData struct {
+	Tasks                         []*Task
+	Theme                         string
+	APIURL                        string
+	APILimit                      int
+	VikunjaAddress                string
+	BackgroundImageURL            string
+	ScrollbarThumbBackgroundColor string
+	ScrollbarTrackBackgroundColor string
+	ShowCreated                   bool
+	ShowDue                       bool
+	ShowPriority                  bool
+	ShowProject                   bool
 }
 
 // GetHash returns the hash of the tasks

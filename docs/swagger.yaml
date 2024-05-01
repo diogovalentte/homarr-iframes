@@ -287,6 +287,22 @@ paths:
         name: api_url
         required: true
         type: string
+      - description: Shows the tasks' created date. Defaults to true.
+        example: false
+        in: query
+        name: showCreated
+        type: boolean
+      - description: Shows the tasks' due/end date and repeating dates. Defaults to
+          true.
+        example: false
+        in: query
+        name: showDue
+        type: boolean
+      - description: Shows the tasks' priority. Defaults to true.
+        example: false
+        in: query
+        name: showPriority
+        type: boolean
       produces:
       - text/html
       responses:

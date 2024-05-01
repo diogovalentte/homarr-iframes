@@ -61,6 +61,9 @@ func CinemarkiFrameHandler(c *gin.Context) {
 // @Param theme query string false "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white" Example(light)
 // @Param limit query int false "Limits the number of items in the iFrame." Example(5)
 // @Param api_url query string true "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload. Also used by the button to set the task done, if not provided, the button will not appear." Example(https://sub.domain.com)
+// @Param showCreated query bool false "Shows the tasks' created date. Defaults to true." Example(false)
+// @Param showDue query bool false "Shows the tasks' due/end date and repeating dates. Defaults to true." Example(false)
+// @Param showPriority query bool false "Shows the tasks' priority. Defaults to true." Example(false)
 // @Router /iframe/vikunja [get]
 func VikunjaiFrameHandler(c *gin.Context) {
 	v := vikunja.Vikunja{}
