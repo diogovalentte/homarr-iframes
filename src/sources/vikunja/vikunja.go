@@ -255,6 +255,21 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
             text-decoration: underline;
         }
 
+        .priority-label {
+            text-decoration: none;
+            font-family: ui-sans-serif, system-ui, -apple-system, BtaskMacSystemFont,
+              Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji,
+              Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+            font-feature-settings: normal;
+            font-variation-settings: normal;
+            font-weight: 600;
+            color: #99b6bb;
+            font-size: 1rem;
+            line-height: 1.5rem;
+
+            margin-right: 3px;
+        }
+
         .info-label {
             text-decoration: none;
             font-family: ui-sans-serif, system-ui, -apple-system, BtaskMacSystemFont,
@@ -376,19 +391,17 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
 
         <div style="padding-left: 20px;" class="text-wrap">
 
-            <a href="{{ with . }}{{ $.VikunjaAddress }}{{ end }}/tasks/{{ .ID }}" target="_blank" class="task-title">
-                {{ with . }}{{ if $.ShowPriority }}
-                    {{ if eq .Priority 3 }}
-                        <span style="color: #ff851b;" class="info-label">! High</span>{{ .Title }}
-                    {{ else if eq .Priority 4 }}
-                        <span style="color: #ff4136;" class="info-label">! Urgent</span>{{ .Title }}
-                    {{ else if eq .Priority 5 }}
-                        <span style="color: #ff4136;" class="info-label">! DO NOW !</span>{{ .Title }}
-                    {{ else }}
-                        {{ .Title }}
-                    {{ end }}
-                {{ end }}{{ end }}
-            </a>
+            {{ with . }}{{ if $.ShowPriority }}
+                {{ if eq .Priority 3 }}
+                    <span style="color: #ff851b;" class="priority-label">! High</span>
+                {{ else if eq .Priority 4 }}
+                    <span style="color: #ff4136;" class="priority-label">! Urgent</span>
+                {{ else if eq .Priority 5 }}
+                    <span style="color: #ff4136;" class="priority-label">! DO NOW !</span>
+                {{ end }}
+            {{ end }}{{ end }}
+
+            <a href="{{ with . }}{{ $.VikunjaAddress }}{{ end }}/tasks/{{ .ID }}" target="_blank" class="task-title">{{ .Title }}</a>
 
             <div>
 
@@ -423,7 +436,7 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
 
         </div>
 
-        {{ with . }}{{ if $.APIURL }}
+        {{ with . }}{{ if and ($.APIURL) (and (eq .RepeatAfter 0) (eq .RepeatMode 0)) }}
             <div class="set-task-done-container">
                 <button id="task-{{ .ID }}" onclick="setTaskDone('{{ .ID }}')" class="set-task-done-button" onmouseenter="this.style.cursor='pointer';">Done</button>
             </div>
