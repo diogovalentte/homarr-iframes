@@ -29,38 +29,34 @@ func TestMain(m *testing.M) {
 }
 
 func TestGetTasks(t *testing.T) {
-	configs := config.GlobalConfigs
-	v := Vikunja{
-		Address: configs.VikunjaConfigs.Address,
-		Token:   configs.VikunjaConfigs.Token,
+	v, err := New(config.GlobalConfigs.Vikunja.Address, config.GlobalConfigs.Vikunja.Token)
+	if err != nil {
+		t.Fatal(err)
 	}
 
 	t.Run("get tasks", func(t *testing.T) {
 		tasks, err := v.GetTasks(-1)
 		if err != nil {
 			t.Fatal(err)
-			return
 		}
 
 		for _, task := range tasks {
 			if task.ID == 0 {
 				t.Fatal("task with ID 0")
-				return
 			}
 		}
 	})
 }
 
 func TestSetTaskDone(t *testing.T) {
-	configs := config.GlobalConfigs
-	v := Vikunja{
-		Address: configs.VikunjaConfigs.Address,
-		Token:   configs.VikunjaConfigs.Token,
+	v, err := New(config.GlobalConfigs.Vikunja.Address, config.GlobalConfigs.Vikunja.Token)
+	if err != nil {
+		t.Fatal(err)
 	}
-	taskId := 0
+	taskID := 0
 
 	t.Run("set task done (need to manually set a valid task ID!!!)", func(t *testing.T) {
-		err := v.SetTaskDone(taskId)
+		err := v.SetTaskDone(taskID)
 		if err != nil {
 			t.Fatal(err)
 			return

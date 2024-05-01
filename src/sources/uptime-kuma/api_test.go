@@ -29,15 +29,15 @@ func TestMain(m *testing.M) {
 }
 
 func TestUptimeKuma_GetStatusPageLastHeartbeats(t *testing.T) {
-	configs := config.GlobalConfigs
-	u := &UptimeKuma{
-		Address: configs.UptimeKumaConfigs.Address,
+	u, err := New(config.GlobalConfigs.UptimeKumaConfigs.Address)
+	if err != nil {
+		t.Fatal(err)
 	}
 
 	t.Run("Test GetStatusPageLastHeartbeats", func(t *testing.T) {
 		_, err := u.GetStatusPageLastUpDownCount("") // change to a valid slug
 		if err != nil {
-			t.Errorf("Error: %v", err)
+			t.Fatal(err)
 		}
 	})
 }

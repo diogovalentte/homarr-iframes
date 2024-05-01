@@ -12,14 +12,15 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/diogovalentte/homarr-iframes/src/config"
 	"github.com/diogovalentte/homarr-iframes/src/sources"
 )
 
 var (
 	backgroundImageURL = "https://vikunja.io/images/vikunja.png"
-	instanceProjects   = []*Project{}
+	instanceProjects   = make(map[int]*Project)
 )
+
+var v *Vikunja
 
 // Vikunja is the a source
 type Vikunja struct {
@@ -27,10 +28,24 @@ type Vikunja struct {
 	Token   string
 }
 
+func New(address, token string) (*Vikunja, error) {
+	if v != nil {
+		return v, nil
+	}
+
+	newV := &Vikunja{}
+	err := newV.Init(address, token)
+	if err != nil {
+		return nil, err
+	}
+
+	v = newV
+
+	return v, nil
+}
+
 // Init sets the Vikunja properties from the configs
-func (v *Vikunja) Init() error {
-	address := config.GlobalConfigs.VikunjaConfigs.Address
-	token := config.GlobalConfigs.VikunjaConfigs.Token
+func (v *Vikunja) Init(address, token string) error {
 	if address == "" || token == "" {
 		return fmt.Errorf("VIKUNJA_ADDRESS and VIKUNJA_TOKEN variables should be set")
 	}
@@ -42,7 +57,7 @@ func (v *Vikunja) Init() error {
 	v.Address = address
 	v.Token = token
 
-	err := v.SetInMemoryIstanceProjects()
+	err := v.SetInMemoryInstanceProjects()
 	if err != nil {
 		return fmt.Errorf("couldn't get Vikunja projects: %s", err.Error())
 	}
@@ -162,7 +177,7 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
     <meta name="referrer" content="no-referrer"> <!-- If not set, can't load some images when behind a domain or reverse proxy -->
     <meta name="color-scheme" content="{{ .Theme }}">
     <script src="https://kit.fontawesome.com/3f763b063a.js" crossorigin="anonymous"></script>
-    <title>Movie Display Template</title>
+    <title>Vikunja iFrame</title>
     <style>
       ::-webkit-scrollbar {
         width: 7px;
@@ -397,10 +412,9 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
 
                 {{ with . }}{{ if $.ShowProject }}
                     {{ if gt .ProjectID 1 }} <!-- 1 = Inbox; -1 = Favorites   -->
-                        {{ $projectTitle := getTaskProjectTitle .ProjectID }}
-                        {{ $projectColor := getTaskProjectHexColor .ProjectID }}
-                        {{ if $projectTitle }}
-                            <span class="info-label" style="color: #{{ $projectColor }};"><i class="fa-solid fa-layer-group"></i> {{ $projectTitle }}</span>
+                        {{ $project := getTaskProject .ProjectID }}
+                        {{ if $project.Title }}
+                            <span class="info-label" style="color: #{{ $project.HexColor }};"><i class="fa-solid fa-layer-group"></i> {{ $project.Title }}</span>
                         {{ end }}
                     {{ end }}
                 {{ end }}{{ end }}
@@ -471,39 +485,21 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
 
 			return "#99b6bb"
 		},
-		"getTaskProjectTitle": func(projectID int) string {
-			for _, project := range instanceProjects {
-				if project.ID == projectID {
-					return project.Title
-				}
+		"getTaskProject": func(projectID int) *Project {
+			project, ok := instanceProjects[projectID]
+			if ok {
+				return project
 			}
-			v := Vikunja{}
-			err := v.Init()
+
+			v, err := New("", "")
 			if err != nil {
-				return ""
+				return &Project{}
 			}
-			project, err := v.GetProject(projectID)
+			project, err = v.GetProject(projectID)
 			if err != nil {
-				return ""
+				return &Project{}
 			}
-			return project.Title
-		},
-		"getTaskProjectHexColor": func(projectID int) string {
-			for _, project := range instanceProjects {
-				if project.ID == projectID {
-					return project.HexColor
-				}
-			}
-			v := Vikunja{}
-			err := v.Init()
-			if err != nil {
-				return ""
-			}
-			project, err := v.GetProject(projectID)
-			if err != nil {
-				return ""
-			}
-			return project.HexColor
+			return project
 		},
 	}
 

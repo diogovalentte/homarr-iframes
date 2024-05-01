@@ -11,20 +11,36 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/diogovalentte/homarr-iframes/src/config"
 	"github.com/diogovalentte/homarr-iframes/src/sources"
 )
 
-var backgroundImageURL = "https://avatars.githubusercontent.com/u/135248736?s=280&v=4"
+var (
+	backgroundImageURL = "https://avatars.githubusercontent.com/u/135248736?s=280&v=4"
+	l                  *Linkwarden
+)
 
 type Linkwarden struct {
 	Address string
 	Token   string
 }
 
-func (l *Linkwarden) Init() error {
-	address := config.GlobalConfigs.LinkwardenConfigs.Address
-	token := config.GlobalConfigs.LinkwardenConfigs.Token
+func New(address, token string) (*Linkwarden, error) {
+	if l != nil {
+		return l, nil
+	}
+
+	newL := &Linkwarden{}
+	err := newL.Init(address, token)
+	if err != nil {
+		return nil, err
+	}
+
+	l = newL
+
+	return l, nil
+}
+
+func (l *Linkwarden) Init(address, token string) error {
 	if address == "" || token == "" {
 		return fmt.Errorf("LINKWARDEN_ADDRESS and LINKWARDEN_TOKEN variables should be set")
 	}
@@ -79,7 +95,7 @@ func (l *Linkwarden) GetiFrame(c *gin.Context) {
 	}
 
 	links := map[string][]*Link{}
-	err = baseRequest(linkwardenURL, &links)
+	err = baseRequest(linkwardenURL, l.Token, &links)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("Error while doing API request: %s", err.Error())})
 		return
@@ -119,7 +135,7 @@ func getLinksiFrame(linkwardenAddress string, links []*Link, theme, apiURL, coll
     <meta name="referrer" content="no-referrer"> <!-- If not set, can't load some images when behind a domain or reverse proxy -->
     <meta name="color-scheme" content="LINKS-CONTAINER-BACKGROUND-COLOR">
     <script src="https://kit.fontawesome.com/3f763b063a.js" crossorigin="anonymous"></script>
-    <title>Movie Display Template</title>
+    <title>Linkwarden iFrame</title>
     <style>
       ::-webkit-scrollbar {
         width: 7px;
@@ -342,7 +358,7 @@ func (l *Linkwarden) GetHash(c *gin.Context) {
 	}
 
 	linksMap := map[string][]*Link{}
-	err = baseRequest(url, &linksMap)
+	err = baseRequest(url, l.Token, &linksMap)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("Error while doing API request: %s", err.Error())})
 		return

@@ -5,18 +5,16 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-
-	"github.com/diogovalentte/homarr-iframes/src/config"
 )
 
-func baseRequest(url string, target interface{}) error {
+func baseRequest(url, token string, target interface{}) error {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return fmt.Errorf("error creating request: %w", err)
 	}
 
-	req.Header.Set("Authorization", "Bearer "+config.GlobalConfigs.LinkwardenConfigs.Token)
+	req.Header.Set("Authorization", "Bearer "+token)
 
 	resp, err := client.Do(req)
 	if err != nil {

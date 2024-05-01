@@ -11,9 +11,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/diogovalentte/homarr-iframes/src/config"
 	"github.com/diogovalentte/homarr-iframes/src/sources"
 )
+
+var u *UptimeKuma
 
 // UptimeKuma is the UptimeKuma source
 type UptimeKuma struct {
@@ -21,9 +22,24 @@ type UptimeKuma struct {
 	Address string
 }
 
+func New(address string) (*UptimeKuma, error) {
+	if u != nil {
+		return u, nil
+	}
+
+	newU := &UptimeKuma{}
+	err := newU.Init(address)
+	if err != nil {
+		return nil, err
+	}
+
+	u = newU
+
+	return u, nil
+}
+
 // Init sets the UptimeKuma properties from the configs
-func (u *UptimeKuma) Init() error {
-	address := config.GlobalConfigs.UptimeKumaConfigs.Address
+func (u *UptimeKuma) Init(address string) error {
 	if address == "" {
 		return fmt.Errorf("UPTIMEKUMA_ADDRESS variable should be set")
 	}
@@ -105,7 +121,7 @@ func getUpDownSitesiFrame(upDownSites *UpDownSites, theme, apiURL, slug, contain
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="referrer" content="no-referrer"> <!-- If not set, can't load some images when behind a domain or reverse proxy -->
     <meta name="color-scheme" content="COLOR-SCHEME">
-    <title>Movie Display Template</title>
+    <title>UptimeKuma iFrame</title>
     <style>
       ::-webkit-scrollbar {
         width: 7px;

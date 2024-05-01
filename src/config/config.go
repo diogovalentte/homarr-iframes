@@ -6,11 +6,11 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var GlobalConfigs Configs
+var GlobalConfigs *Configs
 
 type Configs struct {
-	LinkwardenConfigs linkwardenConfigs
-	VikunjaConfigs    vikunjaConfigs
+	Linkwarden        linkwardenConfigs
+	Vikunja           vikunjaConfigs
 	UptimeKumaConfigs uptimeKumaConfigs
 }
 
@@ -29,18 +29,21 @@ type uptimeKumaConfigs struct {
 }
 
 func SetConfigs(filePath string) error {
+	GlobalConfigs = &Configs{}
+
+	var err error
 	if filePath != "" {
-		err := godotenv.Load(filePath)
+		err = godotenv.Load(filePath)
 		if err != nil {
 			return err
 		}
 	}
 
-	GlobalConfigs.LinkwardenConfigs.Address = os.Getenv("LINKWARDEN_ADDRESS")
-	GlobalConfigs.LinkwardenConfigs.Token = os.Getenv("LINKWARDEN_TOKEN")
+	GlobalConfigs.Linkwarden.Address = os.Getenv("LINKWARDEN_ADDRESS")
+	GlobalConfigs.Linkwarden.Token = os.Getenv("LINKWARDEN_TOKEN")
 
-	GlobalConfigs.VikunjaConfigs.Address = os.Getenv("VIKUNJA_ADDRESS")
-	GlobalConfigs.VikunjaConfigs.Token = os.Getenv("VIKUNJA_TOKEN")
+	GlobalConfigs.Vikunja.Address = os.Getenv("VIKUNJA_ADDRESS")
+	GlobalConfigs.Vikunja.Token = os.Getenv("VIKUNJA_TOKEN")
 
 	GlobalConfigs.UptimeKumaConfigs.Address = os.Getenv("UPTIMEKUMA_ADDRESS")
 

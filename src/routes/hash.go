@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/diogovalentte/homarr-iframes/src/config"
 	"github.com/diogovalentte/homarr-iframes/src/sources/cinemark"
 	"github.com/diogovalentte/homarr-iframes/src/sources/linkwarden"
 	uptimekuma "github.com/diogovalentte/homarr-iframes/src/sources/uptime-kuma"
@@ -27,10 +28,10 @@ func HashRoutes(group *gin.RouterGroup) {
 // @Param limit query int false "Limits the number of items in the iFrame." Example(5)
 // @Router /hash/linkwarden [get]
 func LinkwardenHashHandler(c *gin.Context) {
-	l := linkwarden.Linkwarden{}
-	err := l.Init()
+	l, err := linkwarden.New(config.GlobalConfigs.Linkwarden.Address, config.GlobalConfigs.Linkwarden.Token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
 	}
 	l.GetHash(c)
 }
@@ -59,10 +60,10 @@ type hashResponse struct {
 // @Param limit query int false "Limits the number of items in the iFrame." Example(5)
 // @Router /hash/vikunja [get]
 func VikunjaHashHandler(c *gin.Context) {
-	v := vikunja.Vikunja{}
-	err := v.Init()
+	v, err := vikunja.New(config.GlobalConfigs.Vikunja.Address, config.GlobalConfigs.Vikunja.Token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
 	}
 	v.GetHash(c)
 }
@@ -74,10 +75,10 @@ func VikunjaHashHandler(c *gin.Context) {
 // @Param slug query string true "You need to create a status page in Uptime Kuma and select which sites/services this status page will show. While creating the status page, it'll request **you** to create a slug, after creating the status page, provide this slug here. This iFrame will show data only of the sites/services of this specific status page!" Example(uptime-kuma-slug)
 // @Router /hash/uptimekuma [get]
 func UptimeKumaHashHandler(c *gin.Context) {
-	u := uptimekuma.UptimeKuma{}
-	err := u.Init()
+	u, err := uptimekuma.New(config.GlobalConfigs.UptimeKumaConfigs.Address)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
 	}
 	u.GetHash(c)
 }

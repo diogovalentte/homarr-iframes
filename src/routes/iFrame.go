@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/diogovalentte/homarr-iframes/src/config"
 	"github.com/diogovalentte/homarr-iframes/src/sources/cinemark"
 	"github.com/diogovalentte/homarr-iframes/src/sources/linkwarden"
 	uptimekuma "github.com/diogovalentte/homarr-iframes/src/sources/uptime-kuma"
@@ -31,10 +32,10 @@ func IFrameRoutes(group *gin.RouterGroup) {
 // @Param api_url query string true "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload." Example(https://sub.domain.com)
 // @Router /iframe/linkwarden [get]
 func LinkwardeniFrameHandler(c *gin.Context) {
-	l := linkwarden.Linkwarden{}
-	err := l.Init()
+	l, err := linkwarden.New(config.GlobalConfigs.Linkwarden.Address, config.GlobalConfigs.Linkwarden.Token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
 	}
 	l.GetiFrame(c)
 }
@@ -67,10 +68,10 @@ func CinemarkiFrameHandler(c *gin.Context) {
 // @Param showProject query bool false "Shows the tasks' project. Defaults to true." Example(false)
 // @Router /iframe/vikunja [get]
 func VikunjaiFrameHandler(c *gin.Context) {
-	v := vikunja.Vikunja{}
-	err := v.Init()
+	v, err := vikunja.New(config.GlobalConfigs.Vikunja.Address, config.GlobalConfigs.Vikunja.Token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
 	}
 	v.GetiFrame(c)
 }
@@ -93,10 +94,10 @@ func VikunjaSetTaskDoneHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "task_id must be an integer"})
 	}
 
-	v := vikunja.Vikunja{}
-	err = v.Init()
+	v, err := vikunja.New(config.GlobalConfigs.Vikunja.Address, config.GlobalConfigs.Vikunja.Token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
 	}
 	err = v.SetTaskDone(taskId)
 	if err != nil {
@@ -117,10 +118,10 @@ func VikunjaSetTaskDoneHandler(c *gin.Context) {
 // @Param orientation query string false "Orientation of the containers, defaults to horizontal." Example(vertical)
 // @Router /iframe/uptimekuma [get]
 func UptimeKumaiFrameHandler(c *gin.Context) {
-	u := uptimekuma.UptimeKuma{}
-	err := u.Init()
+	u, err := uptimekuma.New(config.GlobalConfigs.UptimeKumaConfigs.Address)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
 	}
 	u.GetiFrame(c)
 }
