@@ -33,7 +33,7 @@ This source creates an iFrame with your tasks from your [Vikunja](https://github
 To use this source, you'll need to provide the following environment variables:
 
 - `VIKUNJA_ADDRESS`: your Vikunja instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `VIKUNJA_TOKEN`: an access token used to access your Vikunja instance API to get your tasks. You can get it by going to **Settings -> API Tokens -> Create a Token -> In Tasks, select Read All -> Create Token**.
+- `VIKUNJA_TOKEN`: an access token used to access your Vikunja instance API to get your tasks. You can get it by going to **Settings -> API Tokens -> Create a Token -> In "Tasks", select "Read One" and "Read All"; In "Projects", select "Read One" and "Read All" -> Create Token**.
   - If you want to add a button to set task as done in the iframe, also add the permission **Update**.
 
 # Uptime Kuma

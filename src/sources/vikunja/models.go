@@ -26,4 +26,16 @@ type Task struct {
 	Priority    int       `json:"priority"`
 	RepeatAfter int       `json:"repeat_after"`
 	RepeatMode  int       `json:"repeat_mode"`
+	ProjectID   int       `json:"project_id"`
+}
+
+// Project represents a Vikunja project
+// ! IMPORTANT !
+// If you add a filed where the value is a pointer,
+// you have to update the Vikunja.GetHash method
+// to set it to nil.
+type Project struct {
+	ID       int    `json:"id"`
+	Title    string `json:"title"`
+	HexColor string `json:"hex_color"`
 }

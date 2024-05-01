@@ -43,6 +43,42 @@ func (v *Vikunja) SetTaskDone(taskId int) error {
 	return nil
 }
 
+func (v *Vikunja) GetProjects() ([]*Project, error) {
+	path := "/api/v1/projects"
+	projects := []*Project{}
+
+	err := v.baseRequest("GET", v.Address+path, nil, &projects)
+	if err != nil {
+		return nil, err
+	}
+
+	return projects, nil
+}
+
+func (v *Vikunja) GetProject(projectId int) (*Project, error) {
+	path := "/api/v1/projects/" + strconv.Itoa(projectId)
+	project := &Project{}
+
+	err := v.baseRequest("GET", v.Address+path, nil, &project)
+	if err != nil {
+		return nil, err
+	}
+
+	return project, nil
+}
+
+// SetInMemoryIstanceProjects sets the instanceProjects variable to the projects.
+func (v *Vikunja) SetInMemoryIstanceProjects() error {
+	projects, err := v.GetProjects()
+	if err != nil {
+		return err
+	}
+
+	instanceProjects = projects
+
+	return nil
+}
+
 func (v *Vikunja) baseRequest(method, url string, body io.Reader, target interface{}) error {
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, body)

@@ -303,6 +303,11 @@ paths:
         in: query
         name: showPriority
         type: boolean
+      - description: Shows the tasks' project. Defaults to true.
+        example: false
+        in: query
+        name: showProject
+        type: boolean
       produces:
       - text/html
       responses:

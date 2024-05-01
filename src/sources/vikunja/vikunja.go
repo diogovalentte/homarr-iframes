@@ -16,7 +16,10 @@ import (
 	"github.com/diogovalentte/homarr-iframes/src/sources"
 )
 
-var backgroundImageURL = "https://vikunja.io/images/vikunja.png"
+var (
+	backgroundImageURL = "https://vikunja.io/images/vikunja.png"
+	instanceProjects   = []*Project{}
+)
 
 // Vikunja is the a source
 type Vikunja struct {
@@ -38,6 +41,11 @@ func (v *Vikunja) Init() error {
 
 	v.Address = address
 	v.Token = token
+
+	err := v.SetInMemoryIstanceProjects()
+	if err != nil {
+		return fmt.Errorf("couldn't get Vikunja projects: %s", err.Error())
+	}
 
 	return nil
 }
@@ -78,6 +86,7 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 		showCreated  bool
 		showDue      bool
 		showPriority bool
+		showProject  bool
 	)
 	showCreatedStr := c.Query("showCreated")
 	if showCreatedStr == "" {
@@ -109,6 +118,16 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 			return
 		}
 	}
+	showProjectStr := c.Query("showProject")
+	if showProjectStr == "" {
+		showProject = true
+	} else {
+		showProject, err = strconv.ParseBool(showProjectStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "showProject must be a boolean"})
+			return
+		}
+	}
 
 	tasks := []*Task{}
 	if limit != 0 {
@@ -123,7 +142,7 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 	if len(tasks) < 1 {
 		html = sources.GetBaseNothingToShowiFrame("#226fff", backgroundImageURL, "center", "cover", "0.3")
 	} else {
-		html, err = getTasksiFrame(v.Address, tasks, theme, apiURL, limit, showCreated, showDue, showPriority)
+		html, err = getTasksiFrame(v.Address, tasks, theme, apiURL, limit, showCreated, showDue, showPriority, showProject)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, fmt.Errorf("Couldn't create HTML code: %s", err.Error()))
 			return
@@ -133,7 +152,7 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, limit int, showCreated, showDue, showPriority bool) ([]byte, error) {
+func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, limit int, showCreated, showDue, showPriority, showProject bool) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -342,12 +361,24 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
 
         <div style="padding-left: 20px;" class="text-wrap">
 
-            <a href="{{ with . }}{{ $.VikunjaAddress }}{{ end }}/tasks/{{ .ID }}" target="_blank" class="task-title">{{ .Title }}</a>
+            <a href="{{ with . }}{{ $.VikunjaAddress }}{{ end }}/tasks/{{ .ID }}" target="_blank" class="task-title">
+                {{ with . }}{{ if $.ShowPriority }}
+                    {{ if eq .Priority 3 }}
+                        <span style="color: #ff851b;" class="info-label">! High</span>{{ .Title }}
+                    {{ else if eq .Priority 4 }}
+                        <span style="color: #ff4136;" class="info-label">! Urgent</span>{{ .Title }}
+                    {{ else if eq .Priority 5 }}
+                        <span style="color: #ff4136;" class="info-label">! DO NOW !</span>{{ .Title }}
+                    {{ else }}
+                        {{ .Title }}
+                    {{ end }}
+                {{ end }}{{ end }}
+            </a>
 
             <div>
 
                 {{ with . }}{{ if $.ShowCreated }}
-                    <span class="info-label"><i class="fa-solid fa-calendar-days"></i> Created: {{ .CreatedAt.Format "Jan 2, 2006" }}</span>
+                    <span class="info-label"><i class="fa-solid fa-calendar-days"></i> {{ .CreatedAt.Format "Jan 2, 2006" }}</span>
                 {{ end }}{{ end }}
             
                 {{ with . }}{{ if $.ShowDue }}
@@ -364,13 +395,13 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
                     {{ end }}
                 {{ end }}{{ end }}
 
-                {{ with . }}{{ if $.ShowPriority }}
-                    {{ if eq .Priority 3 }}
-                        <span style="color: #ff851b;" class="info-label">! High</span>
-                    {{ else if eq .Priority 4 }}
-                        <span style="color: #ff4136;" class="info-label">! Urgent</span>
-                    {{ else if eq .Priority 5 }}
-                        <span style="color: #ff4136;" class="info-label">! DO NOW !</span>
+                {{ with . }}{{ if $.ShowProject }}
+                    {{ if gt .ProjectID 1 }} <!-- 1 = Inbox; -1 = Favorites   -->
+                        {{ $projectTitle := getTaskProjectTitle .ProjectID }}
+                        {{ $projectColor := getTaskProjectHexColor .ProjectID }}
+                        {{ if $projectTitle }}
+                            <span class="info-label" style="color: #{{ $projectColor }};"><i class="fa-solid fa-layer-group"></i> {{ $projectTitle }}</span>
+                        {{ end }}
                     {{ end }}
                 {{ end }}{{ end }}
 
@@ -409,6 +440,7 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
 		ShowCreated:                   showCreated,
 		ShowDue:                       showDue,
 		ShowPriority:                  showPriority,
+		ShowProject:                   showProject,
 	}
 
 	templateFuncs := template.FuncMap{
@@ -438,6 +470,40 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
 			}
 
 			return "#99b6bb"
+		},
+		"getTaskProjectTitle": func(projectID int) string {
+			for _, project := range instanceProjects {
+				if project.ID == projectID {
+					return project.Title
+				}
+			}
+			v := Vikunja{}
+			err := v.Init()
+			if err != nil {
+				return ""
+			}
+			project, err := v.GetProject(projectID)
+			if err != nil {
+				return ""
+			}
+			return project.Title
+		},
+		"getTaskProjectHexColor": func(projectID int) string {
+			for _, project := range instanceProjects {
+				if project.ID == projectID {
+					return project.HexColor
+				}
+			}
+			v := Vikunja{}
+			err := v.Init()
+			if err != nil {
+				return ""
+			}
+			project, err := v.GetProject(projectID)
+			if err != nil {
+				return ""
+			}
+			return project.HexColor
 		},
 	}
 

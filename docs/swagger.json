@@ -358,6 +358,13 @@
                         "description": "Shows the tasks' priority. Defaults to true.",
                         "name": "showPriority",
                         "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": false,
+                        "description": "Shows the tasks' project. Defaults to true.",
+                        "name": "showProject",
+                        "in": "query"
                     }
                 ],
                 "responses": {
