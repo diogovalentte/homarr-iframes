@@ -155,7 +155,11 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 
 	var html []byte
 	if len(tasks) < 1 {
-		html = sources.GetBaseNothingToShowiFrame("#226fff", backgroundImageURL, "center", "cover", "0.3")
+		var apiURLPath string
+		if apiURL != "" {
+			apiURLPath = apiURL + "/v1/hash/vikunja?limit=" + strconv.Itoa(limit)
+		}
+		html = sources.GetBaseNothingToShowiFrame("#226fff", backgroundImageURL, "center", "cover", "0.3", apiURLPath)
 	} else {
 		html, err = getTasksiFrame(v.Address, tasks, theme, apiURL, limit, showCreated, showDue, showPriority, showProject)
 		if err != nil {

@@ -67,7 +67,11 @@ func (_ *Cinemark) GetiFrame(c *gin.Context) {
 
 	var html []byte
 	if len(movies) < 1 {
-		html = sources.GetBaseNothingToShowiFrame(theme, backgroundImageURL, "center", "cover", "0.3")
+		var apiURLPath string
+		if apiURL != "" {
+			apiURLPath = apiURL + "/v1/hash/cinemark?limit=" + strconv.Itoa(limit) + "&city=" + city + "&theaters=" + theaters
+		}
+		html = sources.GetBaseNothingToShowiFrame(theme, backgroundImageURL, "center", "cover", "0.3", apiURLPath)
 	} else {
 		html, err = getMoviesiFrame(movies, theme, apiURL, limit, city, theaters)
 		if err != nil {
