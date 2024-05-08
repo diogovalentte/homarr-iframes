@@ -431,7 +431,7 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
                     {{ if gt .ProjectID 1 }} <!-- 1 = Inbox; -1 = Favorites   -->
                         {{ $project := getTaskProject .ProjectID }}
                         {{ if $project.Title }}
-                            <a href="{{ $.VikunjaAddress }}/projects/{{ $project.ID }}" target="_blank" class="info-label" style="color: #{{ $project.HexColor }};"><i class="fa-solid fa-layer-group"></i> {{ $project.Title }}</a>
+                            <span class="info-label" style="color: #{{ $project.HexColor }};"><i class="fa-solid fa-layer-group"></i> <a href="{{ $.VikunjaAddress }}/projects/{{ $project.ID }}" target="_blank" class="info-label" style="color: #{{ $project.HexColor }};">{{ $project.Title }}</a></span>
                         {{ end }}
                     {{ end }}
                 {{ end }}{{ end }}
