@@ -575,7 +575,7 @@ func (v *Vikunja) GetHash(c *gin.Context) {
 		tasks = append(tasks, *task)
 	}
 
-	hash := sources.GetHash(tasks)
+	hash := sources.GetHash(tasks, time.Now().Format("2006-01-02"))
 
 	c.JSON(http.StatusOK, gin.H{"hash": fmt.Sprintf("%x", hash)})
 }

@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -365,7 +366,7 @@ func (_ *Cinemark) GetHash(c *gin.Context) {
 		return
 	}
 
-	hash := sources.GetHash(movies)
+	hash := sources.GetHash(movies, time.Now().Format("2006-01-02"))
 
 	c.JSON(http.StatusOK, gin.H{"hash": fmt.Sprintf("%x", hash)})
 }

@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -328,7 +329,7 @@ func (u *UptimeKuma) GetHash(c *gin.Context) {
 		return
 	}
 
-	hash := sources.GetHash(upDownSites)
+	hash := sources.GetHash(upDownSites, time.Now().Format("2006-01-02"))
 
 	c.JSON(http.StatusOK, gin.H{"hash": fmt.Sprintf("%x", hash)})
 }

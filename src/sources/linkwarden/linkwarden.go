@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -387,7 +388,7 @@ func (l *Linkwarden) GetHash(c *gin.Context) {
 		links = append(links, *link)
 	}
 
-	hash := sources.GetHash(links)
+	hash := sources.GetHash(links, time.Now().Format("2006-01-02"))
 
 	c.JSON(http.StatusOK, gin.H{"hash": fmt.Sprintf("%x", hash)})
 }
