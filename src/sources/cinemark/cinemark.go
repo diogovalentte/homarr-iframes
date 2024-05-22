@@ -39,16 +39,16 @@ func (_ *Cinemark) GetiFrame(c *gin.Context) {
 	}
 
 	queryLimit := c.Query("limit")
+	var limitProvided bool
 	var limit int
 	var err error
-	if queryLimit == "" {
-		limit = -1
-	} else {
+	if queryLimit != "" {
 		limit, err = strconv.Atoi(queryLimit)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"message": "limit must be a number"})
 			return
 		}
+		limitProvided = true
 	}
 
 	theme := c.Query("theme")
@@ -69,7 +69,7 @@ func (_ *Cinemark) GetiFrame(c *gin.Context) {
 	}
 
 	cinemark := Cinemark{}
-	movies, err := cinemark.GetOnDisplayByTheater(theaterIds, limit)
+	movies, err := cinemark.GetOnDisplayByTheater(theaterIds, limit, limitProvided)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -388,20 +388,20 @@ func (_ *Cinemark) GetHash(c *gin.Context) {
 	}
 
 	queryLimit := c.Query("limit")
+	var limitProvided bool
 	var limit int
 	var err error
-	if queryLimit == "" {
-		limit = -1
-	} else {
+	if queryLimit != "" {
 		limit, err = strconv.Atoi(queryLimit)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"message": "limit must be a number"})
 			return
 		}
+		limitProvided = true
 	}
 
 	cinemark := Cinemark{}
-	movies, err := cinemark.GetOnDisplayByTheater(theaterIds, limit)
+	movies, err := cinemark.GetOnDisplayByTheater(theaterIds, limit, limitProvided)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return

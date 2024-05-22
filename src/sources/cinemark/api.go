@@ -8,11 +8,18 @@ import (
 	"strings"
 )
 
-var apiURL = "https://br-www-frontend-ext-prod.cinemark.com.br/bff-api/v1/"
+var (
+	apiURL             = "https://br-www-frontend-ext-prod.cinemark.com.br/bff-api/v1/"
+	defaultMoviesLimit = 999
+)
 
-func (c *Cinemark) GetOnDisplayByTheater(theaterIds []int, limit int) ([]Movie, error) {
-	if limit < 1 {
-		return []Movie{}, nil
+func (c *Cinemark) GetOnDisplayByTheater(theaterIds []int, limit int, limitProvided bool) ([]Movie, error) {
+	if !limitProvided {
+		limit = defaultMoviesLimit
+	} else {
+		if limit < 1 {
+			return []Movie{}, nil
+		}
 	}
 
 	moviesNames := make(map[string]struct{})
