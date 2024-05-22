@@ -28,13 +28,13 @@ This source creates an iFrame with your tasks from your [Vikunja](https://github
 
 - It automatically sorts the tasks by **due date** (ascendent), **end date** (ascendent), and **created date** (descendent), and also filters to return only tasks that are **not done**.
 
-![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/e46e6001-d5b6-473a-98a2-e01abaaf22c2)
+![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/787ff13a-a81f-42b4-a3a4-9f0892ca815f)
 
 To use this source, you'll need to provide the following environment variables:
 
 - `VIKUNJA_ADDRESS`: your Vikunja instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `VIKUNJA_TOKEN`: an access token used to access your Vikunja instance API to get your tasks. You can get it by going to **Settings -> API Tokens -> Create a Token -> In "Tasks", select "Read One" and "Read All"; In "Projects", select "Read One" and "Read All" -> Create Token**.
-  - If you want to add a button to set task as done in the iframe, also add the permission **Update**.
+  - If you want to add a button to set the task as done in the iframe, also add the permission **Update**.
 
 # Uptime Kuma
 
@@ -48,10 +48,7 @@ To use this source, you'll need to provide the following environment variables:
 
 # Cinemark Brasil
 
-This source gets movies in Cinemark theaters in your city (only in Brasil) and creates an iFrame. It has links to the movies pages.
+This source gets on display movies of specific Cinemark theaters (only in Brazil) and creates an iFrame. It shows some info about the films and has links to their pages.
+- You have to specify which theaters to get movies from. I recommend you specifing all theaters in your city.
 
-- It does it by scraping the [Cinemark Brasil](https://www.cinemark.com.br) site.
-
-![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/3d073f98-9375-4709-ac84-1983a6329d48)
-
-- The Cinemark site stores your city in a geolocation cookie, if you change the city anytime on the site, you change this cookie’s value. The default value of the cookie is the city of São Paulo, it's set the first time you access the site. If you change the city anytime, it’ll change the value of this cookie, then the next time you access a link to the site, it’ll use this cookie’s value and show your city.
+![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/7071b022-fe90-4db7-874b-8b88d0298641)
