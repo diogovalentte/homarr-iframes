@@ -40,8 +40,7 @@ func LinkwardenHashHandler(c *gin.Context) {
 // @Description Get the hash of the Cinemark movies. Used by the iFrames to check updates and reload the iframe.
 // @Success 200 {object} hashResponse
 // @Produce json
-// @Param city query string true "City to get movies from. First, check if the Cinemark site has a page for this city, if it doesn't, it'll return the page of São Paulo by default. Go to https://cinemark.com.br/rio-de-janeiro/filmes/em-cartaz and select your city. Then grab the city name on the URL." Example(sao-paulo)
-// @Param theaters query string false "Thaters' IDs to get movies from. You can find the filter keywords by going to your city page, like https://cinemark.com.br/sao-paulo/filmes/em-cartaz, clicking to filter by theater, and then grabbing the filters in the URL. The filter is the theaters' IDs separated by **%2C**. For example, in the URL https://cinemark.com.br/sao-paulo/filmes/em-cartaz?cinema=716%2C690%2C699 we have the IDs 716, 690, and 699. You have to pass the text `716%2C690%2C699` to the API!" Example(716%2C690%2C699)
+// @Param theaterIs query string true "The theater IDs to get movies from. It used to be easy to get, but now it's harder. To get it, you need to access the cinemark site, select a theater, open your browser developer console, go to the "Network" tab, filter using the 'onDisplayByTheater' term, and get the theaterId value from the request URL. You have to do it for every theater. Example: 'theaterIds=715, 1222, 4555'" Example(715, 1222, 4555)
 // @Param limit query int false "Limits the number of items in the iFrame." Example(5)
 // @Router /hash/cinemark [get]
 func CinemarkHashHandler(c *gin.Context) {
