@@ -3,7 +3,7 @@
 ![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/8df579cb-9cc9-4bad-a1da-f0cf015e741b)
 
 
-An API that connects with multiple sources and creates a nice HTML code to be used in an iFrame (designed to be used in [Homarr](https://github.com/ajnart/homarr)).
+An API that connects with multiple sources and creates a nice HTML code to be used in an iFrame. They can be used in any dashboard, like [Homarr](https://github.com/ajnart/homarr).
 
 The iFrames will be available under the API routes, like `/v1/iframe/linkwarden`. These routes also accept query parameters to change the iFrame HTML, like limiting the number of items or specifying if you want the iFrames to automatically check and update if the source contents change, like adding new bookmarks on Linkwarden.
 
@@ -71,7 +71,7 @@ go mod download
 go run main.go
 ```
 
-# Adding to Homarr
+# Adding to Homarr (or any other dashboard)
 
 1. In your Homarr dashboard, click on **Enter edit mode -> Add a tile -> Widgets -> iFrame**.
 2. Click to edit the new iFrame widget.
