@@ -452,7 +452,7 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
 </html>
 	`
 	// Homarr theme
-	scrollbarThumbBackgroundColor := "rgba(209, 219, 227, 1)"
+	scrollbarThumbBackgroundColor := "#d1dbe3"
 	scrollbarTrackBackgroundColor := "#ffffff"
 	if theme == "dark" {
 		scrollbarThumbBackgroundColor = "#484d64"

@@ -315,25 +315,12 @@ func getMoviesiFrame(movies []Movie, theme, apiURL string, limit int, theaterIds
 </html>
     `
 	// Homarr theme
-	scrollbarThumbBackgroundColor := "rgba(209, 219, 227, 1)"
+	scrollbarThumbBackgroundColor := "#d1dbe3"
 	scrollbarTrackBackgroundColor := "#ffffff"
 	if theme == "dark" {
 		scrollbarThumbBackgroundColor = "#484d64"
 		scrollbarTrackBackgroundColor = "rgba(37, 40, 53, 1)"
 	}
-
-	// if apiURL != "" {
-	// 	html = strings.Replace(html, "API-URL", apiURL, -1)
-	// 	html = strings.Replace(html, "API-LIMIT", strconv.Itoa(limit), -1)
-	// 	html = strings.Replace(html, "API-THEATER-ID", theaterId, -1)
-	// } else {
-	// 	html = strings.Replace(html, "fetchAndUpdate();", "// fetchAndUpdate", -1)
-	// }
-	//
-	// html = strings.Replace(html, "MOVIES-CONTAINER-BACKGROUND-COLOR", theme, -1)
-	// html = strings.Replace(html, "MOVIES-CONTAINER-BACKGROUND-IMAGE", backgroundImageURL, -1)
-	// html = strings.Replace(html, "SCROLLBAR-THUMB-BACKGROUND-COLOR", scrollbarThumbBackgroundColor, -1)
-	// html = strings.Replace(html, "SCROLLBAR-TRACK-BACKGROUND-COLOR", scrollbarTrackBackgroundColor, -1)
 
 	templateData := iframeTemplateData{
 		Movies:                        movies,

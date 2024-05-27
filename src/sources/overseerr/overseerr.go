@@ -366,7 +366,7 @@ func getRequestsiFrame(overseerrAddress string, requests []iframeRequestData, th
 </html>
 	`
 	// Homarr theme
-	scrollbarThumbBackgroundColor := "rgba(209, 219, 227, 1)"
+	scrollbarThumbBackgroundColor := "#d1dbe3"
 	scrollbarTrackBackgroundColor := "#ffffff"
 	if theme == "dark" {
 		scrollbarThumbBackgroundColor = "#484d64"
