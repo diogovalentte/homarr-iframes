@@ -36,6 +36,17 @@ To use this source, you'll need to provide the following environment variables:
 - `VIKUNJA_TOKEN`: an access token used to access your Vikunja instance API to get your tasks. You can get it by going to **Settings -> API Tokens -> Create a Token -> In "Tasks", select "Read One" and "Read All"; In "Projects", select "Read One" and "Read All" -> Create Token**.
   - If you want to add a button to set the task as done in the iframe, also add the permission **Update**.
 
+# Overseerr
+
+This source creates an iFrame with your media requests from your [Overseerr](https://github.com/sct/overseerr) instance.
+
+![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/7f374beb-e392-4ee9-94fc-4d1556f65e7c)
+
+To use this source, you'll need to provide the following environment variables:
+
+- `OVERSEERR_ADDRESS`: your Overseerr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+- `OVERSEERR_TOKEN`: an access token used to access your Overseerr instance API to get your media requests. You can get it by going to **Settings -> General -> API Key**.
+
 # Uptime Kuma
 
 This source creates an iFrame with the number of UP and DOWN sites from a [Uptime Kuma]() status page.
