@@ -73,7 +73,7 @@ func (o *Overseerr) GetMovie(id int) (GenericMedia, error) {
 }
 
 type getMovieResponse struct {
-	Title       string `json:"title"`
+	Title       string `json:"originalTitle"`
 	ID          int    `json:"id"`
 	ReleaseDate string `json:"releaseDate"`
 	PosterPath  string `json:"posterPath"`
@@ -96,7 +96,7 @@ func (o *Overseerr) GetTv(id int) (GenericMedia, error) {
 }
 
 type getTvResponse struct {
-	Name         string `json:"name"`
+	Name         string `json:"originalName"`
 	ID           int    `json:"id"`
 	FirstAirDate string `json:"firstAirDate"`
 	PosterPath   string `json:"posterPath"`
