@@ -8,12 +8,17 @@ services:
     environment:
       - TZ=${TZ:-UTC} # uses UTC if not specified
       - PORT=${PORT:-8080} # uses port 8080 if not specified
+
       - LINKWARDEN_ADDRESS=${LINKWARDEN_ADDRESS:-}
       - LINKWARDEN_TOKEN=${LINKWARDEN_TOKEN:-}
 
       - VIKUNJA_ADDRESS=${VIKUNJA_ADDRESS:-}
-      - VIKUNJA_USERNAME=${VIKUNJA_USERNAME:-}
-      - VIKUNJA_PASSWORD=${VIKUNJA_PASSWORD:-}
+      - VIKUNJA_TOKEN=${VIKUNJA_TOKEN:-}
+
+      - OVERSEERR_ADDRESS=${OVERSEERR_ADDRESS:-}
+      - OVERSEERR_TOKEN=${OVERSEERR_TOKEN:-}
+
+      - UPTIMEKUMA_ADDRESS=${UPTIMEKUMA_ADDRESS:-}
     logging:
       driver: "json-file"
       options:

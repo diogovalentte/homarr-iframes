@@ -63,6 +63,41 @@ paths:
           schema:
             $ref: '#/definitions/routes.hashResponse'
       summary: Get the hash of the Linkwarden bookmarks
+  /hash/overseerr:
+    get:
+      description: Get the hash of the Overseerr requests. Used by the iFrames to
+        check updates and reload the iframe.
+      parameters:
+      - description: Limits the number of items in the iFrame.
+        example: 5
+        in: query
+        name: limit
+        type: integer
+      - description: 'Available values : all, approved, available, pending, processing,
+          unavailable, failed'
+        example: all
+        in: query
+        name: filter
+        type: string
+      - description: 'Available values : added, modified. Defaults to added'
+        example: added
+        in: query
+        name: sort
+        type: string
+      - description: If specified, only requests from that particular user ID will
+          be returned.
+        example: "1"
+        in: query
+        name: requestedBy
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/routes.hashResponse'
+      summary: Get the hash of the Overseerr requests
   /hash/uptimekuma:
     get:
       description: Get the hash of the Uptime Kuma sites status. Used by the iFrames
@@ -193,6 +228,57 @@ paths:
           schema:
             type: string
       summary: Linkwarden  bookmarks iFrame
+  /iframe/overseerr:
+    get:
+      description: Returns an iFrame with Overseerr media requests list. Returns all
+        requests if the user's API token has the ADMIN or MANAGE_REQUESTS permissions.
+        Otherwise, only the logged-in user's requests are returned.
+      parameters:
+      - description: Homarr theme, defaults to light. If it's different from your
+          Homarr theme, the background turns white
+        example: light
+        in: query
+        name: theme
+        type: string
+      - description: API URL used by your browser. Use by the iFrames to check any
+          update, if there is an update, the iFrame reloads. If not specified, the
+          iFrames will never try to reload. Also used by the button to set the task
+          done, if not provided, the button will not appear.
+        example: https://sub.domain.com
+        in: query
+        name: api_url
+        required: true
+        type: string
+      - description: Limits the number of items in the iFrame.
+        example: 5
+        in: query
+        name: limit
+        type: integer
+      - description: 'Available values : all, approved, available, pending, processing,
+          unavailable, failed'
+        example: all
+        in: query
+        name: filter
+        type: string
+      - description: 'Available values : added, modified. Defaults to added'
+        example: added
+        in: query
+        name: sort
+        type: string
+      - description: If specified, only requests from that particular user ID will
+          be returned.
+        example: "1"
+        in: query
+        name: requestedBy
+        type: string
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+      summary: Overseerr Media Requests
   /iframe/uptimekuma:
     get:
       description: Returns an iFrame with Uptime Kuma sites overview.

@@ -82,6 +82,53 @@ const docTemplate = `{
                 }
             }
         },
+        "/hash/overseerr": {
+            "get": {
+                "description": "Get the hash of the Overseerr requests. Used by the iFrames to check updates and reload the iframe.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get the hash of the Overseerr requests",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 5,
+                        "description": "Limits the number of items in the iFrame.",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "all",
+                        "description": "Available values : all, approved, available, pending, processing, unavailable, failed",
+                        "name": "filter",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "added",
+                        "description": "Available values : added, modified. Defaults to added",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "1",
+                        "description": "If specified, only requests from that particular user ID will be returned.",
+                        "name": "requestedBy",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/routes.hashResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/hash/uptimekuma": {
             "get": {
                 "description": "Get the hash of the Uptime Kuma sites status. Used by the iFrames to check updates and reload the iframe.",
@@ -237,6 +284,68 @@ const docTemplate = `{
                         "name": "api_url",
                         "in": "query",
                         "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/iframe/overseerr": {
+            "get": {
+                "description": "Returns an iFrame with Overseerr media requests list. Returns all requests if the user's API token has the ADMIN or MANAGE_REQUESTS permissions. Otherwise, only the logged-in user's requests are returned.",
+                "produces": [
+                    "text/html"
+                ],
+                "summary": "Overseerr Media Requests",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "light",
+                        "description": "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white",
+                        "name": "theme",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "https://sub.domain.com",
+                        "description": "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload. Also used by the button to set the task done, if not provided, the button will not appear.",
+                        "name": "api_url",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 5,
+                        "description": "Limits the number of items in the iFrame.",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "all",
+                        "description": "Available values : all, approved, available, pending, processing, unavailable, failed",
+                        "name": "filter",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "added",
+                        "description": "Available values : added, modified. Defaults to added",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "1",
+                        "description": "If specified, only requests from that particular user ID will be returned.",
+                        "name": "requestedBy",
+                        "in": "query"
                     }
                 ],
                 "responses": {

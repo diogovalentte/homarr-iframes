@@ -8,6 +8,7 @@ import (
 	"github.com/diogovalentte/homarr-iframes/src/config"
 	"github.com/diogovalentte/homarr-iframes/src/sources/cinemark"
 	"github.com/diogovalentte/homarr-iframes/src/sources/linkwarden"
+	"github.com/diogovalentte/homarr-iframes/src/sources/overseerr"
 	uptimekuma "github.com/diogovalentte/homarr-iframes/src/sources/uptime-kuma"
 	"github.com/diogovalentte/homarr-iframes/src/sources/vikunja"
 )
@@ -17,6 +18,7 @@ func HashRoutes(group *gin.RouterGroup) {
 	group.GET("/linkwarden", LinkwardenHashHandler)
 	group.GET("/cinemark", CinemarkHashHandler)
 	group.GET("/vikunja", VikunjaHashHandler)
+	group.GET("/overseerr", OverseerrHashHandler)
 	group.GET("/uptimekuma", UptimeKumaHashHandler)
 }
 
@@ -65,6 +67,24 @@ func VikunjaHashHandler(c *gin.Context) {
 		return
 	}
 	v.GetHash(c)
+}
+
+// @Summary Get the hash of the Overseerr requests
+// @Description Get the hash of the Overseerr requests. Used by the iFrames to check updates and reload the iframe.
+// @Success 200 {object} hashResponse
+// @Produce json
+// @Param limit query int false "Limits the number of items in the iFrame." Example(5)
+// @Param filter query string false "Available values : all, approved, available, pending, processing, unavailable, failed" Example(all)
+// @Param sort query string false "Available values : added, modified. Defaults to added" Example(added)
+// @Param requestedBy query string false "If specified, only requests from that particular user ID will be returned." Example(1)
+// @Router /hash/overseerr [get]
+func OverseerrHashHandler(c *gin.Context) {
+	o, err := overseerr.New(config.GlobalConfigs.Overseerr.Address, config.GlobalConfigs.Overseerr.Token)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	o.GetHash(c)
 }
 
 // @Summary Get the hash of the Uptime Kuma sites status
