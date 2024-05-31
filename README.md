@@ -3,9 +3,9 @@
 ![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/8df579cb-9cc9-4bad-a1da-f0cf015e741b)
 
 
-An API that connects with multiple sources and creates a nice HTML code to be used in an iFrame. They can be used in any dashboard, like [Homarr](https://github.com/ajnart/homarr).
+An API that connects with multiple sources and creates an iFrame to be used in any dashboard, like [Homarr](https://github.com/ajnart/homarr).
 
-The iFrames will be available under the API routes, like `/v1/iframe/linkwarden`. These routes also accept query parameters to change the iFrame HTML, like limiting the number of items or specifying if you want the iFrames to automatically check and update if the source contents change, like adding new bookmarks on Linkwarden.
+The iFrames will be available under the API routes, like `/v1/iframe/linkwarden`. These routes also accept query parameters to change the iFrame, like limiting the number of items or specifying if you want the iFrames to check for updates automatically, and, if the source contents changes (like adding new bookmarks on Linkwarden), the iframe should reload.
 
 - You can check all query parameters in the API docs.
 
@@ -25,11 +25,11 @@ After starting the API, you can find the API docs under the path `/v1/swagger/in
 
 # Notes
 
-When you add an iFrame widget in your Homarr dashboard, it's **>your<** web browser that fetches the HTML content from the API and shows it to you, not Homarr. So your browser needs to be able to access the API, that's how an iFrame works.
+When you add an iFrame widget in your dashboard, it's **>your<** web browser that fetches the iFrame from the API and shows it to you, not your dashboard application. So your browser needs to be able to access the API, that's how an iFrame works.
 
 - **Examples**:
-  - If you run the API on your server, you need to add your server IP address + port in the Homarr widget, and you need to make sure your browser can access this IP + port.
-  - If you're accessing Homarr with a domain and using HTTPS, you also need to access this API with a domain and using HTTPS. If you try to use HTTP with your HTTPS, your browser will block the iFrame.
+  - If you run the API on your server, you need to use your server IP address + port, and you need to make sure your browser can access this IP + port.
+  - If you're accessing your dashboard with a domain and using HTTPS, you also need to access this API with a domain and using HTTPS. If you try to use HTTP with your HTTPS, your browser will block the iFrame.
 
 # How to run:
 
@@ -49,7 +49,7 @@ docker run --name homarr-iframes -p 8080:8080 -e VARIABLE_NAME=VARIABLE_VALUE -e
 ## Using Docker Compose:
 
 1. There is a `docker-compose.yml` file in this repository. You can clone this repository to use this file or create one yourself.
-2. Create an `.env` file with the environment variables you want to provide to the API. It should be like the `.env.example` file and be in the same directory as the `docker-compose.yml` file.
+2. Create a `.env` file with the environment variables you want to provide to the API. It should be like the `.env.example` file and be in the same directory as the `docker-compose.yml` file.
 3. Start the container by running:
 
 ```sh
@@ -63,7 +63,6 @@ docker compose up
 ```sh
 go mod download
 ```
-
 2. Export the environment variables.
 3. Run:
 
@@ -79,4 +78,4 @@ go run main.go
 
 # IMPORTANT!
 
-- This API doesn't have any authentication system, so anyone who can access the API will be able to get all information from the API routes, like your Vikunja tasks, Linkwarden bookmarks, etc. You can add an authentication portal like [Authelia](https://github.com/authelia/authelia) or [Authentik](https://github.com/goauthentik/authentik) in front of the API to secure it, this is how I do it.
+- This project doesn't have any authentication system, so anyone who can access the API will be able to get all information from the API routes, like your Vikunja tasks, Linkwarden bookmarks, etc. You can add an authentication portal like [Authelia](https://github.com/authelia/authelia) or [Authentik](https://github.com/goauthentik/authentik) in front of the project to secure it, that's how I do it.
