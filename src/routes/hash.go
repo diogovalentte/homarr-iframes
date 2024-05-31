@@ -42,7 +42,7 @@ func LinkwardenHashHandler(c *gin.Context) {
 // @Description Get the hash of the Cinemark movies. Used by the iFrames to check updates and reload the iframe.
 // @Success 200 {object} hashResponse
 // @Produce json
-// @Param theaterIs query string true "The theater IDs to get movies from. It used to be easy to get, but now it's harder. To get it, you need to access the cinemark site, select a theater, open your browser developer console, go to the "Network" tab, filter using the 'onDisplayByTheater' term, and get the theaterId value from the request URL. You have to do it for every theater. Example: 'theaterIds=715, 1222, 4555'" Example(715, 1222, 4555)
+// @Param theaterIds query string true "The theater IDs to get movies from. It used to be easy to get, but now it's harder. To get it, you need to access the cinemark site, select a theater, open your browser developer console, go to the "Network" tab, filter using the 'onDisplayByTheater' term, and get the theaterId value from the request URL. You have to do it for every theater. Example: 'theaterIds=715, 1222, 4555'" Example(715, 1222, 4555)
 // @Param limit query int false "Limits the number of items in the iFrame." Example(5)
 // @Router /hash/cinemark [get]
 func CinemarkHashHandler(c *gin.Context) {

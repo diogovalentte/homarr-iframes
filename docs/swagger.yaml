@@ -22,7 +22,7 @@ paths:
           a theater, open your browser developer console, go to the '
         example: 715, 1222, 4555
         in: query
-        name: theaterIs
+        name: theaterIds
         required: true
         type: string
       - description: Limits the number of items in the iFrame.
@@ -168,7 +168,7 @@ paths:
           a theater, open your browser developer console, go to the '
         example: 715, 1222, 4555
         in: query
-        name: theaterIs
+        name: theaterIds
         required: true
         type: string
       - description: Homarr theme, defaults to light. If it's different from your
