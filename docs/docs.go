@@ -485,6 +485,13 @@ const docTemplate = `{
                         "description": "Shows the tasks' project. Defaults to true.",
                         "name": "showProject",
                         "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": false,
+                        "description": "Shows a start icon in favorite tasks. Defaults to true.",
+                        "name": "showFavoriteIcon",
+                        "in": "query"
                     }
                 ],
                 "responses": {

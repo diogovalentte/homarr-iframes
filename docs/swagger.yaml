@@ -386,6 +386,11 @@ paths:
         in: query
         name: showProject
         type: boolean
+      - description: Shows a start icon in favorite tasks. Defaults to true.
+        example: false
+        in: query
+        name: showFavoriteIcon
+        type: boolean
       produces:
       - text/html
       responses:

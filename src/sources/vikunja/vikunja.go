@@ -108,10 +108,11 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 	}
 
 	var (
-		showCreated  bool
-		showDue      bool
-		showPriority bool
-		showProject  bool
+		showCreated      bool
+		showDue          bool
+		showPriority     bool
+		showProject      bool
+		ShowFavoriteIcon bool
 	)
 	showCreatedStr := c.Query("showCreated")
 	if showCreatedStr == "" {
@@ -154,6 +155,17 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 		}
 	}
 
+	ShowFavoriteIconStr := c.Query("showFavoriteIcon")
+	if ShowFavoriteIconStr == "" {
+		ShowFavoriteIcon = true
+	} else {
+		ShowFavoriteIcon, err = strconv.ParseBool(ShowFavoriteIconStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "showFavoriteIcon must be a boolean"})
+			return
+		}
+	}
+
 	tasks := []*Task{}
 	if limit != 0 {
 		tasks, err = v.GetTasks(limit, projectID)
@@ -171,7 +183,7 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 		}
 		html = sources.GetBaseNothingToShowiFrame("#226fff", backgroundImageURL, "center", "cover", "0.3", apiURLPath)
 	} else {
-		html, err = getTasksiFrame(v.Address, tasks, theme, apiURL, limit, projectID, showCreated, showDue, showPriority, showProject)
+		html, err = getTasksiFrame(v.Address, tasks, theme, apiURL, limit, projectID, showCreated, showDue, showPriority, showProject, ShowFavoriteIcon)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, fmt.Errorf("Couldn't create HTML code: %s", err.Error()))
 			return
@@ -181,7 +193,7 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, limit, projectID int, showCreated, showDue, showPriority, showProject bool) ([]byte, error) {
+func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, limit, projectID int, showCreated, showDue, showPriority, showProject, showFavoriteIcon bool) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -267,6 +279,11 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
 
         .task-title:hover {
             text-decoration: underline;
+        }
+
+        .favorite-label {
+            text-decoration: none;
+            color: #ff851b;
         }
 
         .priority-label {
@@ -405,6 +422,13 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
 
         <div style="padding-left: 20px;" class="text-wrap">
 
+            
+            {{ with . }}{{ if $.ShowFavoriteIcon }}
+                {{ if .IsFavorite }}
+                    <span class="favorite-label"><i class="fa-solid fa-star"></i></span>
+                {{ end }}
+            {{ end }}{{ end }}
+
             {{ with . }}{{ if $.ShowPriority }}
                 {{ if eq .Priority 3 }}
                     <span style="color: #ff851b;" class="priority-label">! High</span>
@@ -483,6 +507,7 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
 		ShowDue:                       showDue,
 		ShowPriority:                  showPriority,
 		ShowProject:                   showProject,
+		ShowFavoriteIcon:              showFavoriteIcon,
 	}
 
 	templateFuncs := template.FuncMap{
@@ -556,6 +581,7 @@ type iframeTemplateData struct {
 	ShowDue                       bool
 	ShowPriority                  bool
 	ShowProject                   bool
+	ShowFavoriteIcon              bool
 }
 
 // GetHash returns the hash of the tasks

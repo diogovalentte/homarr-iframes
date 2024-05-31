@@ -68,6 +68,7 @@ func CinemarkiFrameHandler(c *gin.Context) {
 // @Param showDue query bool false "Shows the tasks' due/end date and repeating dates. Defaults to true." Example(false)
 // @Param showPriority query bool false "Shows the tasks' priority. Defaults to true." Example(false)
 // @Param showProject query bool false "Shows the tasks' project. Defaults to true." Example(false)
+// @Param showFavoriteIcon query bool false "Shows a start icon in favorite tasks. Defaults to true." Example(false)
 // @Router /iframe/vikunja [get]
 func VikunjaiFrameHandler(c *gin.Context) {
 	v, err := vikunja.New(config.GlobalConfigs.Vikunja.Address, config.GlobalConfigs.Vikunja.Token)
