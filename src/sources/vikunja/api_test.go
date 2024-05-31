@@ -35,7 +35,7 @@ func TestGetTasks(t *testing.T) {
 	}
 
 	t.Run("get tasks", func(t *testing.T) {
-		tasks, err := v.GetTasks(-1)
+		tasks, err := v.GetTasks(-1, 0)
 		if err != nil {
 			t.Fatal(err)
 		}

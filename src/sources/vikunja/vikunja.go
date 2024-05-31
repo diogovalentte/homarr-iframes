@@ -88,6 +88,16 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 		}
 	}
 
+	queryProjectID := c.Query("project_id")
+	var projectID int
+	if queryProjectID != "" {
+		projectID, err = strconv.Atoi(queryProjectID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "project_id must be a number"})
+			return
+		}
+	}
+
 	apiURL := c.Query("api_url")
 	if apiURL != "" {
 		_, err = url.ParseRequestURI(apiURL)
@@ -146,7 +156,7 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 
 	tasks := []*Task{}
 	if limit != 0 {
-		tasks, err = v.GetTasks(limit)
+		tasks, err = v.GetTasks(limit, projectID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			return
@@ -157,11 +167,11 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 	if len(tasks) < 1 {
 		var apiURLPath string
 		if apiURL != "" {
-			apiURLPath = apiURL + "/v1/hash/vikunja?limit=" + strconv.Itoa(limit)
+			apiURLPath = apiURL + "/v1/hash/vikunja?limit=" + strconv.Itoa(limit) + "&project_id=" + strconv.Itoa(projectID)
 		}
 		html = sources.GetBaseNothingToShowiFrame("#226fff", backgroundImageURL, "center", "cover", "0.3", apiURLPath)
 	} else {
-		html, err = getTasksiFrame(v.Address, tasks, theme, apiURL, limit, showCreated, showDue, showPriority, showProject)
+		html, err = getTasksiFrame(v.Address, tasks, theme, apiURL, limit, projectID, showCreated, showDue, showPriority, showProject)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, fmt.Errorf("Couldn't create HTML code: %s", err.Error()))
 			return
@@ -171,7 +181,7 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, limit int, showCreated, showDue, showPriority, showProject bool) ([]byte, error) {
+func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, limit, projectID int, showCreated, showDue, showPriority, showProject bool) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -321,7 +331,7 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
 
         async function fetchData() {
             try {
-                var url = '{{ .APIURL }}/v1/hash/vikunja?limit={{ .APILimit }}';
+                var url = '{{ .APIURL }}/v1/hash/vikunja?limit={{ .APILimit }}&project_id={{ .APIProjectID }}';
                 const response = await fetch(url);
                 const data = await response.json();
 
@@ -428,7 +438,7 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
                 {{ end }}{{ end }}
 
                 {{ with . }}{{ if $.ShowProject }}
-                    {{ if gt .ProjectID 1 }} <!-- 1 = Inbox; -1 = Favorites   -->
+                    {{ if gt .ProjectID 1 }} <!-- 1 = Inbox -->
                         {{ $project := getTaskProject .ProjectID }}
                         {{ if $project.Title }}
                             <span class="info-label" style="color: #{{ $project.HexColor }};"><i class="fa-solid fa-layer-group"></i> <a href="{{ $.VikunjaAddress }}/projects/{{ $project.ID }}" target="_blank" class="info-label" style="color: #{{ $project.HexColor }};">{{ $project.Title }}</a></span>
@@ -464,6 +474,7 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
 		Theme:                         theme,
 		APIURL:                        apiURL,
 		APILimit:                      limit,
+		APIProjectID:                  projectID,
 		VikunjaAddress:                vikunjaAddress,
 		BackgroundImageURL:            backgroundImageURL,
 		ScrollbarThumbBackgroundColor: scrollbarThumbBackgroundColor,
@@ -536,6 +547,7 @@ type iframeTemplateData struct {
 	Theme                         string
 	APIURL                        string
 	APILimit                      int
+	APIProjectID                  int
 	VikunjaAddress                string
 	BackgroundImageURL            string
 	ScrollbarThumbBackgroundColor string
@@ -561,9 +573,19 @@ func (v *Vikunja) GetHash(c *gin.Context) {
 		}
 	}
 
+	queryProjectID := c.Query("project_id")
+	var projectID int
+	if queryProjectID != "" {
+		projectID, err = strconv.Atoi(queryProjectID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "project_id must be a number"})
+			return
+		}
+	}
+
 	pTasks := []*Task{}
 	if limit != 0 {
-		pTasks, err = v.GetTasks(limit)
+		pTasks, err = v.GetTasks(limit, projectID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			return

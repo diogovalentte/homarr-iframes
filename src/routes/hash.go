@@ -59,6 +59,7 @@ type hashResponse struct {
 // @Success 200 {object} hashResponse
 // @Produce json
 // @Param limit query int false "Limits the number of items in the iFrame." Example(5)
+// @Param project_id query int false "Project ID to get tasks from. You can get it by going to the project page in Vikunja, the project ID should be on the URL. Example project page URL: https://vikunja.com/projects/2, the project ID is 2. Inbox tasks = 1, Favorite tasks = -1." Example(1)
 // @Router /hash/vikunja [get]
 func VikunjaHashHandler(c *gin.Context) {
 	v, err := vikunja.New(config.GlobalConfigs.Vikunja.Address, config.GlobalConfigs.Vikunja.Token)

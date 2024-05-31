@@ -159,6 +159,13 @@
                         "description": "Limits the number of items in the iFrame.",
                         "name": "limit",
                         "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "description": "Project ID to get tasks from. You can get it by going to the project page in Vikunja, the project ID should be on the URL. Example project page URL: https://vikunja.com/projects/2, the project ID is 2. Inbox tasks = 1, Favorite tasks = -1.",
+                        "name": "project_id",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -423,6 +430,13 @@
                         "example": 5,
                         "description": "Limits the number of items in the iFrame.",
                         "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "description": "Project ID to get tasks from. You can get it by going to the project page in Vikunja, the project ID should be on the URL. Example project page URL: https://vikunja.com/projects/2, the project ID is 2. Inbox tasks = 1, Favorite tasks = -1.",
+                        "name": "project_id",
                         "in": "query"
                     },
                     {

@@ -11,19 +11,36 @@ import (
 
 // GetTasks get not done tasks with using a custom ordering.
 // Can also limit the number of tasks returned.
-func (v *Vikunja) GetTasks(limit int) ([]*Task, error) {
+// The project_id is the id of the project to get the tasks from. Empty gets all tasks from all projects.
+func (v *Vikunja) GetTasks(limit int, projectID int) ([]*Task, error) {
 	target := []*Task{}
 
 	path := "/api/v1/tasks/all?sort_by=due_date&order_by=asc&sort_by=end_date&order_by=asc&sort_by=created&order_by=desc&filter_by=done&filter_value=false&filter_comparator=equals"
 	if limit > 0 {
 		path = path + fmt.Sprintf("&per_page=%d", limit)
 	}
+
+	if projectID > 0 {
+		path = path + fmt.Sprintf("&filter_concat=and&filter_by=project_id&filter_value=%d&filter_comparator=equals", projectID)
+	}
+
 	err := v.baseRequest("GET", v.Address+path, nil, &target)
 	if err != nil {
 		return nil, err
 	}
 
-	return target, err
+	var tasks []*Task
+	if projectID == -1 {
+		for _, task := range target {
+			if task.IsFavorite {
+				tasks = append(tasks, task)
+			}
+		}
+	} else {
+		tasks = target
+	}
+
+	return tasks, nil
 }
 
 func (v *Vikunja) SetTaskDone(taskId int) error {

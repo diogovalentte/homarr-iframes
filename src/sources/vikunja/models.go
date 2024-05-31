@@ -27,6 +27,7 @@ type Task struct {
 	RepeatAfter int       `json:"repeat_after"`
 	RepeatMode  int       `json:"repeat_mode"`
 	ProjectID   int       `json:"project_id"`
+	IsFavorite  bool      `json:"is_favorite"`
 }
 
 // Project represents a Vikunja project
