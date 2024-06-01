@@ -516,7 +516,7 @@ const docTemplate = `{
                         "type": "integer",
                         "example": 1,
                         "description": "The task ID.",
-                        "name": "task_id",
+                        "name": "taskId",
                         "in": "query",
                         "required": true
                     }

@@ -83,18 +83,18 @@ func VikunjaiFrameHandler(c *gin.Context) {
 // @Description Set a Vikunja task as done.
 // @Success 200 {object} messsageResponse "Task done"
 // @Produce json
-// @Param task_id query int true "The task ID." Example(1)
+// @Param taskId query int true "The task ID." Example(1)
 // @Router /iframe/vikunja/set_task_done [patch]
 func VikunjaSetTaskDoneHandler(c *gin.Context) {
 	taskIdStr := c.Query("taskId")
 	if taskIdStr == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "task_id is required"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "taskId is required"})
 		return
 	}
 
 	taskId, err := strconv.Atoi(taskIdStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "task_id must be an integer"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "taskId must be an integer"})
 	}
 
 	v, err := vikunja.New(config.GlobalConfigs.Vikunja.Address, config.GlobalConfigs.Vikunja.Token)
