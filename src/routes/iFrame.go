@@ -57,13 +57,13 @@ func CinemarkiFrameHandler(c *gin.Context) {
 }
 
 // @Summary Vikunja tasks iFrame
-// @Description Returns an iFrame with Vikunja tasks.
+// @Description Returns an iFrame with not done Vikunja tasks. Uses a custom sort/order: due date (asc); end date (asc); priority (desc); created date (desc). When the due/end date is today, the date color will be orange, if it's past due, the date color will be red.
 // @Success 200 {string} string "HTML content"
 // @Produce html
 // @Param theme query string false "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white" Example(light)
 // @Param limit query int false "Limits the number of items in the iFrame." Example(5)
 // @Param project_id query int false "Project ID to get tasks from. You can get it by going to the project page in Vikunja, the project ID should be on the URL. Example project page URL: https://vikunja.com/projects/2, the project ID is 2. Inbox tasks = 1, Favorite tasks = -1." Example(1)
-// @Param api_url query string true "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload. Also used by the button to set the task done, if not provided, the button will not appear." Example(https://sub.domain.com)
+// @Param api_url query string true "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload. Also used by the button to set the task done, if not provided, the button will not appear (the button doesn't appear in repeating tasks.)" Example(https://sub.domain.com)
 // @Param showCreated query bool false "Shows the tasks' created date. Defaults to true." Example(false)
 // @Param showDue query bool false "Shows the tasks' due/end date and repeating dates. Defaults to true." Example(false)
 // @Param showPriority query bool false "Shows the tasks' priority. Defaults to true." Example(false)

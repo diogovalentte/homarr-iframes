@@ -15,7 +15,7 @@ import (
 func (v *Vikunja) GetTasks(limit int, projectID int) ([]*Task, error) {
 	target := []*Task{}
 
-	path := "/api/v1/tasks/all?sort_by=due_date&order_by=asc&sort_by=end_date&order_by=asc&sort_by=created&order_by=desc&filter_by=done&filter_value=false&filter_comparator=equals"
+	path := "/api/v1/tasks/all?sort_by=due_date&order_by=asc&sort_by=end_date&order_by=asc&sort_by=priority&order_by=desc&sort_by=created&order_by=desc&filter_by=done&filter_value=false&filter_comparator=equals"
 	if limit > 0 {
 		path = path + fmt.Sprintf("&per_page=%d", limit)
 	}
