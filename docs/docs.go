@@ -423,7 +423,7 @@ const docTemplate = `{
         },
         "/iframe/vikunja": {
             "get": {
-                "description": "Returns an iFrame with Vikunja tasks.",
+                "description": "Returns an iFrame with not done Vikunja tasks. Uses a custom sort/order: due date (asc); end date (asc); priority (desc); created date (desc). When the due/end date is today, the date color will be orange, if it's past due, the date color will be red.",
                 "produces": [
                     "text/html"
                 ],
@@ -453,7 +453,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "example": "https://sub.domain.com",
-                        "description": "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload. Also used by the button to set the task done, if not provided, the button will not appear.",
+                        "description": "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload. Also used by the button to set the task done, if not provided, the button will not appear (the button doesn't appear in repeating tasks.)",
                         "name": "api_url",
                         "in": "query",
                         "required": true
