@@ -9,6 +9,7 @@ import (
 	"github.com/diogovalentte/homarr-iframes/src/config"
 	"github.com/diogovalentte/homarr-iframes/src/sources/cinemark"
 	"github.com/diogovalentte/homarr-iframes/src/sources/linkwarden"
+	"github.com/diogovalentte/homarr-iframes/src/sources/media"
 	"github.com/diogovalentte/homarr-iframes/src/sources/overseerr"
 	uptimekuma "github.com/diogovalentte/homarr-iframes/src/sources/uptime-kuma"
 	"github.com/diogovalentte/homarr-iframes/src/sources/vikunja"
@@ -21,6 +22,7 @@ func IFrameRoutes(group *gin.RouterGroup) {
 	group.GET("/vikunja", VikunjaiFrameHandler)
 	group.PATCH("/vikunja/set_task_done", VikunjaSetTaskDoneHandler)
 	group.GET("/overseerr", OverseerriFrameHandler)
+	group.GET("/media_releases", MediaReleasesiFrameHandler)
 	group.GET("/uptimekuma", UptimeKumaiFrameHandler)
 }
 
@@ -128,6 +130,19 @@ func OverseerriFrameHandler(c *gin.Context) {
 		return
 	}
 	o.GetiFrame(c)
+}
+
+// @Summary Media Releases
+// @Description Returns an iFrame with the media releases of today. The media releases are from Radarr/Sonarr.
+// @Success 200 {string} string "HTML content"
+// @Produce html
+// @Param theme query string false "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white" Example(light)
+// @Param api_url query string true "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload. Also used by the button to set the task done, if not provided, the button will not appear." Example(https://sub.domain.com)
+// @Param radarrReleaseType query string false "Filter movies get from Radarr. Can be 'inCinemas', 'physical', or 'digital'. Defaults to 'inCinemas'" Example(physical)
+// @Param showUnmonitored query bool false "Specify if show unmonitored media. Defaults to false." Example(true)
+// @Router /iframe/media_releases [get]
+func MediaReleasesiFrameHandler(c *gin.Context) {
+	media.GetiFrame(c)
 }
 
 // @Summary Uptime Kuma iFrame

@@ -12,6 +12,8 @@ type Configs struct {
 	Linkwarden        linkwardenConfigs
 	Vikunja           vikunjaConfigs
 	Overseerr         overseerrConfigs
+	Sonarr            sonarrConfigs
+	Radarr            radarrConfigs
 	UptimeKumaConfigs uptimeKumaConfigs
 }
 
@@ -28,6 +30,16 @@ type vikunjaConfigs struct {
 type overseerrConfigs struct {
 	Address string
 	Token   string
+}
+
+type sonarrConfigs struct {
+	Address string
+	APIKey  string
+}
+
+type radarrConfigs struct {
+	Address string
+	APIKey  string
 }
 
 type uptimeKumaConfigs struct {
@@ -53,6 +65,12 @@ func SetConfigs(filePath string) error {
 
 	GlobalConfigs.Overseerr.Address = os.Getenv("OVERSEERR_ADDRESS")
 	GlobalConfigs.Overseerr.Token = os.Getenv("OVERSEERR_TOKEN")
+
+	GlobalConfigs.Sonarr.Address = os.Getenv("SONARR_ADDRESS")
+	GlobalConfigs.Sonarr.APIKey = os.Getenv("SONARR_API_KEY")
+
+	GlobalConfigs.Radarr.Address = os.Getenv("RADARR_ADDRESS")
+	GlobalConfigs.Radarr.APIKey = os.Getenv("RADARR_API_KEY")
 
 	GlobalConfigs.UptimeKumaConfigs.Address = os.Getenv("UPTIMEKUMA_ADDRESS")
 

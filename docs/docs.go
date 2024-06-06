@@ -82,6 +82,39 @@ const docTemplate = `{
                 }
             }
         },
+        "/hash/media_releases": {
+            "get": {
+                "description": "Get the hash of the media releases. Used by the iFrames to check updates and reload the iframe.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get the hash of media releases",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "physical",
+                        "description": "Filter movies get from Radarr. Can be 'inCinemas', 'physical', or 'digital'. Defaults to 'inCinemas'",
+                        "name": "radarrReleaseType",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Specify if show unmonitored media. Defaults to false.",
+                        "name": "showUnmonitored",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/routes.hashResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/hash/overseerr": {
             "get": {
                 "description": "Get the hash of the Overseerr requests. Used by the iFrames to check updates and reload the iframe.",
@@ -291,6 +324,54 @@ const docTemplate = `{
                         "name": "api_url",
                         "in": "query",
                         "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/iframe/media_releases": {
+            "get": {
+                "description": "Returns an iFrame with the media releases of today. The media releases are from Radarr/Sonarr.",
+                "produces": [
+                    "text/html"
+                ],
+                "summary": "Media Releases",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "light",
+                        "description": "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white",
+                        "name": "theme",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "https://sub.domain.com",
+                        "description": "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload. Also used by the button to set the task done, if not provided, the button will not appear.",
+                        "name": "api_url",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "physical",
+                        "description": "Filter movies get from Radarr. Can be 'inCinemas', 'physical', or 'digital'. Defaults to 'inCinemas'",
+                        "name": "radarrReleaseType",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Specify if show unmonitored media. Defaults to false.",
+                        "name": "showUnmonitored",
+                        "in": "query"
                     }
                 ],
                 "responses": {

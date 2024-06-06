@@ -8,6 +8,7 @@ import (
 	"github.com/diogovalentte/homarr-iframes/src/config"
 	"github.com/diogovalentte/homarr-iframes/src/sources/cinemark"
 	"github.com/diogovalentte/homarr-iframes/src/sources/linkwarden"
+	"github.com/diogovalentte/homarr-iframes/src/sources/media"
 	"github.com/diogovalentte/homarr-iframes/src/sources/overseerr"
 	uptimekuma "github.com/diogovalentte/homarr-iframes/src/sources/uptime-kuma"
 	"github.com/diogovalentte/homarr-iframes/src/sources/vikunja"
@@ -19,6 +20,7 @@ func HashRoutes(group *gin.RouterGroup) {
 	group.GET("/cinemark", CinemarkHashHandler)
 	group.GET("/vikunja", VikunjaHashHandler)
 	group.GET("/overseerr", OverseerrHashHandler)
+	group.GET("/media_releases", MediaReleasesHashHandler)
 	group.GET("/uptimekuma", UptimeKumaHashHandler)
 }
 
@@ -86,6 +88,17 @@ func OverseerrHashHandler(c *gin.Context) {
 		return
 	}
 	o.GetHash(c)
+}
+
+// @Summary Get the hash of media releases
+// @Description Get the hash of the media releases. Used by the iFrames to check updates and reload the iframe.
+// @Success 200 {object} hashResponse
+// @Produce json
+// @Param radarrReleaseType query string false "Filter movies get from Radarr. Can be 'inCinemas', 'physical', or 'digital'. Defaults to 'inCinemas'" Example(physical)
+// @Param showUnmonitored query bool false "Specify if show unmonitored media. Defaults to false." Example(true)
+// @Router /hash/media_releases [get]
+func MediaReleasesHashHandler(c *gin.Context) {
+	media.GetHash(c)
 }
 
 // @Summary Get the hash of the Uptime Kuma sites status

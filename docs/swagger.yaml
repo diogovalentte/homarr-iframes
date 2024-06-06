@@ -63,6 +63,30 @@ paths:
           schema:
             $ref: '#/definitions/routes.hashResponse'
       summary: Get the hash of the Linkwarden bookmarks
+  /hash/media_releases:
+    get:
+      description: Get the hash of the media releases. Used by the iFrames to check
+        updates and reload the iframe.
+      parameters:
+      - description: Filter movies get from Radarr. Can be 'inCinemas', 'physical',
+          or 'digital'. Defaults to 'inCinemas'
+        example: physical
+        in: query
+        name: radarrReleaseType
+        type: string
+      - description: Specify if show unmonitored media. Defaults to false.
+        example: true
+        in: query
+        name: showUnmonitored
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/routes.hashResponse'
+      summary: Get the hash of media releases
   /hash/overseerr:
     get:
       description: Get the hash of the Overseerr requests. Used by the iFrames to
@@ -236,6 +260,45 @@ paths:
           schema:
             type: string
       summary: Linkwarden  bookmarks iFrame
+  /iframe/media_releases:
+    get:
+      description: Returns an iFrame with the media releases of today. The media releases
+        are from Radarr/Sonarr.
+      parameters:
+      - description: Homarr theme, defaults to light. If it's different from your
+          Homarr theme, the background turns white
+        example: light
+        in: query
+        name: theme
+        type: string
+      - description: API URL used by your browser. Use by the iFrames to check any
+          update, if there is an update, the iFrame reloads. If not specified, the
+          iFrames will never try to reload. Also used by the button to set the task
+          done, if not provided, the button will not appear.
+        example: https://sub.domain.com
+        in: query
+        name: api_url
+        required: true
+        type: string
+      - description: Filter movies get from Radarr. Can be 'inCinemas', 'physical',
+          or 'digital'. Defaults to 'inCinemas'
+        example: physical
+        in: query
+        name: radarrReleaseType
+        type: string
+      - description: Specify if show unmonitored media. Defaults to false.
+        example: true
+        in: query
+        name: showUnmonitored
+        type: boolean
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+      summary: Media Releases
   /iframe/overseerr:
     get:
       description: Returns an iFrame with Overseerr media requests list. Returns all

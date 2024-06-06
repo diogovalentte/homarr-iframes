@@ -15,7 +15,7 @@ func GetBaseNothingToShowiFrame(backgroundColor, backgroundImageURL, backgroundP
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>No Movies To Show</title>
+<title>No items to show</title>
     <style>
         body {
             margin: 0;
