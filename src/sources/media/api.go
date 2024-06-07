@@ -55,9 +55,9 @@ func getReleaseCoverImageURL(images []defaultReleaseImagesResponse) string {
 
 // isReleaseDateWithinDateRange will convert the releaseDate to local timezone and
 // check if it's within a given date range.
-// If startDate and endDate are equal, it will check if the release date is today.
+// startDate is inclusive, endDate is exclusive.
 func isReleaseDateWithinDateRange(releaseDate, startDate, endDate time.Time) bool {
 	releaseDate = releaseDate.In(time.Local)
 
-	return releaseDate.After(startDate) && releaseDate.Before(endDate)
+	return (releaseDate.After(startDate) || releaseDate.Equal(startDate)) && releaseDate.Before(endDate)
 }
