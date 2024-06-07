@@ -65,6 +65,7 @@ func (s *Sonarr) GetCalendar(unmonitored bool, startDate, endDate time.Time) (*C
 		if err != nil {
 			return nil, fmt.Errorf("error parsing episode '%#v' air date: %w", entry, err)
 		}
+		airDate = airDate.In(time.Local)
 		if !isReleaseDateWithinDateRange(airDate, startDate, endDate) {
 			continue
 		}
@@ -72,6 +73,7 @@ func (s *Sonarr) GetCalendar(unmonitored bool, startDate, endDate time.Time) (*C
 		calendar.Releases = append(calendar.Releases, MediaRelease{
 			Title:         entry.Series.Title,
 			Source:        "Sonarr",
+			ReleaseDate:   airDate,
 			Slug:          entry.Series.TitleSlug,
 			CoverImageURL: coverImageURL,
 			IsDownloaded:  entry.HasFile,

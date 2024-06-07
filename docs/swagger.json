@@ -361,6 +361,13 @@
                         "description": "Specify if show unmonitored media. Defaults to false.",
                         "name": "showUnmonitored",
                         "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": false,
+                        "description": "Specify if show the episodes' (Sonarr) release hour and minute. Defaults to true.",
+                        "name": "showEpisodesHour",
+                        "in": "query"
                     }
                 ],
                 "responses": {

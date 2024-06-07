@@ -291,6 +291,12 @@ paths:
         in: query
         name: showUnmonitored
         type: boolean
+      - description: Specify if show the episodes' (Sonarr) release hour and minute.
+          Defaults to true.
+        example: false
+        in: query
+        name: showEpisodesHour
+        type: boolean
       produces:
       - text/html
       responses:

@@ -53,11 +53,8 @@ func getReleaseCoverImageURL(images []defaultReleaseImagesResponse) string {
 	return images[0].RemoteURL
 }
 
-// isReleaseDateWithinDateRange will convert the releaseDate to local timezone and
-// check if it's within a given date range.
+// isReleaseDateWithinDateRange checks if it's within a given date range.
 // startDate is inclusive, endDate is exclusive.
 func isReleaseDateWithinDateRange(releaseDate, startDate, endDate time.Time) bool {
-	releaseDate = releaseDate.In(time.Local)
-
 	return (releaseDate.After(startDate) || releaseDate.Equal(startDate)) && releaseDate.Before(endDate)
 }

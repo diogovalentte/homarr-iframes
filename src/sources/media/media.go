@@ -77,18 +77,36 @@ func GetiFrame(c *gin.Context) {
 		}
 	}
 
-	radarrReleaseType := c.Query("radarrReleaseType")
+	var (
+		radarrReleaseType string
+		showUnmonitored   bool
+	)
+	showEpisodeHours := true
+
+	radarrReleaseType = c.Query("radarrReleaseType")
 	if radarrReleaseType == "" {
 		radarrReleaseType = "inCinemas"
 	}
+
 	queryShowUnmonitored := c.Query("showUnmonitored")
-	var showUnmonitored bool
-	if queryShowUnmonitored == "" {
-	} else if queryShowUnmonitored == "true" {
+	switch queryShowUnmonitored {
+	case "true":
 		showUnmonitored = true
-	} else if queryShowUnmonitored == "false" {
-	} else {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "showUnmonitored must be 'true' or 'false'"})
+	case "false":
+	case "":
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{"message": "showUnmonitored must be empty, 'true', or 'false'"})
+		return
+	}
+
+	queryShowEpisodeHours := c.Query("showEpisodesHour")
+	switch queryShowEpisodeHours {
+	case "true":
+	case "false":
+		showEpisodeHours = false
+	case "":
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{"message": "showEpisodeHours must be empty, 'true', or 'false'"})
 		return
 	}
 
@@ -99,7 +117,7 @@ func GetiFrame(c *gin.Context) {
 	}
 
 	var html []byte
-	html, err = getMediaReleasesiFrame(iframeRequestData, theme, apiURL, radarrReleaseType, showUnmonitored)
+	html, err = getMediaReleasesiFrame(iframeRequestData, theme, apiURL, radarrReleaseType, showUnmonitored, showEpisodeHours)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, fmt.Errorf("Couldn't create iFrame: %s", err.Error()))
 		return
@@ -108,7 +126,7 @@ func GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func getMediaReleasesiFrame(calendar *Calendar, theme string, apiURL string, radarrReleaseType string, showUnmonitored bool) ([]byte, error) {
+func getMediaReleasesiFrame(calendar *Calendar, theme string, apiURL string, radarrReleaseType string, showUnmonitored, showEpisodeHours bool) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -326,7 +344,10 @@ func getMediaReleasesiFrame(calendar *Calendar, theme string, apiURL string, rad
             {{ if eq .Source "Sonarr" }}
                 <a href="{{ with . }}{{ $.SonarrAddress }}{{ end }}/series/{{ .Slug }}" target="_blank" class="release-title">{{ .Title }}</a>
                 <div class="more-info-container">
-                    <span class="info-label">S{{ .EpisodeDetails.SeasonNumber }}E{{ .EpisodeDetails.EpisodeNumber}} - {{ .EpisodeDetails.EpisodeName }}</span>
+                    {{ with . }}{{ if $.ShowEpisodeHours }}
+                        <span class="info-label" style="display: inline-block; min-width: 63.25px;"><i class="fa-solid fa-calendar-days"></i> {{ .ReleaseDate.Format "15h04" }}</span>
+                    {{ end }}{{ end }}
+                    <span class="info-label"><i class="fas fa-tv fa-xm"></i> S{{ .EpisodeDetails.SeasonNumber }}E{{ .EpisodeDetails.EpisodeNumber}} - {{ .EpisodeDetails.EpisodeName }}</span>
                 </div>
             {{ else if eq .Source "Radarr" }}
                 <a href="{{ with . }}{{ $.RadarrAddress }}{{ end }}/movie/{{ .Slug }}" target="_blank" class="release-title">{{ .Title }}</a>
@@ -362,6 +383,7 @@ func getMediaReleasesiFrame(calendar *Calendar, theme string, apiURL string, rad
 		APIURL:                        apiURL,
 		APIShowUnmonitored:            showUnmonitored,
 		APIRadarrReleaseType:          radarrReleaseType,
+		ShowEpisodeHours:              showEpisodeHours,
 		SonarrAddress:                 config.GlobalConfigs.Sonarr.Address,
 		RadarrAddress:                 config.GlobalConfigs.Radarr.Address,
 		ScrollbarThumbBackgroundColor: scrollbarThumbBackgroundColor,
@@ -401,6 +423,7 @@ type iframeTemplateData struct {
 	APIURL                        string
 	APIShowUnmonitored            bool
 	APIRadarrReleaseType          string
+	ShowEpisodeHours              bool
 	SonarrAddress                 string
 	RadarrAddress                 string
 	ScrollbarThumbBackgroundColor string

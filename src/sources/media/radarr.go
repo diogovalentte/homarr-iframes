@@ -60,15 +60,17 @@ func (r *Radarr) GetCalendar(unmonitored bool, startDate, endDate time.Time, rel
 	}
 
 	for _, entry := range entries {
+		var releaseDate time.Time
 		switch releaseType {
 		case "inCinemas":
 			if entry.InCinemas == "" {
 				continue
 			}
-			releaseDate, err := time.Parse(time.RFC3339, entry.InCinemas)
+			releaseDate, err = time.Parse(time.RFC3339, entry.InCinemas)
 			if err != nil {
 				return nil, fmt.Errorf("error parsing movie '%#v' in cinemas date: %w", entry, err)
 			}
+			releaseDate = releaseDate.In(time.Local)
 			if !isReleaseDateWithinDateRange(releaseDate, startDate, endDate) {
 				continue
 			}
@@ -76,10 +78,11 @@ func (r *Radarr) GetCalendar(unmonitored bool, startDate, endDate time.Time, rel
 			if entry.PhysicalRelease == "" {
 				continue
 			}
-			releaseDate, err := time.Parse(time.RFC3339, entry.InCinemas)
+			releaseDate, err = time.Parse(time.RFC3339, entry.InCinemas)
 			if err != nil {
 				return nil, fmt.Errorf("error parsing movie '%#v' physical release date: %w", entry, err)
 			}
+			releaseDate = releaseDate.In(time.Local)
 			if !isReleaseDateWithinDateRange(releaseDate, startDate, endDate) {
 				continue
 			}
@@ -87,10 +90,11 @@ func (r *Radarr) GetCalendar(unmonitored bool, startDate, endDate time.Time, rel
 			if entry.DigitalRelease == "" {
 				continue
 			}
-			releaseDate, err := time.Parse(time.RFC3339, entry.InCinemas)
+			releaseDate, err = time.Parse(time.RFC3339, entry.InCinemas)
 			if err != nil {
 				return nil, fmt.Errorf("error parsing movie '%#v' digital release date: %w", entry, err)
 			}
+			releaseDate = releaseDate.In(time.Local)
 			if !isReleaseDateWithinDateRange(releaseDate, startDate, endDate) {
 				continue
 			}
@@ -103,6 +107,7 @@ func (r *Radarr) GetCalendar(unmonitored bool, startDate, endDate time.Time, rel
 		calendar.Releases = append(calendar.Releases, MediaRelease{
 			Title:         entry.OriginalTitle,
 			Source:        "Radarr",
+			ReleaseDate:   releaseDate,
 			Slug:          entry.TitleSlug,
 			CoverImageURL: coverImageURL,
 			IsDownloaded:  entry.HasFile,
