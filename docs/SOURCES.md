@@ -53,7 +53,7 @@ This source creates an iFrame with media that is released today. There is also a
 - It gets the media from [Sonarr](https://github.com/Sonarr/Sonarr) and [Radarr](https://github.com/Radarr/Radarr).
 - Set the container timezone to get a more precise result.
 
-![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/633846d1-3717-4d52-92f4-b9e805696c9c)
+![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/17665aaf-5eb5-44df-a0db-9b99a5fe77fb)
 
 To use this source, you'll need to provide the environment variables below, but you don't need to provide all of them, you can specify only the Sonarr variables for example.
 
