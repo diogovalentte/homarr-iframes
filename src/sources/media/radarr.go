@@ -101,16 +101,18 @@ func (r *Radarr) GetCalendar(unmonitored bool, startDate, endDate time.Time, rel
 		default:
 			return nil, fmt.Errorf("invalid release type: %s", releaseType)
 		}
+		shouldBeDownloaded := releaseDate.Before(time.Now())
 
 		coverImageURL := getReleaseCoverImageURL(entry.Images)
 
 		calendar.Releases = append(calendar.Releases, MediaRelease{
-			Title:         entry.OriginalTitle,
-			Source:        "Radarr",
-			ReleaseDate:   releaseDate,
-			Slug:          entry.TitleSlug,
-			CoverImageURL: coverImageURL,
-			IsDownloaded:  entry.HasFile,
+			Title:              entry.OriginalTitle,
+			Source:             "Radarr",
+			ReleaseDate:        releaseDate,
+			Slug:               entry.TitleSlug,
+			CoverImageURL:      coverImageURL,
+			IsDownloaded:       entry.HasFile,
+			ShouldBeDownloaded: shouldBeDownloaded,
 		})
 	}
 

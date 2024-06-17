@@ -69,14 +69,17 @@ func (s *Sonarr) GetCalendar(unmonitored bool, startDate, endDate time.Time) (*C
 		if !isReleaseDateWithinDateRange(airDate, startDate, endDate) {
 			continue
 		}
+		now := time.Now()
+		shouldBeDownloaded := airDate.Before(now)
 
 		calendar.Releases = append(calendar.Releases, MediaRelease{
-			Title:         entry.Series.Title,
-			Source:        "Sonarr",
-			ReleaseDate:   airDate,
-			Slug:          entry.Series.TitleSlug,
-			CoverImageURL: coverImageURL,
-			IsDownloaded:  entry.HasFile,
+			Title:              entry.Series.Title,
+			Source:             "Sonarr",
+			ReleaseDate:        airDate,
+			Slug:               entry.Series.TitleSlug,
+			CoverImageURL:      coverImageURL,
+			IsDownloaded:       entry.HasFile,
+			ShouldBeDownloaded: shouldBeDownloaded,
 			EpisodeDetails: struct {
 				SeasonNumber  int
 				EpisodeNumber int

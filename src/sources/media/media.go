@@ -51,7 +51,7 @@ func getIframeData(radarrReleaseType string, unmonitored bool) (*Calendar, error
 	}
 
 	if !isAnySourceValid {
-		return nil, fmt.Errorf("no valid source found. Please check the docs for what environment variables should be set.")
+		return nil, fmt.Errorf("no valid source found. Please check the docs for what environment variables should be set")
 	}
 
 	return calendar, nil
@@ -119,7 +119,7 @@ func GetiFrame(c *gin.Context) {
 	var html []byte
 	html, err = getMediaReleasesiFrame(iframeRequestData, theme, apiURL, radarrReleaseType, showUnmonitored, showEpisodeHours)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, fmt.Errorf("Couldn't create iFrame: %s", err.Error()))
+		c.JSON(http.StatusInternalServerError, fmt.Errorf("couldn't create iFrame: %s", err.Error()))
 		return
 	}
 
@@ -360,7 +360,11 @@ func getMediaReleasesiFrame(calendar *Calendar, theme string, apiURL string, rad
                 {{ if .IsDownloaded }}
                     <p class="status-label" style="color: white; background-color: green;">Available</p>
                 {{ else }}
-                    <p class="status-label" style="color: white; background-color: red;">Not Available</p>
+                    {{ if .ShouldBeDownloaded }}
+                        <p class="status-label" style="color: white; background-color: red;">Not Available</p>
+                    {{ else }}
+                        <p class="status-label" style="color: white; background-color: #99b6bb;">Not Available</p>
+                    {{ end }}
                 {{ end }}
             </div>
         </div>
@@ -438,12 +442,13 @@ func GetHash(c *gin.Context) {
 	}
 	queryShowUnmonitored := c.Query("showUnmonitored")
 	var showUnmonitored bool
-	if queryShowUnmonitored == "" {
-	} else if queryShowUnmonitored == "true" {
+	switch queryShowUnmonitored {
+	case "true":
 		showUnmonitored = true
-	} else if queryShowUnmonitored == "false" {
-	} else {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "showUnmonitored must be 'true' or 'false'"})
+	case "false":
+	case "":
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{"message": "showUnmonitored must be empty, 'true', or 'false'"})
 		return
 	}
 
