@@ -43,8 +43,8 @@ func (v *Vikunja) GetTasks(limit int, projectID int) ([]*Task, error) {
 	return tasks, nil
 }
 
-func (v *Vikunja) SetTaskDone(taskId int) error {
-	path := "/api/v1/tasks/" + strconv.Itoa(taskId)
+func (v *Vikunja) SetTaskDone(taskID int) error {
+	path := "/api/v1/tasks/" + strconv.Itoa(taskID)
 	body := []byte(`{"done": true}`)
 	task := &Task{}
 
@@ -53,7 +53,7 @@ func (v *Vikunja) SetTaskDone(taskId int) error {
 		return err
 	}
 
-	if task.Done != true {
+	if !task.Done {
 		return fmt.Errorf("task not done")
 	}
 
@@ -77,8 +77,8 @@ func (v *Vikunja) GetProjects() (map[int]*Project, error) {
 	return projectsMap, nil
 }
 
-func (v *Vikunja) GetProject(projectId int) (*Project, error) {
-	path := "/api/v1/projects/" + strconv.Itoa(projectId)
+func (v *Vikunja) GetProject(projectID int) (*Project, error) {
+	path := "/api/v1/projects/" + strconv.Itoa(projectID)
 	project := &Project{}
 
 	err := v.baseRequest("GET", v.Address+path, nil, &project)

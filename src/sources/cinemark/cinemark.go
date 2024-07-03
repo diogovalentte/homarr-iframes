@@ -20,22 +20,21 @@ var backgroundImageURL = "https://static.vecteezy.com/system/resources/previews/
 type Cinemark struct{}
 
 // GetiFrame returns an iframe with the in theater movies for a specific city
-func (_ *Cinemark) GetiFrame(c *gin.Context) {
-	theaterIdsStr := c.Query("theaterIds")
-	var theaterIds []int
-	if theaterIdsStr == "" {
+func (Cinemark) GetiFrame(c *gin.Context) {
+	theaterIDsStr := c.Query("theaterIds")
+	var theaterIDs []int
+	if theaterIDsStr == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "theaterIds is required"})
 		return
-	} else {
-		theaterStrings := strings.Split(theaterIdsStr, ",")
-		for _, theaterStr := range theaterStrings {
-			theaterId, err := strconv.Atoi(theaterStr)
-			if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"message": "theaterIds must be a list of numbers"})
-				return
-			}
-			theaterIds = append(theaterIds, theaterId)
+	}
+	theaterStrings := strings.Split(theaterIDsStr, ",")
+	for _, theaterStr := range theaterStrings {
+		theaterID, err := strconv.Atoi(theaterStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "theaterIds must be a list of numbers"})
+			return
 		}
+		theaterIDs = append(theaterIDs, theaterID)
 	}
 
 	queryLimit := c.Query("limit")
@@ -69,7 +68,7 @@ func (_ *Cinemark) GetiFrame(c *gin.Context) {
 	}
 
 	cinemark := Cinemark{}
-	movies, err := cinemark.GetOnDisplayByTheater(theaterIds, limit, limitProvided)
+	movies, err := cinemark.GetOnDisplayByTheater(theaterIDs, limit, limitProvided)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -79,11 +78,11 @@ func (_ *Cinemark) GetiFrame(c *gin.Context) {
 	if len(movies) < 1 {
 		var apiURLPath string
 		if apiURL != "" {
-			apiURLPath = apiURL + "/v1/hash/cinemark?limit=" + strconv.Itoa(limit) + "&theaterId=" + theaterIdsStr
+			apiURLPath = apiURL + "/v1/hash/cinemark?limit=" + strconv.Itoa(limit) + "&theaterId=" + theaterIDsStr
 		}
 		html = sources.GetBaseNothingToShowiFrame(theme, backgroundImageURL, "center", "cover", "0.3", apiURLPath)
 	} else {
-		html, err = getMoviesiFrame(movies, theme, apiURL, limit, theaterIdsStr)
+		html, err = getMoviesiFrame(movies, theme, apiURL, limit, theaterIDsStr)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("Couldn't create HTML code: %s", err.Error())})
 			return
@@ -93,7 +92,7 @@ func (_ *Cinemark) GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func getMoviesiFrame(movies []Movie, theme, apiURL string, limit int, theaterIds string) ([]byte, error) {
+func getMoviesiFrame(movies []Movie, theme, apiURL string, limit int, theaterIDs string) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -327,7 +326,7 @@ func getMoviesiFrame(movies []Movie, theme, apiURL string, limit int, theaterIds
 		Theme:                         theme,
 		APIURL:                        apiURL,
 		APILimit:                      limit,
-		TheaterId:                     theaterIds,
+		TheaterID:                     theaterIDs,
 		BackgroundImageURL:            backgroundImageURL,
 		ScrollbarThumbBackgroundColor: scrollbarThumbBackgroundColor,
 		ScrollbarTrackBackgroundColor: scrollbarTrackBackgroundColor,
@@ -349,29 +348,28 @@ type iframeTemplateData struct {
 	Theme                         string
 	APIURL                        string
 	APILimit                      int
-	TheaterId                     string
+	TheaterID                     string
 	BackgroundImageURL            string
 	ScrollbarThumbBackgroundColor string
 	ScrollbarTrackBackgroundColor string
 }
 
 // GetHash returns the hash of the in theater movies for a specific city
-func (_ *Cinemark) GetHash(c *gin.Context) {
-	theaterIdsStr := c.Query("theaterIds")
-	var theaterIds []int
-	if theaterIdsStr == "" {
+func (Cinemark) GetHash(c *gin.Context) {
+	theaterIDsStr := c.Query("theaterIds")
+	var theaterIDs []int
+	if theaterIDsStr == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "theaterIds is required"})
 		return
-	} else {
-		theaterStrings := strings.Split(theaterIdsStr, ",")
-		for _, theaterStr := range theaterStrings {
-			theaterId, err := strconv.Atoi(theaterStr)
-			if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"message": "theaterIds must be a list of numbers"})
-				return
-			}
-			theaterIds = append(theaterIds, theaterId)
+	}
+	theaterStrings := strings.Split(theaterIDsStr, ",")
+	for _, theaterStr := range theaterStrings {
+		theaterID, err := strconv.Atoi(theaterStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "theaterIds must be a list of numbers"})
+			return
 		}
+		theaterIDs = append(theaterIDs, theaterID)
 	}
 
 	queryLimit := c.Query("limit")
@@ -388,7 +386,7 @@ func (_ *Cinemark) GetHash(c *gin.Context) {
 	}
 
 	cinemark := Cinemark{}
-	movies, err := cinemark.GetOnDisplayByTheater(theaterIds, limit, limitProvided)
+	movies, err := cinemark.GetOnDisplayByTheater(theaterIDs, limit, limitProvided)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return

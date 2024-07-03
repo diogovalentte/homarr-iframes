@@ -130,7 +130,7 @@ func (l *Linkwarden) GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func getLinksiFrame(linkwardenAddress string, links []*Link, theme, apiURL, collectionId string, limit int) ([]byte, error) {
+func getLinksiFrame(linkwardenAddress string, links []*Link, theme, apiURL, collectionID string, limit int) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -317,7 +317,7 @@ func getLinksiFrame(linkwardenAddress string, links []*Link, theme, apiURL, coll
 	if apiURL != "" {
 		html = strings.Replace(html, "API-URL", apiURL, -1)
 		html = strings.Replace(html, "API-LIMIT", strconv.Itoa(limit), -1)
-		html = strings.Replace(html, "API-COLLECTION-ID", collectionId, -1)
+		html = strings.Replace(html, "API-COLLECTION-ID", collectionID, -1)
 	} else {
 		html = strings.Replace(html, "fetchAndUpdate();", "// fetchAndUpdate", -1)
 	}

@@ -49,12 +49,7 @@ func (v *Vikunja) Init(address, token string) error {
 	if address == "" || token == "" {
 		return fmt.Errorf("VIKUNJA_ADDRESS and VIKUNJA_TOKEN variables should be set")
 	}
-
-	if strings.HasSuffix(address, "/") {
-		address = address[:len(address)-1]
-	}
-
-	v.Address = address
+	v.Address = strings.TrimSuffix(address, "/")
 	v.Token = token
 
 	err := v.SetInMemoryInstanceProjects()

@@ -13,7 +13,7 @@ var (
 	defaultMoviesLimit = 999
 )
 
-func (c *Cinemark) GetOnDisplayByTheater(theaterIds []int, limit int, limitProvided bool) ([]Movie, error) {
+func (c *Cinemark) GetOnDisplayByTheater(theaterIDs []int, limit int, limitProvided bool) ([]Movie, error) {
 	if !limitProvided {
 		limit = defaultMoviesLimit
 	} else {
@@ -24,9 +24,9 @@ func (c *Cinemark) GetOnDisplayByTheater(theaterIds []int, limit int, limitProvi
 
 	moviesNames := make(map[string]struct{})
 	moviesSlice := []Movie{}
-	for _, theaterId := range theaterIds {
+	for _, theaterID := range theaterIDs {
 		var responseData onDisplayByTheaterResponse
-		err := c.baseRequest("GET", apiURL+"movies/OnDisplayByTheater"+fmt.Sprintf("?&theaterId=%d&pageNumber=1&pageSize=%d", theaterId, limit), nil, &responseData)
+		err := c.baseRequest("GET", apiURL+"movies/OnDisplayByTheater"+fmt.Sprintf("?&theaterId=%d&pageNumber=1&pageSize=%d", theaterID, limit), nil, &responseData)
 		if err != nil {
 			return nil, err
 		}
@@ -34,7 +34,7 @@ func (c *Cinemark) GetOnDisplayByTheater(theaterIds []int, limit int, limitProvi
 		for _, movie := range responseData.Movies {
 			if _, exists := moviesNames[movie.Name]; !exists {
 				movieURL := fmt.Sprintf("https://www.cinemark.com.br/filme/%s", movie.Slug)
-				if len(theaterIds) > 1 {
+				if len(theaterIDs) > 1 {
 					movieURL = movieURL + "?city=true"
 				}
 
@@ -67,7 +67,7 @@ type onDisplayByTheaterResponse struct {
 	} `json:"dataResult"`
 }
 
-func (_ *Cinemark) baseRequest(method, url string, body io.Reader, target interface{}) error {
+func (Cinemark) baseRequest(method, url string, body io.Reader, target interface{}) error {
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
