@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	backgroundImageURL = "https://vikunja.io/images/vikunja.png"
+	backgroundImageURL = "https://avatars.githubusercontent.com/u/41270016"
 	instanceProjects   = make(map[int]*Project)
 )
 
