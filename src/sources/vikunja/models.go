@@ -2,6 +2,10 @@ package vikunja
 
 import "time"
 
+type Info struct {
+	Version string `json:"version"`
+}
+
 type loginRequestBody struct {
 	Username string `json:"username"`
 	Password string `json:"password"`

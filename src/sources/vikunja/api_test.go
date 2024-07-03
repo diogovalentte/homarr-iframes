@@ -28,6 +28,44 @@ func TestMain(m *testing.M) {
 	os.Exit(exitCode)
 }
 
+func TestGetVersion(t *testing.T) {
+	v, err := New(config.GlobalConfigs.Vikunja.Address, config.GlobalConfigs.Vikunja.Token)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Run("get version", func(t *testing.T) {
+		version, err := v.getVikunjaVersion()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if version == "" {
+			t.Fatal("version is empty")
+		}
+	})
+
+	tests := map[string]string{
+		"1.25.3":  "1.25.3",
+		"1.25.4":  "1.25.3",
+		"1.25.0":  "1.24.3",
+		"2.25.3":  "1.55.4",
+		"24.25.3": "5.0.8",
+	}
+
+	t.Run("extract version", func(t *testing.T) {
+		for version1, version2 := range tests {
+			v, err := IsVersionGreaterOrEqualTo(version1, version2)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !v {
+				t.Fatalf("%s is not greater or equal to %s", version1, version2)
+			}
+		}
+	})
+}
+
 func TestGetTasks(t *testing.T) {
 	v, err := New(config.GlobalConfigs.Vikunja.Address, config.GlobalConfigs.Vikunja.Token)
 	if err != nil {
