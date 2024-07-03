@@ -84,7 +84,7 @@ func (Cinemark) GetiFrame(c *gin.Context) {
 	} else {
 		html, err = getMoviesiFrame(movies, theme, apiURL, limit, theaterIDsStr)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("Couldn't create HTML code: %s", err.Error())})
+			c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Sprintf("Couldn't create HTML code: %s", err.Error())})
 			return
 		}
 	}
@@ -252,7 +252,7 @@ func getMoviesiFrame(movies []Movie, theme, apiURL string, limit int, theaterIDs
 
         async function fetchData() {
             try {
-                var url = '{{ .APIURL }}/v1/hash/cinemark?limit={{ .APILimit }}&theaterId={{ .TheaterId }}';
+                var url = '{{ .APIURL }}/v1/hash/cinemark?limit={{ .APILimit }}&theaterId={{ .TheaterID }}';
                 const response = await fetch(url);
                 const data = await response.json();
 
