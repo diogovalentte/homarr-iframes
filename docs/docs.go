@@ -540,6 +540,13 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "example": "1,5,7",
+                        "description": "Project IDs to NOT get tasks from. You can get it by going to the project page in Vikunja, the project ID should be on the URL. Example project page URL: https://vikunja.com/projects/2, the project ID is 2. Inbox tasks = 1, Favorite tasks = -1.",
+                        "name": "exclude_project_ids",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "example": "https://sub.domain.com",
                         "description": "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload. Also used by the button to set the task done, if not provided, the button will not appear (the button doesn't appear in repeating tasks.)",
                         "name": "api_url",

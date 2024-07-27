@@ -22,7 +22,6 @@ var (
 
 var v *Vikunja
 
-// Vikunja is the a source
 type Vikunja struct {
 	Address string
 	Token   string
@@ -90,6 +89,20 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"message": "project_id must be a number"})
 			return
+		}
+	}
+
+	queryExcludeProjectIDs := c.Query("exclude_project_ids")
+	var excludeProjectIDs []*int
+	if queryExcludeProjectIDs != "" {
+		excludeProjectIDsStr := strings.Split(queryExcludeProjectIDs, ",")
+		for _, excludeProjectIDStr := range excludeProjectIDsStr {
+			excludeProjectID, err := strconv.Atoi(excludeProjectIDStr)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"message": "exclude_project_ids must be a comma separated list of numbers"})
+				return
+			}
+			excludeProjectIDs = append(excludeProjectIDs, &excludeProjectID)
 		}
 	}
 
@@ -163,7 +176,7 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 
 	tasks := []*Task{}
 	if limit != 0 {
-		tasks, err = v.GetTasks(limit, projectID)
+		tasks, err = v.GetTasks(limit, projectID, excludeProjectIDs)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			return
@@ -174,11 +187,11 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 	if len(tasks) < 1 {
 		var apiURLPath string
 		if apiURL != "" {
-			apiURLPath = apiURL + "/v1/hash/vikunja?limit=" + strconv.Itoa(limit) + "&project_id=" + strconv.Itoa(projectID)
+			apiURLPath = apiURL + "/v1/hash/vikunja?limit=" + strconv.Itoa(limit) + "&project_id=" + strconv.Itoa(projectID) + "&exclude_project_ids=" + queryExcludeProjectIDs
 		}
 		html = sources.GetBaseNothingToShowiFrame("#226fff", backgroundImageURL, "center", "cover", "0.3", apiURLPath)
 	} else {
-		html, err = getTasksiFrame(v.Address, tasks, theme, apiURL, limit, projectID, showCreated, showDue, showPriority, showProject, ShowFavoriteIcon)
+		html, err = getTasksiFrame(v.Address, tasks, theme, apiURL, limit, projectID, queryExcludeProjectIDs, showCreated, showDue, showPriority, showProject, ShowFavoriteIcon)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, fmt.Errorf("Couldn't create HTML code: %s", err.Error()))
 			return
@@ -188,7 +201,7 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, limit, projectID int, showCreated, showDue, showPriority, showProject, showFavoriteIcon bool) ([]byte, error) {
+func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, limit, projectID int, excludeProjectIDs string, showCreated, showDue, showPriority, showProject, showFavoriteIcon bool) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -343,7 +356,7 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
 
         async function fetchData() {
             try {
-                var url = '{{ .APIURL }}/v1/hash/vikunja?limit={{ .APILimit }}&project_id={{ .APIProjectID }}';
+                var url = '{{ .APIURL }}/v1/hash/vikunja?limit={{ .APILimit }}&project_id={{ .APIProjectID }}&exclude_project_ids={{ .APIExcludeProjectIDs }}';
                 const response = await fetch(url);
                 const data = await response.json();
 
@@ -494,6 +507,7 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
 		APIURL:                        apiURL,
 		APILimit:                      limit,
 		APIProjectID:                  projectID,
+		APIExcludeProjectIDs:          excludeProjectIDs,
 		VikunjaAddress:                vikunjaAddress,
 		BackgroundImageURL:            backgroundImageURL,
 		ScrollbarThumbBackgroundColor: scrollbarThumbBackgroundColor,
@@ -568,6 +582,7 @@ type iframeTemplateData struct {
 	APIURL                        string
 	APILimit                      int
 	APIProjectID                  int
+	APIExcludeProjectIDs          string
 	VikunjaAddress                string
 	BackgroundImageURL            string
 	ScrollbarThumbBackgroundColor string
@@ -604,9 +619,23 @@ func (v *Vikunja) GetHash(c *gin.Context) {
 		}
 	}
 
+	queryExcludeProjectIDs := c.Query("exclude_project_ids")
+	var excludeProjectIDs []*int
+	if queryExcludeProjectIDs != "" {
+		excludeProjectIDsStr := strings.Split(queryExcludeProjectIDs, ",")
+		for _, excludeProjectIDStr := range excludeProjectIDsStr {
+			excludeProjectID, err := strconv.Atoi(excludeProjectIDStr)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"message": "exclude_project_ids must be a comma separated list of numbers"})
+				return
+			}
+			excludeProjectIDs = append(excludeProjectIDs, &excludeProjectID)
+		}
+	}
+
 	pTasks := []*Task{}
 	if limit != 0 {
-		pTasks, err = v.GetTasks(limit, projectID)
+		pTasks, err = v.GetTasks(limit, projectID, excludeProjectIDs)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			return

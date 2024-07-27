@@ -13,14 +13,47 @@ import (
 // GetTasks get not done tasks with using a custom ordering.
 // Can also limit the number of tasks returned.
 // The project_id is the id of the project to get the tasks from. Empty gets all tasks from all projects.
-func (v *Vikunja) GetTasks(limit int, projectID int) ([]*Task, error) {
+func (v *Vikunja) GetTasks(limit int, projectID int, excludeProjectIDs []*int) ([]*Task, error) {
+	var tasks []*Task
+	var err error
 	if isGreater, err := v.IsVikunjaVersionGreaterOrEqualTo("0.24.0"); err != nil {
 		return nil, err
 	} else if isGreater {
-		return v.getTasksV2(limit, projectID)
+		tasks, err = v.getTasksV2(limit, projectID)
+	} else {
+		tasks, err = v.getTasksV1(limit, projectID)
 	}
 
-	return v.getTasksV1(limit, projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(excludeProjectIDs) > 0 {
+		var filteredTasks []*Task
+		for _, task := range tasks {
+			exclude := false
+			for _, excludeProjectID := range excludeProjectIDs {
+				if *excludeProjectID == -1 {
+					if task.IsFavorite {
+						exclude = true
+						break
+					}
+				} else {
+					if task.ProjectID == *excludeProjectID {
+						exclude = true
+						break
+					}
+				}
+			}
+			if !exclude {
+				filteredTasks = append(filteredTasks, task)
+			}
+		}
+
+		return filteredTasks, nil
+	}
+
+	return tasks, nil
 }
 
 func (v *Vikunja) getTasksV2(limit int, projectID int) ([]*Task, error) {
