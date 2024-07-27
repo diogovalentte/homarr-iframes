@@ -77,9 +77,10 @@ func GetBaseNothingToShowiFrame(backgroundColor, backgroundImageURL, backgroundP
 </body>
 </html>
     `
-	if backgroundColor == "light" {
+	switch backgroundColor {
+	case "light":
 		backgroundColor = "#ffffff"
-	} else if backgroundColor == "dark" {
+	case "dark":
 		backgroundColor = "#25262b"
 	}
 	var refreshIframe string

@@ -99,7 +99,7 @@ func (n *Netdata) GetiFrame(c *gin.Context) {
 	} else {
 		html, err = getAlarmsiFrame(n.Address, alarms, theme, apiURL, limit)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, fmt.Errorf("Couldn't create HTML code: %s", err.Error()))
+			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			return
 		}
 	}

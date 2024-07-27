@@ -45,9 +45,7 @@ func (u *UptimeKuma) Init(address string) error {
 		return fmt.Errorf("UPTIMEKUMA_ADDRESS variable should be set")
 	}
 
-	if strings.HasSuffix(address, "/") {
-		address = address[:len(address)-1]
-	}
+	strings.TrimSuffix(address, "/")
 
 	u.Address = address
 
@@ -271,24 +269,24 @@ func getUpDownSitesiFrame(upDownSites *UpDownSites, theme, apiURL, slug, contain
 	}
 
 	if apiURL != "" {
-		html = strings.Replace(html, "API-URL", apiURL, -1)
-		html = strings.Replace(html, "SLUG", slug, -1)
+		html = strings.ReplaceAll(html, "API-URL", apiURL)
+		html = strings.ReplaceAll(html, "SLUG", slug)
 	} else {
-		html = strings.Replace(html, "fetchAndUpdate();", "// fetchAndUpdate", -1)
+		html = strings.ReplaceAll(html, "fetchAndUpdate();", "// fetchAndUpdate")
 	}
 
 	if !showTitle {
-		html = strings.Replace(html, "IFRAME-TITLE", "", -1)
+		html = strings.ReplaceAll(html, "IFRAME-TITLE", "")
 	} else {
-		html = strings.Replace(html, "IFRAME-TITLE", `<div><div class="title-container">Uptime Kuma</div></div>`, -1)
+		html = strings.ReplaceAll(html, "IFRAME-TITLE", `<div><div class="title-container">Uptime Kuma</div></div>`)
 	}
 
 	if containersDisplay == "horizontal" {
-		html = strings.Replace(html, "CONTAINERS-DISPLAY", "flex", -1)
-		html = strings.Replace(html, "CONTAINER-MARGIN", "0px 10px 0px 0px", -1)
+		html = strings.ReplaceAll(html, "CONTAINERS-DISPLAY", "flex")
+		html = strings.ReplaceAll(html, "CONTAINER-MARGIN", "0px 10px 0px 0px")
 	} else {
-		html = strings.Replace(html, "CONTAINERS-DISPLAY", "block", -1)
-		html = strings.Replace(html, "CONTAINER-MARGIN", "0px 0px 10px 0px", -1)
+		html = strings.ReplaceAll(html, "CONTAINERS-DISPLAY", "block")
+		html = strings.ReplaceAll(html, "CONTAINER-MARGIN", "0px 0px 10px 0px")
 	}
 
 	var uptimePercentage int

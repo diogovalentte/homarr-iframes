@@ -193,7 +193,7 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 	} else {
 		html, err = getTasksiFrame(v.Address, tasks, theme, apiURL, limit, projectID, queryExcludeProjectIDs, showCreated, showDue, showPriority, showProject, ShowFavoriteIcon)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, fmt.Errorf("Couldn't create HTML code: %s", err.Error()))
+			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			return
 		}
 	}
