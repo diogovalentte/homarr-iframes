@@ -15,6 +15,7 @@ type Configs struct {
 	Sonarr            sonarrConfigs
 	Radarr            radarrConfigs
 	UptimeKumaConfigs uptimeKumaConfigs
+	NetdataConfigs    netdataConfigs
 }
 
 type linkwardenConfigs struct {
@@ -46,6 +47,11 @@ type uptimeKumaConfigs struct {
 	Address string
 }
 
+type netdataConfigs struct {
+	Address string
+	Token   string
+}
+
 func SetConfigs(filePath string) error {
 	GlobalConfigs = &Configs{}
 
@@ -73,6 +79,9 @@ func SetConfigs(filePath string) error {
 	GlobalConfigs.Radarr.APIKey = os.Getenv("RADARR_API_KEY")
 
 	GlobalConfigs.UptimeKumaConfigs.Address = os.Getenv("UPTIMEKUMA_ADDRESS")
+
+	GlobalConfigs.NetdataConfigs.Address = os.Getenv("NETDATA_ADDRESS")
+	GlobalConfigs.NetdataConfigs.Token = os.Getenv("NETDATA_TOKEN")
 
 	return nil
 }

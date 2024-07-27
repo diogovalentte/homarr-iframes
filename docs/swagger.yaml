@@ -87,6 +87,24 @@ paths:
           schema:
             $ref: '#/definitions/routes.hashResponse'
       summary: Get the hash of media releases
+  /hash/netdata:
+    get:
+      description: Get the hash of the Netdata alarms. Used by the iFrames to check
+        updates and reload the iframe.
+      parameters:
+      - description: Limits the number of items in the iFrame.
+        example: 5
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/routes.hashResponse'
+      summary: Get the hash of the Netdata alarms
   /hash/overseerr:
     get:
       description: Get the hash of the Overseerr requests. Used by the iFrames to
@@ -305,6 +323,37 @@ paths:
           schema:
             type: string
       summary: Media Releases
+  /iframe/netdata:
+    get:
+      description: Returns an iFrame with Netdata alarms.
+      parameters:
+      - description: Homarr theme, defaults to light. If it's different from your
+          Homarr theme, the background turns white
+        example: light
+        in: query
+        name: theme
+        type: string
+      - description: API URL used by your browser. Use by the iFrames to check any
+          update, if there is an update, the iFrame reloads. If not specified, the
+          iFrames will never try to reload.
+        example: https://sub.domain.com
+        in: query
+        name: api_url
+        required: true
+        type: string
+      - description: Limits the number of items in the iFrame.
+        example: 5
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+      summary: Netdata iFrame
   /iframe/overseerr:
     get:
       description: Returns an iFrame with Overseerr media requests list. Returns all

@@ -9,6 +9,7 @@ import (
 	"github.com/diogovalentte/homarr-iframes/src/sources/cinemark"
 	"github.com/diogovalentte/homarr-iframes/src/sources/linkwarden"
 	"github.com/diogovalentte/homarr-iframes/src/sources/media"
+	"github.com/diogovalentte/homarr-iframes/src/sources/netdata"
 	"github.com/diogovalentte/homarr-iframes/src/sources/overseerr"
 	uptimekuma "github.com/diogovalentte/homarr-iframes/src/sources/uptime-kuma"
 	"github.com/diogovalentte/homarr-iframes/src/sources/vikunja"
@@ -22,6 +23,7 @@ func HashRoutes(group *gin.RouterGroup) {
 	group.GET("/overseerr", OverseerrHashHandler)
 	group.GET("/media_releases", MediaReleasesHashHandler)
 	group.GET("/uptimekuma", UptimeKumaHashHandler)
+	group.GET("/netdata", NetdataHashHandler)
 }
 
 // @Summary Get the hash of the Linkwarden bookmarks
@@ -114,4 +116,19 @@ func UptimeKumaHashHandler(c *gin.Context) {
 		return
 	}
 	u.GetHash(c)
+}
+
+// @Summary Get the hash of the Netdata alarms
+// @Description Get the hash of the Netdata alarms. Used by the iFrames to check updates and reload the iframe.
+// @Success 200 {object} hashResponse
+// @Produce json
+// @Param limit query int false "Limits the number of items in the iFrame." Example(5)
+// @Router /hash/netdata [get]
+func NetdataHashHandler(c *gin.Context) {
+	n, err := netdata.New(config.GlobalConfigs.NetdataConfigs.Address, config.GlobalConfigs.NetdataConfigs.Token)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	n.GetHash(c)
 }

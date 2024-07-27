@@ -10,6 +10,7 @@ import (
 	"github.com/diogovalentte/homarr-iframes/src/sources/cinemark"
 	"github.com/diogovalentte/homarr-iframes/src/sources/linkwarden"
 	"github.com/diogovalentte/homarr-iframes/src/sources/media"
+	"github.com/diogovalentte/homarr-iframes/src/sources/netdata"
 	"github.com/diogovalentte/homarr-iframes/src/sources/overseerr"
 	uptimekuma "github.com/diogovalentte/homarr-iframes/src/sources/uptime-kuma"
 	"github.com/diogovalentte/homarr-iframes/src/sources/vikunja"
@@ -24,6 +25,7 @@ func IFrameRoutes(group *gin.RouterGroup) {
 	group.GET("/overseerr", OverseerriFrameHandler)
 	group.GET("/media_releases", MediaReleasesiFrameHandler)
 	group.GET("/uptimekuma", UptimeKumaiFrameHandler)
+	group.GET("/netdata", NetdataiFrameHandler)
 }
 
 // @Summary Linkwarden  bookmarks iFrame
@@ -164,6 +166,23 @@ func UptimeKumaiFrameHandler(c *gin.Context) {
 		return
 	}
 	u.GetiFrame(c)
+}
+
+// @Summary Netdata iFrame
+// @Description Returns an iFrame with Netdata alarms.
+// @Success 200 {string} string "HTML content"
+// @Produce html
+// @Param theme query string false "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white" Example(light)
+// @Param api_url query string true "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload." Example(https://sub.domain.com)
+// @Param limit query int false "Limits the number of items in the iFrame." Example(5)
+// @Router /iframe/netdata [get]
+func NetdataiFrameHandler(c *gin.Context) {
+	n, err := netdata.New(config.GlobalConfigs.NetdataConfigs.Address, config.GlobalConfigs.NetdataConfigs.Token)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	n.GetiFrame(c)
 }
 
 type messsageResponse struct {
