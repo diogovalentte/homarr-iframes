@@ -79,3 +79,14 @@ This source gets on display movies of specific Cinemark theaters (only in Brazil
 - You have to specify which theaters to get movies from. I recommend specifying all theaters in your city.
 
 ![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/7071b022-fe90-4db7-874b-8b88d0298641)
+
+# Netdata
+
+This source creates an iFrame with your alarms from your [Netdata](https://github.com/netdata/netdata) instance.
+
+![image](https://github.com/user-attachments/assets/1145c008-7853-4438-a154-7a1a6b8dde21)
+
+To use this source, you'll need to provide the following environment variables:
+
+- `NETDATA_ADDRESS`: your Netdata instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+- `NETDATA_TOKEN`: an access token used to access your Netdata instance API to get your alarms. See how to get it [here](https://learn.netdata.cloud/docs/netdata-cloud/authentication-&-authorization/api-tokens).
