@@ -107,7 +107,7 @@ func (n *Netdata) GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func getAlarmsiFrame(netdataAddress string, alarms []*Alarm, theme, apiURL string, limit int) ([]byte, error) {
+func getAlarmsiFrame(netdataAddress string, alarms []Alarm, theme, apiURL string, limit int) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -373,7 +373,7 @@ func getAlarmsiFrame(netdataAddress string, alarms []*Alarm, theme, apiURL strin
 }
 
 type iframeTemplateData struct {
-	Alarms                        []*Alarm
+	Alarms                        []Alarm
 	Theme                         string
 	APIURL                        string
 	APILimit                      int

@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"sort"
 	"time"
 )
 
-func (n *Netdata) GetAlarms(limit int) ([]*Alarm, error) {
+func (n *Netdata) GetAlarms(limit int) ([]Alarm, error) {
 	if limit == 0 {
-		return []*Alarm{}, nil
+		return []Alarm{}, nil
 	}
 
 	path := "/api/v1/alarms"
@@ -25,7 +26,7 @@ func (n *Netdata) GetAlarms(limit int) ([]*Alarm, error) {
 	if len(resp.Alarms) < limit || limit < 0 {
 		alarmsSliceSize = len(resp.Alarms)
 	}
-	alarms := make([]*Alarm, 0, alarmsSliceSize)
+	alarms := make([]Alarm, 0, alarmsSliceSize)
 	counter := 0
 	for _, alarm := range resp.Alarms {
 		alarm.LastStatusChange = time.Unix(alarm.LastStatusChangeUnix, 0)
@@ -38,11 +39,15 @@ func (n *Netdata) GetAlarms(limit int) ([]*Alarm, error) {
 		}
 	}
 
+	sort.Slice(alarms, func(i, j int) bool {
+		return alarms[i].LastStatusChange.Before(alarms[j].LastStatusChange)
+	})
+
 	return alarms, nil
 }
 
 type getAlarmsResponse struct {
-	Alarms map[string]*Alarm `json:"alarms"`
+	Alarms map[string]Alarm `json:"alarms"`
 }
 
 func (n *Netdata) baseRequest(method, url string, body io.Reader, target interface{}) error {
