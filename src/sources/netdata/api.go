@@ -40,7 +40,7 @@ func (n *Netdata) GetAlarms(limit int) ([]Alarm, error) {
 	}
 
 	sort.Slice(alarms, func(i, j int) bool {
-		return alarms[i].LastStatusChange.Before(alarms[j].LastStatusChange)
+		return alarms[i].LastStatusChange.After(alarms[j].LastStatusChange)
 	})
 
 	return alarms, nil
