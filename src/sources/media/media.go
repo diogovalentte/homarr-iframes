@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -22,7 +23,7 @@ func getIframeData(radarrReleaseType string, unmonitored bool) (*Calendar, error
 
 	if config.GlobalConfigs.Radarr.Address != "" && config.GlobalConfigs.Radarr.APIKey != "" {
 		isAnySourceValid = true
-		radarr, err := NewRadarr(config.GlobalConfigs.Radarr.Address, config.GlobalConfigs.Radarr.APIKey)
+		radarr, err := NewRadarr(config.GlobalConfigs.Radarr.Address, config.GlobalConfigs.Radarr.InternalAddress, config.GlobalConfigs.Radarr.APIKey)
 		if err != nil {
 			return nil, fmt.Errorf("couldn't create Radarr client: %s", err.Error())
 		}
@@ -37,7 +38,7 @@ func getIframeData(radarrReleaseType string, unmonitored bool) (*Calendar, error
 
 	if config.GlobalConfigs.Sonarr.Address != "" && config.GlobalConfigs.Sonarr.APIKey != "" {
 		isAnySourceValid = true
-		sonarr, err := NewSonarr(config.GlobalConfigs.Sonarr.Address, config.GlobalConfigs.Sonarr.APIKey)
+		sonarr, err := NewSonarr(config.GlobalConfigs.Sonarr.Address, config.GlobalConfigs.Sonarr.InternalAddress, config.GlobalConfigs.Sonarr.APIKey)
 		if err != nil {
 			return nil, fmt.Errorf("couldn't create Sonarr client: %s", err.Error())
 		}
@@ -388,8 +389,8 @@ func getMediaReleasesiFrame(calendar *Calendar, theme string, apiURL string, rad
 		APIShowUnmonitored:            showUnmonitored,
 		APIRadarrReleaseType:          radarrReleaseType,
 		ShowEpisodeHours:              showEpisodeHours,
-		SonarrAddress:                 config.GlobalConfigs.Sonarr.Address,
-		RadarrAddress:                 config.GlobalConfigs.Radarr.Address,
+		SonarrAddress:                 strings.TrimSuffix(config.GlobalConfigs.Sonarr.Address, "/"),
+		RadarrAddress:                 strings.TrimSuffix(config.GlobalConfigs.Radarr.Address, "/"),
 		ScrollbarThumbBackgroundColor: scrollbarThumbBackgroundColor,
 		ScrollbarTrackBackgroundColor: scrollbarTrackBackgroundColor,
 	}

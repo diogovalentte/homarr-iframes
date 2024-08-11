@@ -8,7 +8,7 @@ import (
 )
 
 func TestGetRadarrCalendar(t *testing.T) {
-	s, err := NewRadarr(config.GlobalConfigs.Radarr.Address, config.GlobalConfigs.Radarr.APIKey)
+	s, err := NewRadarr(config.GlobalConfigs.Radarr.Address, config.GlobalConfigs.Radarr.InternalAddress, config.GlobalConfigs.Radarr.APIKey)
 	if err != nil {
 		t.Fatalf("error creating Radarr instance: %v", err)
 	}

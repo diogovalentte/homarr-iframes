@@ -9,17 +9,18 @@ import (
 var r *Radarr
 
 type Radarr struct {
-	Address string
-	APIKey  string
+	Address         string
+	InternalAddress string
+	APIKey          string
 }
 
-func NewRadarr(address, APIKey string) (*Radarr, error) {
+func NewRadarr(address, internalAddress, APIKey string) (*Radarr, error) {
 	if r != nil {
 		return r, nil
 	}
 
 	newR := &Radarr{}
-	err := newR.Init(address, APIKey)
+	err := newR.Init(address, internalAddress, APIKey)
 	if err != nil {
 		return nil, err
 	}
@@ -29,17 +30,18 @@ func NewRadarr(address, APIKey string) (*Radarr, error) {
 	return r, nil
 }
 
-func (r *Radarr) Init(address, token string) error {
-	if address == "" || token == "" {
+func (r *Radarr) Init(address, internalAddress, APIKey string) error {
+	if address == "" || APIKey == "" {
 		return fmt.Errorf("RADARR_ADDRESS and RADARR_API_KEY variables should be set")
 	}
 
-	if strings.HasSuffix(address, "/") {
-		address = address[:len(address)-1]
+	r.Address = strings.TrimSuffix(address, "/")
+	if internalAddress == "" {
+		r.InternalAddress = r.Address
+	} else {
+		r.InternalAddress = strings.TrimSuffix(internalAddress, "/")
 	}
-
-	r.Address = address
-	r.APIKey = token
+	r.APIKey = APIKey
 
 	return nil
 }
@@ -54,7 +56,7 @@ func (r *Radarr) GetCalendar(unmonitored bool, startDate, endDate time.Time, rel
 	endDate = time.Date(endDate.Year(), endDate.Month(), endDate.Day(), 0, 0, 0, 0, endDate.Location())
 
 	var entries []getRadarrCalendarEntryResponse
-	err := baseRequest("GET", fmt.Sprintf("%s/api/v3/calendar?apiKey=%s&start=%s&end=%s&unmonitored=%v&includeSeries=true", r.Address, r.APIKey, startDate.Format("2006-01-02"), endDate.Format("2006-01-02"), unmonitored), nil, &entries)
+	err := baseRequest("GET", fmt.Sprintf("%s/api/v3/calendar?apiKey=%s&start=%s&end=%s&unmonitored=%v&includeSeries=true", r.InternalAddress, r.APIKey, startDate.Format("2006-01-02"), endDate.Format("2006-01-02"), unmonitored), nil, &entries)
 	if err != nil {
 		return nil, err
 	}

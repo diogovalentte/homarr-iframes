@@ -9,17 +9,18 @@ import (
 var s *Sonarr
 
 type Sonarr struct {
-	Address string
-	APIKey  string
+	Address         string
+	InternalAddress string
+	APIKey          string
 }
 
-func NewSonarr(address, APIKey string) (*Sonarr, error) {
+func NewSonarr(address, internalAddress, APIKey string) (*Sonarr, error) {
 	if s != nil {
 		return s, nil
 	}
 
 	newS := &Sonarr{}
-	err := newS.Init(address, APIKey)
+	err := newS.Init(address, internalAddress, APIKey)
 	if err != nil {
 		return nil, err
 	}
@@ -29,17 +30,18 @@ func NewSonarr(address, APIKey string) (*Sonarr, error) {
 	return s, nil
 }
 
-func (s *Sonarr) Init(address, token string) error {
-	if address == "" || token == "" {
+func (s *Sonarr) Init(address, internalAddress, APIKey string) error {
+	if address == "" || APIKey == "" {
 		return fmt.Errorf("SONARR_ADDRESS and SONARR_API_KEY variables should be set")
 	}
 
-	if strings.HasSuffix(address, "/") {
-		address = address[:len(address)-1]
+	s.Address = strings.TrimSuffix(address, "/")
+	if internalAddress == "" {
+		s.InternalAddress = s.Address
+	} else {
+		s.InternalAddress = strings.TrimSuffix(internalAddress, "/")
 	}
-
-	s.Address = address
-	s.APIKey = token
+	s.APIKey = APIKey
 
 	return nil
 }
@@ -54,7 +56,7 @@ func (s *Sonarr) GetCalendar(unmonitored bool, startDate, endDate time.Time) (*C
 	endDate = time.Date(endDate.Year(), endDate.Month(), endDate.Day(), 0, 0, 0, 0, endDate.Location())
 
 	var entries []getSonarrCalendarEntryResponse
-	err := baseRequest("GET", fmt.Sprintf("%s/api/v3/calendar?apiKey=%s&start=%s&end=%s&unmonitored=%v&includeSeries=true", s.Address, s.APIKey, startDate.Format("2006-01-02"), endDate.Format("2006-01-02"), unmonitored), nil, &entries)
+	err := baseRequest("GET", fmt.Sprintf("%s/api/v3/calendar?apiKey=%s&start=%s&end=%s&unmonitored=%v&includeSeries=true", s.InternalAddress, s.APIKey, startDate.Format("2006-01-02"), endDate.Format("2006-01-02"), unmonitored), nil, &entries)
 	if err != nil {
 		return nil, err
 	}
