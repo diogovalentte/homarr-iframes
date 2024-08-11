@@ -26,13 +26,13 @@ type Linkwarden struct {
 	Token           string
 }
 
-func New(address, internalAdress, token string) (*Linkwarden, error) {
+func New(address, internalAddress, token string) (*Linkwarden, error) {
 	if l != nil {
 		return l, nil
 	}
 
 	newL := &Linkwarden{}
-	err := newL.Init(address, internalAdress, token)
+	err := newL.Init(address, internalAddress, token)
 	if err != nil {
 		return nil, err
 	}
@@ -42,16 +42,16 @@ func New(address, internalAdress, token string) (*Linkwarden, error) {
 	return l, nil
 }
 
-func (l *Linkwarden) Init(address, internalAdress, token string) error {
+func (l *Linkwarden) Init(address, internalAddress, token string) error {
 	if address == "" || token == "" {
 		return fmt.Errorf("LINKWARDEN_ADDRESS and LINKWARDEN_TOKEN variables should be set")
 	}
 
 	l.Address = strings.TrimSuffix(address, "/")
-	if internalAdress == "" {
+	if internalAddress == "" {
 		l.InternalAddress = l.Address
 	} else {
-		l.InternalAddress = strings.TrimSuffix(internalAdress, "/")
+		l.InternalAddress = strings.TrimSuffix(internalAddress, "/")
 	}
 	l.Token = token
 

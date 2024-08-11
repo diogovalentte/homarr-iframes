@@ -28,13 +28,13 @@ type Overseerr struct {
 	Token           string
 }
 
-func New(address, internalAdress, token string) (*Overseerr, error) {
+func New(address, internalAddress, token string) (*Overseerr, error) {
 	if o != nil {
 		return o, nil
 	}
 
 	newO := &Overseerr{}
-	err := newO.Init(address, internalAdress, token)
+	err := newO.Init(address, internalAddress, token)
 	if err != nil {
 		return nil, err
 	}
@@ -45,16 +45,16 @@ func New(address, internalAdress, token string) (*Overseerr, error) {
 }
 
 // Init sets the Overseerr properties from the configs
-func (o *Overseerr) Init(address, internalAdress, token string) error {
+func (o *Overseerr) Init(address, internalAddress, token string) error {
 	if address == "" || token == "" {
 		return fmt.Errorf("OVERSEERR_ADDRESS and OVERSEERR_TOKEN variables should be set")
 	}
 
 	o.Address = strings.TrimSuffix(address, "/")
-	if internalAdress == "" {
+	if internalAddress == "" {
 		o.InternalAddress = o.Address
 	} else {
-		o.InternalAddress = strings.TrimSuffix(internalAdress, "/")
+		o.InternalAddress = strings.TrimSuffix(internalAddress, "/")
 	}
 	o.Token = token
 

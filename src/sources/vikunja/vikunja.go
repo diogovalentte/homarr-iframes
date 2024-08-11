@@ -28,13 +28,13 @@ type Vikunja struct {
 	Token           string
 }
 
-func New(address, internalAdress, token string) (*Vikunja, error) {
+func New(address, internalAddress, token string) (*Vikunja, error) {
 	if v != nil {
 		return v, nil
 	}
 
 	newV := &Vikunja{}
-	err := newV.Init(address, internalAdress, token)
+	err := newV.Init(address, internalAddress, token)
 	if err != nil {
 		return nil, err
 	}
