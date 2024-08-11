@@ -24,7 +24,7 @@ func (o *Overseerr) GetRequests(limit int, filter, sort string, requestedBy int)
 	}
 
 	var responseData getRequestsResponse
-	if err := o.baseRequest(http.MethodGet, o.Address+path, nil, &responseData); err != nil {
+	if err := o.baseRequest(http.MethodGet, o.InternalAddress+path, nil, &responseData); err != nil {
 		return nil, fmt.Errorf("error getting requests: %w", err)
 	}
 
@@ -58,7 +58,7 @@ func (o *Overseerr) GetMedia(mediaType string, tmdbID int) (GenericMedia, error)
 
 func (o *Overseerr) GetMovie(id int) (GenericMedia, error) {
 	var responseData getMovieResponse
-	if err := o.baseRequest(http.MethodGet, o.Address+"/api/v1/movie/"+fmt.Sprint(id), nil, &responseData); err != nil {
+	if err := o.baseRequest(http.MethodGet, o.InternalAddress+"/api/v1/movie/"+fmt.Sprint(id), nil, &responseData); err != nil {
 		return GenericMedia{}, fmt.Errorf("error getting movie: %w", err)
 	}
 
@@ -81,7 +81,7 @@ type getMovieResponse struct {
 
 func (o *Overseerr) GetTv(id int) (GenericMedia, error) {
 	var responseData getTvResponse
-	if err := o.baseRequest(http.MethodGet, o.Address+"/api/v1/tv/"+fmt.Sprint(id), nil, &responseData); err != nil {
+	if err := o.baseRequest(http.MethodGet, o.InternalAddress+"/api/v1/tv/"+fmt.Sprint(id), nil, &responseData); err != nil {
 		return GenericMedia{}, fmt.Errorf("error getting tv show: %w", err)
 	}
 

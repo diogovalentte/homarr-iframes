@@ -23,37 +23,39 @@ var (
 
 // Overseerr is the a source
 type Overseerr struct {
-	Address string
-	Token   string
+	Address         string
+	InternalAddress string
+	Token           string
 }
 
-func New(address, token string) (*Overseerr, error) {
+func New(address, internalAdress, token string) (*Overseerr, error) {
 	if o != nil {
 		return o, nil
 	}
 
-	newV := &Overseerr{}
-	err := newV.Init(address, token)
+	newO := &Overseerr{}
+	err := newO.Init(address, internalAdress, token)
 	if err != nil {
 		return nil, err
 	}
 
-	o = newV
+	o = newO
 
 	return o, nil
 }
 
 // Init sets the Overseerr properties from the configs
-func (o *Overseerr) Init(address, token string) error {
+func (o *Overseerr) Init(address, internalAdress, token string) error {
 	if address == "" || token == "" {
 		return fmt.Errorf("OVERSEERR_ADDRESS and OVERSEERR_TOKEN variables should be set")
 	}
 
-	if strings.HasSuffix(address, "/") {
-		address = address[:len(address)-1]
+	o.Address = strings.TrimSuffix(address, "/")
+	if internalAdress == "" {
+		o.InternalAddress = o.Address
+	} else {
+		o.InternalAddress = strings.TrimSuffix(internalAdress, "/")
 	}
-
-	o.Address = address
 	o.Token = token
 
 	return nil
@@ -121,7 +123,7 @@ func (o *Overseerr) GetiFrame(c *gin.Context) {
 		}
 		html = sources.GetBaseNothingToShowiFrame("#226fff", backgroundImageURL, "center", "cover", "0.3", apiURLPath)
 	} else {
-		html, err = getRequestsiFrame(o.Address, iframeRequestData, theme, apiURL, limit, filter, sort, requestedBy)
+		html, err = o.getRequestsiFrame(iframeRequestData, theme, apiURL, limit, filter, sort, requestedBy)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, fmt.Errorf("Couldn't create HTML code: %s", err.Error()))
 			return
@@ -131,7 +133,7 @@ func (o *Overseerr) GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func getRequestsiFrame(overseerrAddress string, requests []iframeRequestData, theme, apiURL string, limit int, filter, sort string, requestedBy int) ([]byte, error) {
+func (o *Overseerr) getRequestsiFrame(requests []iframeRequestData, theme, apiURL string, limit int, filter, sort string, requestedBy int) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -381,7 +383,7 @@ func getRequestsiFrame(overseerrAddress string, requests []iframeRequestData, th
 		APIFilter:                     filter,
 		APISort:                       sort,
 		APIRequestedBy:                requestedBy,
-		OverseerrAddress:              overseerrAddress,
+		OverseerrAddress:              o.Address,
 		ScrollbarThumbBackgroundColor: scrollbarThumbBackgroundColor,
 		ScrollbarTrackBackgroundColor: scrollbarTrackBackgroundColor,
 	}

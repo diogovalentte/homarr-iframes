@@ -29,7 +29,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestGetRequests(t *testing.T) {
-	o, err := New(config.GlobalConfigs.Overseerr.Address, config.GlobalConfigs.Overseerr.Token)
+	o, err := New(config.GlobalConfigs.Overseerr.Address, config.GlobalConfigs.Overseerr.InternalAddress, config.GlobalConfigs.Overseerr.Token)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -49,7 +49,7 @@ func TestGetRequests(t *testing.T) {
 }
 
 func TestGetMedia(t *testing.T) {
-	o, err := New(config.GlobalConfigs.Overseerr.Address, config.GlobalConfigs.Overseerr.Token)
+	o, err := New(config.GlobalConfigs.Overseerr.Address, config.GlobalConfigs.Overseerr.InternalAddress, config.GlobalConfigs.Overseerr.Token)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -78,7 +78,7 @@ func TestGetMedia(t *testing.T) {
 }
 
 func TestGetIframeData(t *testing.T) {
-	o, err := New(config.GlobalConfigs.Overseerr.Address, config.GlobalConfigs.Overseerr.Token)
+	o, err := New(config.GlobalConfigs.Overseerr.Address, config.GlobalConfigs.Overseerr.InternalAddress, config.GlobalConfigs.Overseerr.Token)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -84,7 +84,7 @@ func VikunjaHashHandler(c *gin.Context) {
 // @Param requestedBy query string false "If specified, only requests from that particular user ID will be returned." Example(1)
 // @Router /hash/overseerr [get]
 func OverseerrHashHandler(c *gin.Context) {
-	o, err := overseerr.New(config.GlobalConfigs.Overseerr.Address, config.GlobalConfigs.Overseerr.Token)
+	o, err := overseerr.New(config.GlobalConfigs.Overseerr.Address, config.GlobalConfigs.Overseerr.InternalAddress, config.GlobalConfigs.Overseerr.Token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
