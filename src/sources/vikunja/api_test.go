@@ -29,7 +29,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestGetVersion(t *testing.T) {
-	v, err := New(config.GlobalConfigs.Vikunja.Address, config.GlobalConfigs.Vikunja.Token)
+	v, err := New(config.GlobalConfigs.Vikunja.Address, config.GlobalConfigs.Vikunja.InternalAddress, config.GlobalConfigs.Vikunja.Token)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -67,7 +67,7 @@ func TestGetVersion(t *testing.T) {
 }
 
 func TestGetTasks(t *testing.T) {
-	v, err := New(config.GlobalConfigs.Vikunja.Address, config.GlobalConfigs.Vikunja.Token)
+	v, err := New(config.GlobalConfigs.Vikunja.Address, config.GlobalConfigs.Vikunja.InternalAddress, config.GlobalConfigs.Vikunja.Token)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -87,7 +87,7 @@ func TestGetTasks(t *testing.T) {
 }
 
 func TestSetTaskDone(t *testing.T) {
-	v, err := New(config.GlobalConfigs.Vikunja.Address, config.GlobalConfigs.Vikunja.Token)
+	v, err := New(config.GlobalConfigs.Vikunja.Address, config.GlobalConfigs.Vikunja.InternalAddress, config.GlobalConfigs.Vikunja.Token)
 	if err != nil {
 		t.Fatal(err)
 	}

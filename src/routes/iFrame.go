@@ -76,7 +76,7 @@ func CinemarkiFrameHandler(c *gin.Context) {
 // @Param showFavoriteIcon query bool false "Shows a start icon in favorite tasks. Defaults to true." Example(false)
 // @Router /iframe/vikunja [get]
 func VikunjaiFrameHandler(c *gin.Context) {
-	v, err := vikunja.New(config.GlobalConfigs.Vikunja.Address, config.GlobalConfigs.Vikunja.Token)
+	v, err := vikunja.New(config.GlobalConfigs.Vikunja.Address, config.GlobalConfigs.Vikunja.InternalAddress, config.GlobalConfigs.Vikunja.Token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -102,7 +102,7 @@ func VikunjaSetTaskDoneHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "taskId must be an integer"})
 	}
 
-	v, err := vikunja.New(config.GlobalConfigs.Vikunja.Address, config.GlobalConfigs.Vikunja.Token)
+	v, err := vikunja.New(config.GlobalConfigs.Vikunja.Address, config.GlobalConfigs.Vikunja.InternalAddress, config.GlobalConfigs.Vikunja.Token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return

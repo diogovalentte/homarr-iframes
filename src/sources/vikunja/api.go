@@ -70,7 +70,7 @@ func (v *Vikunja) getTasksV2(limit int, projectID int) ([]*Task, error) {
 		path = path + fmt.Sprintf("&per_page=%d", limit)
 	}
 
-	err := v.baseRequest("GET", v.Address+path, nil, &target)
+	err := v.baseRequest("GET", v.InternalAddress+path, nil, &target)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (v *Vikunja) getTasksV1(limit int, projectID int) ([]*Task, error) {
 		path = path + fmt.Sprintf("&filter_concat=and&filter_by=project_id&filter_value=%d&filter_comparator=equals", projectID)
 	}
 
-	err := v.baseRequest("GET", v.Address+path, nil, &target)
+	err := v.baseRequest("GET", v.InternalAddress+path, nil, &target)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +125,7 @@ func (v *Vikunja) SetTaskDone(taskID int) error {
 	body := []byte(`{"done": true}`)
 	task := &Task{}
 
-	err := v.baseRequest("POST", v.Address+path, bytes.NewBuffer(body), task)
+	err := v.baseRequest("POST", v.InternalAddress+path, bytes.NewBuffer(body), task)
 	if err != nil {
 		return err
 	}
@@ -141,7 +141,7 @@ func (v *Vikunja) GetProjects() (map[int]*Project, error) {
 	path := "/api/v1/projects"
 	projects := []*Project{}
 
-	err := v.baseRequest("GET", v.Address+path, nil, &projects)
+	err := v.baseRequest("GET", v.InternalAddress+path, nil, &projects)
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +158,7 @@ func (v *Vikunja) GetProject(projectID int) (*Project, error) {
 	path := "/api/v1/projects/" + strconv.Itoa(projectID)
 	project := &Project{}
 
-	err := v.baseRequest("GET", v.Address+path, nil, &project)
+	err := v.baseRequest("GET", v.InternalAddress+path, nil, &project)
 	if err != nil {
 		return nil, err
 	}
@@ -253,7 +253,7 @@ func IsVersionGreaterOrEqualTo(version1 string, version2 string) (bool, error) {
 
 func (v *Vikunja) getVikunjaVersion() (string, error) {
 	info := &Info{}
-	err := v.baseRequest("GET", v.Address+"/api/v1/info", nil, info)
+	err := v.baseRequest("GET", v.InternalAddress+"/api/v1/info", nil, info)
 	if err != nil {
 		return "", err
 	}

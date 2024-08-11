@@ -23,17 +23,18 @@ var (
 var v *Vikunja
 
 type Vikunja struct {
-	Address string
-	Token   string
+	Address         string
+	InternalAddress string
+	Token           string
 }
 
-func New(address, token string) (*Vikunja, error) {
+func New(address, internalAdress, token string) (*Vikunja, error) {
 	if v != nil {
 		return v, nil
 	}
 
 	newV := &Vikunja{}
-	err := newV.Init(address, token)
+	err := newV.Init(address, internalAdress, token)
 	if err != nil {
 		return nil, err
 	}
@@ -44,11 +45,17 @@ func New(address, token string) (*Vikunja, error) {
 }
 
 // Init sets the Vikunja properties from the configs
-func (v *Vikunja) Init(address, token string) error {
+func (v *Vikunja) Init(address, internalAddress, token string) error {
 	if address == "" || token == "" {
 		return fmt.Errorf("VIKUNJA_ADDRESS and VIKUNJA_TOKEN variables should be set")
 	}
+
 	v.Address = strings.TrimSuffix(address, "/")
+	if internalAddress == "" {
+		v.InternalAddress = v.Address
+	} else {
+		v.InternalAddress = strings.TrimSuffix(internalAddress, "/")
+	}
 	v.Token = token
 
 	err := v.SetInMemoryInstanceProjects()
@@ -191,7 +198,7 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 		}
 		html = sources.GetBaseNothingToShowiFrame("#226fff", backgroundImageURL, "center", "cover", "0.3", apiURLPath)
 	} else {
-		html, err = getTasksiFrame(v.Address, tasks, theme, apiURL, limit, projectID, queryExcludeProjectIDs, showCreated, showDue, showPriority, showProject, ShowFavoriteIcon)
+		html, err = v.getTasksiFrame(tasks, theme, apiURL, limit, projectID, queryExcludeProjectIDs, showCreated, showDue, showPriority, showProject, ShowFavoriteIcon)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			return
@@ -201,7 +208,7 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, limit, projectID int, excludeProjectIDs string, showCreated, showDue, showPriority, showProject, showFavoriteIcon bool) ([]byte, error) {
+func (v *Vikunja) getTasksiFrame(tasks []*Task, theme, apiURL string, limit, projectID int, excludeProjectIDs string, showCreated, showDue, showPriority, showProject, showFavoriteIcon bool) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -508,7 +515,7 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
 		APILimit:                      limit,
 		APIProjectID:                  projectID,
 		APIExcludeProjectIDs:          excludeProjectIDs,
-		VikunjaAddress:                vikunjaAddress,
+		VikunjaAddress:                v.Address,
 		BackgroundImageURL:            backgroundImageURL,
 		ScrollbarThumbBackgroundColor: scrollbarThumbBackgroundColor,
 		ScrollbarTrackBackgroundColor: scrollbarTrackBackgroundColor,
@@ -553,7 +560,7 @@ func getTasksiFrame(vikunjaAddress string, tasks []*Task, theme, apiURL string, 
 				return project
 			}
 
-			v, err := New("", "")
+			v, err := New("", "", "")
 			if err != nil {
 				return &Project{}
 			}
