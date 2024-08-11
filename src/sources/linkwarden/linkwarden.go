@@ -308,7 +308,6 @@ func (l *Linkwarden) getLinksiFrame(links []*Link, theme, apiURL, collectionID s
 		APIURL:                        apiURL,
 		APILimit:                      limit,
 		LinkwardenAddress:             l.Address,
-		InternalLinkwardenAddress:     l.InternalAddress,
 		BackgroundImageURL:            backgroundImageURL,
 		ScrollbarThumbBackgroundColor: scrollbarThumbBackgroundColor,
 		ScrollbarTrackBackgroundColor: scrollbarTrackBackgroundColor,
@@ -332,7 +331,6 @@ type iframeTemplateData struct {
 	APIURL                        string
 	APILimit                      int
 	LinkwardenAddress             string
-	InternalLinkwardenAddress     string
 	BackgroundImageURL            string
 	ScrollbarThumbBackgroundColor string
 	ScrollbarTrackBackgroundColor string
