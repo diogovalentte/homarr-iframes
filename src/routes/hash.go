@@ -34,7 +34,7 @@ func HashRoutes(group *gin.RouterGroup) {
 // @Param limit query int false "Limits the number of items in the iFrame." Example(5)
 // @Router /hash/linkwarden [get]
 func LinkwardenHashHandler(c *gin.Context) {
-	l, err := linkwarden.New(config.GlobalConfigs.Linkwarden.Address, config.GlobalConfigs.Linkwarden.Token)
+	l, err := linkwarden.New(config.GlobalConfigs.Linkwarden.Address, config.GlobalConfigs.Linkwarden.InternalAddress, config.GlobalConfigs.Linkwarden.Token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return

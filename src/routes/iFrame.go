@@ -38,7 +38,7 @@ func IFrameRoutes(group *gin.RouterGroup) {
 // @Param api_url query string true "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload." Example(https://sub.domain.com)
 // @Router /iframe/linkwarden [get]
 func LinkwardeniFrameHandler(c *gin.Context) {
-	l, err := linkwarden.New(config.GlobalConfigs.Linkwarden.Address, config.GlobalConfigs.Linkwarden.Token)
+	l, err := linkwarden.New(config.GlobalConfigs.Linkwarden.Address, config.GlobalConfigs.Linkwarden.InternalAddress, config.GlobalConfigs.Linkwarden.Token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return

@@ -21,17 +21,18 @@ var (
 )
 
 type Linkwarden struct {
-	Address string
-	Token   string
+	Address         string
+	InternalAddress string
+	Token           string
 }
 
-func New(address, token string) (*Linkwarden, error) {
+func New(address, internalAdress, token string) (*Linkwarden, error) {
 	if l != nil {
 		return l, nil
 	}
 
 	newL := &Linkwarden{}
-	err := newL.Init(address, token)
+	err := newL.Init(address, internalAdress, token)
 	if err != nil {
 		return nil, err
 	}
@@ -41,16 +42,17 @@ func New(address, token string) (*Linkwarden, error) {
 	return l, nil
 }
 
-func (l *Linkwarden) Init(address, token string) error {
+func (l *Linkwarden) Init(address, internalAdress, token string) error {
 	if address == "" || token == "" {
 		return fmt.Errorf("LINKWARDEN_ADDRESS and LINKWARDEN_TOKEN variables should be set")
 	}
 
-	if strings.HasSuffix(address, "/") {
-		address = address[:len(address)-1]
+	l.Address = strings.TrimSuffix(address, "/")
+	if internalAdress == "" {
+		l.InternalAddress = l.Address
+	} else {
+		l.InternalAddress = strings.TrimSuffix(internalAdress, "/")
 	}
-
-	l.Address = address
 	l.Token = token
 
 	return nil
@@ -79,12 +81,6 @@ func (l *Linkwarden) GetiFrame(c *gin.Context) {
 	}
 
 	collectionID := c.Query("collectionId")
-	var linkwardenURL string
-	if collectionID != "" {
-		linkwardenURL = l.Address + "/api/v1/links?collectionId=" + collectionID
-	} else {
-		linkwardenURL = l.Address + "/api/v1/links"
-	}
 
 	apiURL := c.Query("api_url")
 	if apiURL != "" {
@@ -95,34 +91,23 @@ func (l *Linkwarden) GetiFrame(c *gin.Context) {
 		}
 	}
 
-	links := map[string][]*Link{}
-	err = baseRequest(linkwardenURL, l.Token, &links)
+	links, err := l.GetLinks(limit, collectionID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("Error while doing API request: %s", err.Error())})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("couldn't get links: %s", err.Error())})
 		return
-	}
-
-	res, exists := links["response"]
-	if !exists {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("No 'response' field in API response")})
-		return
-	}
-
-	if limit >= 0 {
-		res = res[:limit]
 	}
 
 	var html []byte
-	if len(res) < 1 {
+	if len(links) < 1 {
 		var apiURLPath string
 		if apiURL != "" {
 			apiURLPath = apiURL + "/v1/hash/linkwarden?limit=" + strconv.Itoa(limit) + "&collectionId=" + collectionID
 		}
 		html = sources.GetBaseNothingToShowiFrame(theme, backgroundImageURL, "center", "cover", "0.3", apiURLPath)
 	} else {
-		html, err = getLinksiFrame(l.Address, res, theme, apiURL, collectionID, limit)
+		html, err = l.getLinksiFrame(links, theme, apiURL, collectionID, limit)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("Couldn't create HTML code: %s", err.Error())})
+			c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("couldn't create HTML code: %s", err.Error())})
 			return
 		}
 	}
@@ -130,7 +115,7 @@ func (l *Linkwarden) GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func getLinksiFrame(linkwardenAddress string, links []*Link, theme, apiURL, collectionID string, limit int) ([]byte, error) {
+func (l *Linkwarden) getLinksiFrame(links []*Link, theme, apiURL, collectionID string, limit int) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -138,7 +123,7 @@ func getLinksiFrame(linkwardenAddress string, links []*Link, theme, apiURL, coll
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="referrer" content="no-referrer"> <!-- If not set, can't load some images when behind a domain or reverse proxy -->
-    <meta name="color-scheme" content="LINKS-CONTAINER-BACKGROUND-COLOR">
+    <meta name="color-scheme" content="{{ .Theme }}">
     <script src="https://kit.fontawesome.com/3f763b063a.js" crossorigin="anonymous"></script>
     <title>Linkwarden iFrame</title>
     <style>
@@ -147,7 +132,7 @@ func getLinksiFrame(linkwardenAddress string, links []*Link, theme, apiURL, coll
       }
 
       ::-webkit-scrollbar-thumb {
-        background-color: SCROLLBAR-THUMB-BACKGROUND-COLOR;
+        background-color: {{ .ScrollbarThumbBackgroundColor }};
         border-radius: 2.3px;
       }
 
@@ -156,7 +141,7 @@ func getLinksiFrame(linkwardenAddress string, links []*Link, theme, apiURL, coll
       }
 
       ::-webkit-scrollbar-track:hover {
-        background-color: SCROLLBAR-TRACK-BACKGROUND-COLOR;
+        background-color: {{ .ScrollbarTrackBackgroundColor }};
       }
     </style>
     <style>
@@ -185,6 +170,7 @@ func getLinksiFrame(linkwardenAddress string, links []*Link, theme, apiURL, coll
         }
 
         .background-image {
+            background-image: url('{{ .BackgroundImageURL }}');
             background-position: 50% 47.2%;
             background-size: cover;
             position: absolute;
@@ -249,7 +235,7 @@ func getLinksiFrame(linkwardenAddress string, links []*Link, theme, apiURL, coll
 
         async function fetchData() {
             try {
-                var url = 'API-URL/v1/hash/linkwarden?limit=API-LIMIT&collectionId=API-COLLECTION-ID';
+                var url = '{{ .APIURL }}/v1/hash/linkwarden?limit={{ .APILimit }}&collectionId={{ .CollectionID }}';
                 const response = await fetch(url);
                 const data = await response.json();
 
@@ -271,16 +257,18 @@ func getLinksiFrame(linkwardenAddress string, links []*Link, theme, apiURL, coll
             setTimeout(fetchAndUpdate, 10000); // 10 seconds
         }
 
-        fetchAndUpdate();
+        {{ if .APIURL }}
+            fetchAndUpdate();
+        {{ end }}
         
     </script>
 
 </head>
 <body>
-{{ range . }}
+{{ range .Links }}
     <div class="links-container">
 
-        <div style="background-image: url('LINKS-CONTAINER-BACKGROUND-IMAGE');" class="background-image"></div>
+        <div class="background-image"></div>
 
         <img class="link-icon" src="https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url={{ .URL }}/&size=32" alt="Link Site Favicon">
 
@@ -296,7 +284,7 @@ func getLinksiFrame(linkwardenAddress string, links []*Link, theme, apiURL, coll
             <div>
                 <span style="margin-right: 7px;" class="info-label"><i class="fa-solid fa-calendar-days"></i> {{ .CreatedAt.Format "Jan 2, 2006" }}</span>
                 {{ if .CollectionID }}
-                    <a href="LINKWARDEN-ADDRESS/collections/{{ .CollectionID }}" target="_blank" class="info-label"><i style="color: {{ .Collection.Color }};" class="fa-solid fa-folder-closed"></i> {{ .Collection.Name }}</a>
+                    <i style="color: {{ .Collection.Color }};" class="fa-solid fa-folder-closed"></i> <a href="{{ with . }}{{ $.LinkwardenAddress }}{{ end }}/collections/{{ .CollectionID }}" target="_blank" class="info-label">{{ .Collection.Name }}</a>
                 {{ end }}
             </div>
         </div>
@@ -314,29 +302,41 @@ func getLinksiFrame(linkwardenAddress string, links []*Link, theme, apiURL, coll
 		scrollbarTrackBackgroundColor = "rgba(37, 40, 53, 1)"
 	}
 
-	if apiURL != "" {
-		html = strings.Replace(html, "API-URL", apiURL, -1)
-		html = strings.Replace(html, "API-LIMIT", strconv.Itoa(limit), -1)
-		html = strings.Replace(html, "API-COLLECTION-ID", collectionID, -1)
-	} else {
-		html = strings.Replace(html, "fetchAndUpdate();", "// fetchAndUpdate", -1)
+	templateData := iframeTemplateData{
+		Links:                         links,
+		Theme:                         theme,
+		APIURL:                        apiURL,
+		APILimit:                      limit,
+		LinkwardenAddress:             l.Address,
+		InternalLinkwardenAddress:     l.InternalAddress,
+		BackgroundImageURL:            backgroundImageURL,
+		ScrollbarThumbBackgroundColor: scrollbarThumbBackgroundColor,
+		ScrollbarTrackBackgroundColor: scrollbarTrackBackgroundColor,
+		CollectionID:                  collectionID,
 	}
-
-	html = strings.Replace(html, "LINKWARDEN-ADDRESS", linkwardenAddress, -1)
-	html = strings.Replace(html, "LINKS-CONTAINER-BACKGROUND-COLOR", theme, -1)
-	html = strings.Replace(html, "LINKS-CONTAINER-BACKGROUND-IMAGE", backgroundImageURL, -1)
-	html = strings.Replace(html, "SCROLLBAR-THUMB-BACKGROUND-COLOR", scrollbarThumbBackgroundColor, -1)
-	html = strings.Replace(html, "SCROLLBAR-TRACK-BACKGROUND-COLOR", scrollbarTrackBackgroundColor, -1)
 
 	tmpl := template.Must(template.New("links").Parse(html))
 
 	var buf bytes.Buffer
-	err := tmpl.Execute(&buf, links)
+	err := tmpl.Execute(&buf, templateData)
 	if err != nil {
 		return []byte{}, err
 	}
 
 	return buf.Bytes(), nil
+}
+
+type iframeTemplateData struct {
+	Links                         []*Link
+	Theme                         string
+	APIURL                        string
+	APILimit                      int
+	LinkwardenAddress             string
+	InternalLinkwardenAddress     string
+	BackgroundImageURL            string
+	ScrollbarThumbBackgroundColor string
+	ScrollbarTrackBackgroundColor string
+	CollectionID                  string
 }
 
 // GetHash returns the hash of the bookmarks
@@ -355,33 +355,15 @@ func (l *Linkwarden) GetHash(c *gin.Context) {
 	}
 
 	collectionID := c.Query("collectionId")
-	var url string
-	if collectionID != "" {
-		url = l.Address + "/api/v1/links?collectionId=" + collectionID
-	} else {
-		url = l.Address + "/api/v1/links"
-	}
 
-	linksMap := map[string][]*Link{}
-	err = baseRequest(url, l.Token, &linksMap)
+	pLinks, err := l.GetLinks(limit, collectionID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("Error while doing API request: %s", err.Error())})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("couldn't get links: %s", err.Error())})
 		return
-	}
-
-	res, exists := linksMap["response"]
-	if !exists {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("No 'response' field in API response")})
-		return
-	}
-
-	if limit >= 0 {
-		res = res[:limit]
 	}
 
 	var links []Link
-	for _, link := range res {
-		// Set all fields where the value is a pointer to nil
+	for _, link := range pLinks {
 		link.Description = nil
 		link.CollectionID = nil
 		link.Collection = nil
