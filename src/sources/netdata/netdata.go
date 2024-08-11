@@ -20,17 +20,18 @@ var n *Netdata
 var backgroundImageURL = "https://avatars.githubusercontent.com/u/43390781"
 
 type Netdata struct {
-	Address string
-	Token   string
+	Address         string
+	InternalAddress string
+	Token           string
 }
 
-func New(address, token string) (*Netdata, error) {
+func New(address, internalAddress, token string) (*Netdata, error) {
 	if n != nil {
 		return n, nil
 	}
 
 	newN := &Netdata{}
-	err := newN.Init(address, token)
+	err := newN.Init(address, internalAddress, token)
 	if err != nil {
 		return nil, err
 	}
@@ -41,11 +42,16 @@ func New(address, token string) (*Netdata, error) {
 }
 
 // Init sets the Netdata properties from the configs
-func (n *Netdata) Init(address, token string) error {
+func (n *Netdata) Init(address, internalAddress, token string) error {
 	if address == "" || token == "" {
 		return fmt.Errorf("NETDATA_ADDRESS and NETDATA_TOKEN variables should be set")
 	}
 	n.Address = strings.TrimSuffix(address, "/")
+	if internalAddress == "" {
+		n.InternalAddress = n.Address
+	} else {
+		n.InternalAddress = strings.TrimSuffix(internalAddress, "/")
+	}
 	n.Token = token
 
 	return nil
@@ -97,7 +103,7 @@ func (n *Netdata) GetiFrame(c *gin.Context) {
 		}
 		html = sources.GetBaseNothingToShowiFrame("#226fff", backgroundImageURL, "center", "cover", "0.3", apiURLPath)
 	} else {
-		html, err = getAlarmsiFrame(n.Address, alarms, theme, apiURL, limit)
+		html, err = n.getAlarmsiFrame(alarms, theme, apiURL, limit)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			return
@@ -107,7 +113,7 @@ func (n *Netdata) GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func getAlarmsiFrame(netdataAddress string, alarms []Alarm, theme, apiURL string, limit int) ([]byte, error) {
+func (n *Netdata) getAlarmsiFrame(alarms []Alarm, theme, apiURL string, limit int) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -341,7 +347,7 @@ func getAlarmsiFrame(netdataAddress string, alarms []Alarm, theme, apiURL string
 		APIURL:                        apiURL,
 		APILimit:                      limit,
 		BackgroundImageURL:            backgroundImageURL,
-		NetdataAddress:                netdataAddress,
+		NetdataAddress:                n.Address,
 		ScrollbarThumbBackgroundColor: scrollbarThumbBackgroundColor,
 		ScrollbarTrackBackgroundColor: scrollbarTrackBackgroundColor,
 	}

@@ -29,7 +29,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestGetAlarms(t *testing.T) {
-	n, err := New(config.GlobalConfigs.NetdataConfigs.Address, config.GlobalConfigs.NetdataConfigs.Token)
+	n, err := New(config.GlobalConfigs.NetdataConfigs.Address, config.GlobalConfigs.NetdataConfigs.InternalAddress, config.GlobalConfigs.NetdataConfigs.Token)
 	if err != nil {
 		t.Fatal(err)
 	}

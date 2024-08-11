@@ -17,7 +17,7 @@ func (n *Netdata) GetAlarms(limit int) ([]Alarm, error) {
 	path := "/api/v1/alarms"
 
 	var resp *getAlarmsResponse
-	err := n.baseRequest("GET", n.Address+path, nil, &resp)
+	err := n.baseRequest("GET", n.InternalAddress+path, nil, &resp)
 	if err != nil {
 		return nil, err
 	}

@@ -177,7 +177,7 @@ func UptimeKumaiFrameHandler(c *gin.Context) {
 // @Param limit query int false "Limits the number of items in the iFrame." Example(5)
 // @Router /iframe/netdata [get]
 func NetdataiFrameHandler(c *gin.Context) {
-	n, err := netdata.New(config.GlobalConfigs.NetdataConfigs.Address, config.GlobalConfigs.NetdataConfigs.Token)
+	n, err := netdata.New(config.GlobalConfigs.NetdataConfigs.Address, config.GlobalConfigs.NetdataConfigs.InternalAddress, config.GlobalConfigs.NetdataConfigs.Token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
