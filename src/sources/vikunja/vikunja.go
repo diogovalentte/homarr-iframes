@@ -446,11 +446,11 @@ func (v *Vikunja) getTasksiFrame(tasks []*Task, theme, apiURL string, limit, pro
 
             {{ with . }}{{ if $.ShowPriority }}
                 {{ if eq .Priority 3 }}
-                    <span style="color: #ff851b;" class="priority-label">! High</span>
+                    <span style="color: #ff851b;" class="priority-label"><i class="fa-solid fa-circle-exclamation"></i> High</span>
                 {{ else if eq .Priority 4 }}
-                    <span style="color: #ff4136;" class="priority-label">! Urgent</span>
+                    <span style="color: #ff4136;" class="priority-label"><i class="fa-solid fa-circle-exclamation"></i> Urgent</span>
                 {{ else if eq .Priority 5 }}
-                    <span style="color: #ff4136;" class="priority-label">! DO NOW !</span>
+                    <span style="color: #ff4136;" class="priority-label"><i class="fa-solid fa-circle-exclamation"></i> DO NOW</span>
                 {{ end }}
             {{ end }}{{ end }}
 
