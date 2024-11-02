@@ -9,7 +9,10 @@ import (
 	"github.com/diogovalentte/homarr-iframes/src/sources/radarr"
 )
 
-var s *Sonarr
+var (
+	s                  *Sonarr
+	BackgroundImageURL = "https://avatars.githubusercontent.com/u/1082903"
+)
 
 type Sonarr struct {
 	Address         string

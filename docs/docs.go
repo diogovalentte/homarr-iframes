@@ -15,6 +15,47 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/hash/alarms": {
+            "get": {
+                "description": "Get the hash of the alarms. Used by the iFrames to check updates and reload the iframe.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get the hash of the alarms",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 5,
+                        "description": "Limits the number of items in the iFrame.",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "netdata,radarr,sonarr",
+                        "description": "Alarms to show. Available values: netdata, radarr, sonarr, prowlarr",
+                        "name": "alarms",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "example": false,
+                        "description": "Sort alarms in descending order. Defaults to false.",
+                        "name": "sort_desc",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/routes.hashResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/hash/cinemark": {
             "get": {
                 "description": "Get the hash of the Cinemark movies. Used by the iFrames to check updates and reload the iframe.",
@@ -102,32 +143,6 @@ const docTemplate = `{
                         "example": true,
                         "description": "Specify if show unmonitored media. Defaults to false.",
                         "name": "showUnmonitored",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/routes.hashResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/hash/netdata": {
-            "get": {
-                "description": "Get the hash of the Netdata alarms. Used by the iFrames to check updates and reload the iframe.",
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Get the hash of the Netdata alarms",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "example": 5,
-                        "description": "Limits the number of items in the iFrame.",
-                        "name": "limit",
                         "in": "query"
                     }
                 ],
@@ -258,6 +273,62 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/iframe/alarms": {
+            "get": {
+                "description": "Returns an iFrame with alarms from multiple sources.",
+                "produces": [
+                    "text/html"
+                ],
+                "summary": "Alarms iFrame",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "light",
+                        "description": "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white",
+                        "name": "theme",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "https://sub.domain.com",
+                        "description": "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload.",
+                        "name": "api_url",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 5,
+                        "description": "Limits the number of items in the iFrame.",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "netdata,radarr,sonarr",
+                        "description": "Alarms to show. Available values: netdata, radarr, sonarr, prowlarr",
+                        "name": "alarms",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "example": false,
+                        "description": "Sort alarms in descending order. Defaults to false.",
+                        "name": "sort_desc",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
                         "schema": {
                             "type": "string"
                         }
@@ -404,47 +475,6 @@ const docTemplate = `{
                         "example": false,
                         "description": "Specify if show the episodes' (Sonarr) release hour and minute. Defaults to true.",
                         "name": "showEpisodesHour",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "HTML content",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/iframe/netdata": {
-            "get": {
-                "description": "Returns an iFrame with Netdata alarms.",
-                "produces": [
-                    "text/html"
-                ],
-                "summary": "Netdata iFrame",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "example": "light",
-                        "description": "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white",
-                        "name": "theme",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "example": "https://sub.domain.com",
-                        "description": "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload.",
-                        "name": "api_url",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "example": 5,
-                        "description": "Limits the number of items in the iFrame.",
-                        "name": "limit",
                         "in": "query"
                     }
                 ],

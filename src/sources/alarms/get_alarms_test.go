@@ -1,4 +1,4 @@
-package netdata
+package alarms
 
 import (
 	"fmt"
@@ -29,13 +29,9 @@ func TestMain(m *testing.M) {
 }
 
 func TestGetAlarms(t *testing.T) {
-	n, err := New()
-	if err != nil {
-		t.Fatal(err)
-	}
-
+	alarms := Alarms{}
 	t.Run("get alarms", func(t *testing.T) {
-		_, err := n.GetAlarms(-1)
+		_, err := alarms.GetAlarms([]string{"netdata", "prowlarr", "radarr", "sonarr"}, -1)
 		if err != nil {
 			t.Fatal(err)
 		}

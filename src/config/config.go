@@ -14,6 +14,7 @@ type Configs struct {
 	Overseerr         overseerrConfigs
 	Sonarr            sonarrConfigs
 	Radarr            radarrConfigs
+	Prowlarr          prowlarrConfigs
 	UptimeKumaConfigs uptimeKumaConfigs
 	NetdataConfigs    netdataConfigs
 }
@@ -43,6 +44,12 @@ type sonarrConfigs struct {
 }
 
 type radarrConfigs struct {
+	Address         string
+	InternalAddress string
+	APIKey          string
+}
+
+type prowlarrConfigs struct {
 	Address         string
 	InternalAddress string
 	APIKey          string
@@ -88,6 +95,10 @@ func SetConfigs(filePath string) error {
 	GlobalConfigs.Radarr.Address = os.Getenv("RADARR_ADDRESS")
 	GlobalConfigs.Radarr.InternalAddress = os.Getenv("INTERNAL_RADARR_ADDRESS")
 	GlobalConfigs.Radarr.APIKey = os.Getenv("RADARR_API_KEY")
+
+	GlobalConfigs.Prowlarr.Address = os.Getenv("PROWLARR_ADDRESS")
+	GlobalConfigs.Prowlarr.InternalAddress = os.Getenv("INTERNAL_PROWLARR_ADDRESS")
+	GlobalConfigs.Prowlarr.APIKey = os.Getenv("PROWLARR_API_KEY")
 
 	GlobalConfigs.UptimeKumaConfigs.Address = os.Getenv("UPTIMEKUMA_ADDRESS")
 

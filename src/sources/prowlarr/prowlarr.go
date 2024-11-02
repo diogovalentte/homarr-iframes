@@ -7,7 +7,10 @@ import (
 	"github.com/diogovalentte/homarr-iframes/src/config"
 )
 
-var p *Prowlarr
+var (
+	p                  *Prowlarr
+	BackgroundImageURL = "https://avatars.githubusercontent.com/u/73049443"
+)
 
 type Prowlarr struct {
 	Address         string

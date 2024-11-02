@@ -7,10 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/diogovalentte/homarr-iframes/src/config"
+	"github.com/diogovalentte/homarr-iframes/src/sources/alarms"
 	"github.com/diogovalentte/homarr-iframes/src/sources/cinemark"
 	"github.com/diogovalentte/homarr-iframes/src/sources/linkwarden"
 	"github.com/diogovalentte/homarr-iframes/src/sources/media"
-	"github.com/diogovalentte/homarr-iframes/src/sources/netdata"
 	"github.com/diogovalentte/homarr-iframes/src/sources/overseerr"
 	uptimekuma "github.com/diogovalentte/homarr-iframes/src/sources/uptime-kuma"
 	"github.com/diogovalentte/homarr-iframes/src/sources/vikunja"
@@ -25,7 +25,7 @@ func IFrameRoutes(group *gin.RouterGroup) {
 	group.GET("/overseerr", OverseerriFrameHandler)
 	group.GET("/media_releases", MediaReleasesiFrameHandler)
 	group.GET("/uptimekuma", UptimeKumaiFrameHandler)
-	group.GET("/netdata", NetdataiFrameHandler)
+	group.GET("/alarms", AlarmsiFrameHandler)
 }
 
 // @Summary Linkwarden  bookmarks iFrame
@@ -168,21 +168,23 @@ func UptimeKumaiFrameHandler(c *gin.Context) {
 	u.GetiFrame(c)
 }
 
-// @Summary Netdata iFrame
-// @Description Returns an iFrame with Netdata alarms.
+// @Summary Alarms iFrame
+// @Description Returns an iFrame with alarms from multiple sources.
 // @Success 200 {string} string "HTML content"
 // @Produce html
 // @Param theme query string false "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white" Example(light)
 // @Param api_url query string true "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload." Example(https://sub.domain.com)
 // @Param limit query int false "Limits the number of items in the iFrame." Example(5)
-// @Router /iframe/netdata [get]
-func NetdataiFrameHandler(c *gin.Context) {
-	n, err := netdata.New(config.GlobalConfigs.NetdataConfigs.Address, config.GlobalConfigs.NetdataConfigs.InternalAddress, config.GlobalConfigs.NetdataConfigs.Token)
+// @Param alarms query string true "Alarms to show. Available values: netdata, radarr, sonarr, prowlarr" Example(netdata,radarr,sonarr)
+// @Param sort_desc query bool false "Sort alarms in descending order. Defaults to false." Example(false)
+// @Router /iframe/alarms [get]
+func AlarmsiFrameHandler(c *gin.Context) {
+	a, err := alarms.New()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
-	n.GetiFrame(c)
+	a.GetiFrame(c)
 }
 
 type messsageResponse struct {

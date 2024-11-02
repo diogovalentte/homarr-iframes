@@ -6,10 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/diogovalentte/homarr-iframes/src/config"
+	"github.com/diogovalentte/homarr-iframes/src/sources/alarms"
 	"github.com/diogovalentte/homarr-iframes/src/sources/cinemark"
 	"github.com/diogovalentte/homarr-iframes/src/sources/linkwarden"
 	"github.com/diogovalentte/homarr-iframes/src/sources/media"
-	"github.com/diogovalentte/homarr-iframes/src/sources/netdata"
 	"github.com/diogovalentte/homarr-iframes/src/sources/overseerr"
 	uptimekuma "github.com/diogovalentte/homarr-iframes/src/sources/uptime-kuma"
 	"github.com/diogovalentte/homarr-iframes/src/sources/vikunja"
@@ -23,7 +23,7 @@ func HashRoutes(group *gin.RouterGroup) {
 	group.GET("/overseerr", OverseerrHashHandler)
 	group.GET("/media_releases", MediaReleasesHashHandler)
 	group.GET("/uptimekuma", UptimeKumaHashHandler)
-	group.GET("/netdata", NetdataHashHandler)
+	group.GET("/alarms", AlarmsHashHandler)
 }
 
 // @Summary Get the hash of the Linkwarden bookmarks
@@ -118,17 +118,19 @@ func UptimeKumaHashHandler(c *gin.Context) {
 	u.GetHash(c)
 }
 
-// @Summary Get the hash of the Netdata alarms
-// @Description Get the hash of the Netdata alarms. Used by the iFrames to check updates and reload the iframe.
+// @Summary Get the hash of the alarms
+// @Description Get the hash of the alarms. Used by the iFrames to check updates and reload the iframe.
 // @Success 200 {object} hashResponse
 // @Produce json
 // @Param limit query int false "Limits the number of items in the iFrame." Example(5)
-// @Router /hash/netdata [get]
-func NetdataHashHandler(c *gin.Context) {
-	n, err := netdata.New(config.GlobalConfigs.NetdataConfigs.Address, config.GlobalConfigs.NetdataConfigs.InternalAddress, config.GlobalConfigs.NetdataConfigs.Token)
+// @Param alarms query string true "Alarms to show. Available values: netdata, radarr, sonarr, prowlarr" Example(netdata,radarr,sonarr)
+// @Param sort_desc query bool false "Sort alarms in descending order. Defaults to false." Example(false)
+// @Router /hash/alarms [get]
+func AlarmsHashHandler(c *gin.Context) {
+	a, err := alarms.New()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
-	n.GetHash(c)
+	a.GetHash(c)
 }

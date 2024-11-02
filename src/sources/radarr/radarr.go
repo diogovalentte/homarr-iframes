@@ -8,7 +8,10 @@ import (
 	"github.com/diogovalentte/homarr-iframes/src/config"
 )
 
-var r *Radarr
+var (
+	r                  *Radarr
+	BackgroundImageURL = "https://avatars.githubusercontent.com/u/25025331"
+)
 
 type Radarr struct {
 	Address         string
