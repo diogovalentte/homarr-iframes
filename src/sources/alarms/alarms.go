@@ -103,18 +103,10 @@ func (a *Alarms) GetiFrame(c *gin.Context) {
 	}
 
 	var html []byte
-	if len(alarms) < 1 {
-		var apiURLPath string
-		if apiURL != "" {
-			apiURLPath = apiURL + "/v1/hash/alarms?limit=" + strconv.Itoa(limit) + "&alarms=" + alarmNamesStr
-		}
-		html = sources.GetBaseNothingToShowiFrame("#226fff", backgroundImageURL, "center", "cover", "0.3", apiURLPath)
-	} else {
-		html, err = a.getAlarmsiFrame(alarms, desc, alarmNamesStr, theme, apiURL, limit)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-			return
-		}
+	html, err = a.getAlarmsiFrame(alarms, desc, alarmNamesStr, theme, apiURL, limit)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
 	}
 
 	c.Data(http.StatusOK, "text/html", []byte(html))
