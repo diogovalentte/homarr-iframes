@@ -29,7 +29,7 @@ func TestMain(m *testing.M) {
 	os.Exit(exitCode)
 }
 
-func TestGetRadarrCalendar(t *testing.T) {
+func TestGetCalendar(t *testing.T) {
 	s, err := New()
 	if err != nil {
 		t.Fatalf("error creating Radarr instance: %v", err)
@@ -37,5 +37,16 @@ func TestGetRadarrCalendar(t *testing.T) {
 	_, err = s.GetCalendar(false, time.Now(), time.Now().AddDate(0, 0, 1))
 	if err != nil {
 		t.Fatalf("error getting calendar: %v", err)
+	}
+}
+
+func TestGetHealth(t *testing.T) {
+	s, err := New()
+	if err != nil {
+		t.Fatalf("error creating Radarr instance: %v", err)
+	}
+	_, err = s.GetHealth()
+	if err != nil {
+		t.Fatalf("error getting health: %v", err)
 	}
 }

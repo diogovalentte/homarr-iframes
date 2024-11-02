@@ -68,15 +68,32 @@ func (r *Radarr) GetCalendar(unmonitored bool, startDate, endDate time.Time) ([]
 
 type getRadarrCalendarEntryResponse struct {
 	OriginalTitle   string                         `json:"originalTitle"`
-	HasFile         bool                           `json:"hasFile"`
 	TitleSlug       string                         `json:"titleSlug"`
 	InCinemas       string                         `json:"inCinemas"`
 	PhysicalRelease string                         `json:"physicalRelease"`
 	DigitalRelease  string                         `json:"digitalRelease"`
 	Images          []DefaultReleaseImagesResponse `json:"images"`
+	HasFile         bool                           `json:"hasFile"`
 }
 
 type DefaultReleaseImagesResponse struct {
 	CoverType string `json:"coverType"`
 	RemoteURL string `json:"remoteUrl"`
+}
+
+func (r *Radarr) GetHealth() ([]*HealthEntry, error) {
+	var entries []*HealthEntry
+	err := baseRequest("GET", fmt.Sprintf("%s/api/v3/health", r.InternalAddress), nil, &entries)
+	if err != nil {
+		return nil, err
+	}
+
+	return entries, nil
+}
+
+type HealthEntry struct {
+	Source  string `json:"source"`
+	Type    string `json:"type"`
+	Message string `json:"message"`
+	WikiURL string `json:"wikiUrl"`
 }

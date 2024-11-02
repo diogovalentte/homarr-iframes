@@ -79,3 +79,20 @@ type getSonarrCalendarEntryResponse struct {
 	SeasonNumber  int  `json:"seasonNumber"`
 	EpisodeNumber int  `json:"episodeNumber"`
 }
+
+func (s *Sonarr) GetHealth() ([]*HealthEntry, error) {
+	var entries []*HealthEntry
+	err := baseRequest("GET", fmt.Sprintf("%s/api/v3/health", s.InternalAddress), nil, &entries)
+	if err != nil {
+		return nil, err
+	}
+
+	return entries, nil
+}
+
+type HealthEntry struct {
+	Source  string `json:"source"`
+	Type    string `json:"type"`
+	Message string `json:"message"`
+	WikiURL string `json:"wikiUrl"`
+}
