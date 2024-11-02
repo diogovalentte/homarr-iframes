@@ -488,6 +488,23 @@ const docTemplate = `{
                 }
             }
         },
+        "/iframe/netdata": {
+            "get": {
+                "description": "Returns a message saying that this iFrame is not implemented anymore.",
+                "produces": [
+                    "text/html"
+                ],
+                "summary": "Netdata iFrame",
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/iframe/overseerr": {
             "get": {
                 "description": "Returns an iFrame with Overseerr media requests list. Returns all requests if the user's API token has the ADMIN or MANAGE_REQUESTS permissions. Otherwise, only the logged-in user's requests are returned.",

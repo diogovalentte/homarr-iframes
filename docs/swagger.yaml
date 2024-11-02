@@ -376,6 +376,17 @@ paths:
           schema:
             type: string
       summary: Media Releases
+  /iframe/netdata:
+    get:
+      description: Returns a message saying that this iFrame is not implemented anymore.
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+      summary: Netdata iFrame
   /iframe/overseerr:
     get:
       description: Returns an iFrame with Overseerr media requests list. Returns all

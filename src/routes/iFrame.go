@@ -26,6 +26,7 @@ func IFrameRoutes(group *gin.RouterGroup) {
 	group.GET("/media_releases", MediaReleasesiFrameHandler)
 	group.GET("/uptimekuma", UptimeKumaiFrameHandler)
 	group.GET("/alarms", AlarmsiFrameHandler)
+	group.GET("/netdata", NetdataiFrameHandler)
 }
 
 // @Summary Linkwarden  bookmarks iFrame
@@ -185,6 +186,15 @@ func AlarmsiFrameHandler(c *gin.Context) {
 		return
 	}
 	a.GetiFrame(c)
+}
+
+// @Summary Netdata iFrame
+// @Description Returns a message saying that this iFrame is not implemented anymore.
+// @Success 200 {string} string "HTML content"
+// @Produce html
+// @Router /iframe/netdata [get]
+func NetdataiFrameHandler(c *gin.Context) {
+	c.String(http.StatusOK, "Netdata iFrame was removed. It's now implemented in the alarms iFrame. Please consult the alarms iFrame documentation.")
 }
 
 type messsageResponse struct {
