@@ -73,11 +73,18 @@ func getNetdataAlarms() ([]Alarm, error) {
 
 	var alarms []Alarm
 	for _, alarm := range netdataAlarms {
+		summary := alarm.Summary
+		if summary == "" {
+			summary = alarm.Name
+		}
+		if summary == "" {
+			summary = "Unknown"
+		}
 		alarms = append(alarms, Alarm{
 			Source:            "Netdata",
 			BackgroundImgURL:  netdata.BackgroundImageURL,
 			BackgroundImgSize: 80,
-			Summary:           alarm.Summary,
+			Summary:           summary,
 			URL:               n.Address,
 			Status:            alarm.Status,
 			Value:             alarm.ValueString,
