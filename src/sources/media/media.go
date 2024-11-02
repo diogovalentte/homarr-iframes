@@ -13,50 +13,8 @@ import (
 
 	"github.com/diogovalentte/homarr-iframes/src/config"
 	"github.com/diogovalentte/homarr-iframes/src/sources"
+	"github.com/diogovalentte/homarr-iframes/src/sources/radarr"
 )
-
-func getIframeData(radarrReleaseType string, unmonitored bool) (*Calendar, error) {
-	var isAnySourceValid bool
-	calendar := &Calendar{}
-	startDate := time.Now()
-	endDate := startDate.AddDate(0, 0, 1)
-
-	if config.GlobalConfigs.Radarr.Address != "" && config.GlobalConfigs.Radarr.APIKey != "" {
-		isAnySourceValid = true
-		radarr, err := NewRadarr(config.GlobalConfigs.Radarr.Address, config.GlobalConfigs.Radarr.InternalAddress, config.GlobalConfigs.Radarr.APIKey)
-		if err != nil {
-			return nil, fmt.Errorf("couldn't create Radarr client: %s", err.Error())
-		}
-		radarrCalendar, err := radarr.GetCalendar(unmonitored, startDate, endDate, radarrReleaseType)
-		if err != nil {
-			return nil, fmt.Errorf("couldn't get Radarr calendar: %s", err.Error())
-		}
-		for _, release := range radarrCalendar.Releases {
-			calendar.Releases = append(calendar.Releases, release)
-		}
-	}
-
-	if config.GlobalConfigs.Sonarr.Address != "" && config.GlobalConfigs.Sonarr.APIKey != "" {
-		isAnySourceValid = true
-		sonarr, err := NewSonarr(config.GlobalConfigs.Sonarr.Address, config.GlobalConfigs.Sonarr.InternalAddress, config.GlobalConfigs.Sonarr.APIKey)
-		if err != nil {
-			return nil, fmt.Errorf("couldn't create Sonarr client: %s", err.Error())
-		}
-		sonarrCalendar, err := sonarr.GetCalendar(unmonitored, startDate, endDate)
-		if err != nil {
-			return nil, fmt.Errorf("couldn't get Sonarr calendar: %s", err.Error())
-		}
-		for _, release := range sonarrCalendar.Releases {
-			calendar.Releases = append(calendar.Releases, release)
-		}
-	}
-
-	if !isAnySourceValid {
-		return nil, fmt.Errorf("no valid source found. Please check the docs for what environment variables should be set")
-	}
-
-	return calendar, nil
-}
 
 // GetiFrame returns an HTML/CSS code to be used as an iFrame
 func GetiFrame(c *gin.Context) {
@@ -111,7 +69,7 @@ func GetiFrame(c *gin.Context) {
 		return
 	}
 
-	iframeRequestData, err := getIframeData(radarrReleaseType, showUnmonitored)
+	iframeRequestData, err := getCalendar(radarrReleaseType, showUnmonitored)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -426,13 +384,13 @@ type iframeTemplateData struct {
 	Calendar                      *Calendar
 	Theme                         string
 	APIURL                        string
-	APIShowUnmonitored            bool
 	APIRadarrReleaseType          string
-	ShowEpisodeHours              bool
 	SonarrAddress                 string
 	RadarrAddress                 string
 	ScrollbarThumbBackgroundColor string
 	ScrollbarTrackBackgroundColor string
+	ShowEpisodeHours              bool
+	APIShowUnmonitored            bool
 }
 
 // GetHash returns the hash of the media releases
@@ -453,7 +411,7 @@ func GetHash(c *gin.Context) {
 		return
 	}
 
-	releases, err := getIframeData(radarrReleaseType, showUnmonitored)
+	releases, err := getCalendar(radarrReleaseType, showUnmonitored)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -461,4 +419,24 @@ func GetHash(c *gin.Context) {
 	hash := sources.GetHash(*releases, time.Now().Format("2006-01-02"))
 
 	c.JSON(http.StatusOK, gin.H{"hash": fmt.Sprintf("%x", hash)})
+}
+
+func GetReleaseCoverImageURL(images []radarr.DefaultReleaseImagesResponse) string {
+	if len(images) == 0 {
+		return ""
+	}
+
+	for _, image := range images {
+		if image.CoverType == "poster" {
+			return image.RemoteURL
+		}
+	}
+
+	return images[0].RemoteURL
+}
+
+// IsReleaseDateWithinDateRange checks if it's within a given date range.
+// startDate is inclusive, endDate is exclusive.
+func IsReleaseDateWithinDateRange(releaseDate, startDate, endDate time.Time) bool {
+	return (releaseDate.After(startDate) || releaseDate.Equal(startDate)) && releaseDate.Before(endDate)
 }

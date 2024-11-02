@@ -1,4 +1,4 @@
-package media
+package radarr
 
 import (
 	"fmt"
@@ -29,10 +29,10 @@ func TestMain(m *testing.M) {
 	os.Exit(exitCode)
 }
 
-func TestGetSonarrCalendar(t *testing.T) {
-	s, err := NewSonarr(config.GlobalConfigs.Sonarr.Address, config.GlobalConfigs.Sonarr.APIKey)
+func TestGetRadarrCalendar(t *testing.T) {
+	s, err := New()
 	if err != nil {
-		t.Fatalf("error creating Sonarr instance: %v", err)
+		t.Fatalf("error creating Radarr instance: %v", err)
 	}
 	_, err = s.GetCalendar(false, time.Now(), time.Now().AddDate(0, 0, 1))
 	if err != nil {

@@ -1,11 +1,10 @@
-package media
+package sonarr
 
 import (
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"time"
 )
 
 func baseRequest(method, url string, body io.Reader, target interface{}) error {
@@ -16,6 +15,7 @@ func baseRequest(method, url string, body io.Reader, target interface{}) error {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Api-Key", s.APIKey)
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -37,24 +37,4 @@ func baseRequest(method, url string, body io.Reader, target interface{}) error {
 	}
 
 	return nil
-}
-
-func getReleaseCoverImageURL(images []defaultReleaseImagesResponse) string {
-	if len(images) == 0 {
-		return ""
-	}
-
-	for _, image := range images {
-		if image.CoverType == "poster" {
-			return image.RemoteURL
-		}
-	}
-
-	return images[0].RemoteURL
-}
-
-// isReleaseDateWithinDateRange checks if it's within a given date range.
-// startDate is inclusive, endDate is exclusive.
-func isReleaseDateWithinDateRange(releaseDate, startDate, endDate time.Time) bool {
-	return (releaseDate.After(startDate) || releaseDate.Equal(startDate)) && releaseDate.Before(endDate)
 }
