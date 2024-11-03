@@ -9,7 +9,7 @@ type Alarm struct {
 	Summary string
 	// URL: an URL to be used in the link of the alarm
 	URL string
-	// Status: can be only "CLEAR", "WARNING", "ERROR", or "CRITICAL"
+	// Status: like "CLEAR", "WARNING", "ERROR", or "CRITICAL"
 	// Prefer to uppercase the status
 	Status string
 	// Value: a value related to the alarm, like "12GB free"
@@ -20,8 +20,8 @@ type Alarm struct {
 	Source string
 	// BackgroundImgURL: URL to an image to be used as background of the alarm card
 	BackgroundImgURL string
-	// BackgroundImgSize: Size of the background image in %, like 80 or 102.5
-	BackgroundImgSize float32
 	// BackgroundColor: Color to be used as background of the alarm card if no BackgroundImgURL is set
 	BackgroundColor string
+	// BackgroundImgSize: Size of the background image in %, like 80 or 102.5
+	BackgroundImgSize float32
 }

@@ -7,13 +7,14 @@ import (
 	"time"
 
 	"github.com/diogovalentte/homarr-iframes/src/sources/netdata"
+	"github.com/diogovalentte/homarr-iframes/src/sources/pihole"
 	"github.com/diogovalentte/homarr-iframes/src/sources/prowlarr"
 	"github.com/diogovalentte/homarr-iframes/src/sources/radarr"
 	"github.com/diogovalentte/homarr-iframes/src/sources/sonarr"
 	speedtesttracker "github.com/diogovalentte/homarr-iframes/src/sources/speedtest-tracker"
 )
 
-var validAlarmNames = []string{"netdata", "prowlarr", "sonarr", "radarr", "speedtest-tracker"}
+var validAlarmNames = []string{"netdata", "prowlarr", "sonarr", "radarr", "speedtest-tracker", "pihole"}
 
 func (a *Alarms) GetAlarms(alarmNames []string, limit int, desc bool) ([]Alarm, error) {
 	if limit == 0 {
@@ -54,6 +55,12 @@ func (a *Alarms) GetAlarms(alarmNames []string, limit int, desc bool) ([]Alarm, 
 				return nil, err
 			}
 			alarms = append(alarms, speedTestTrackerAlarms...)
+		case "pihole":
+			piholeAlarms, err := getPiholeAlarms()
+			if err != nil {
+				return nil, err
+			}
+			alarms = append(alarms, piholeAlarms...)
 		default:
 			return nil, fmt.Errorf("invalid alarm name: %s", alarmName)
 		}
@@ -232,6 +239,37 @@ func getSpeedTestTrackerAlarms() ([]Alarm, error) {
 		Property:        test.Data.ServerName,
 		Time:            updatedAt,
 	})
+
+	return alarms, nil
+}
+
+func getPiholeAlarms() ([]Alarm, error) {
+	p, err := pihole.New()
+	if err != nil {
+		return nil, err
+	}
+
+	messages, err := p.GetMessages()
+	if err != nil {
+		return nil, err
+	}
+
+	var alarms []Alarm
+	for _, message := range messages.Messages {
+		summary := fmt.Sprintf("%s | %v | %v", message.Message, message.Blob1, message.Blob2)
+		timestamp := time.Unix(message.Timestamp, 0)
+		url := p.Address + "/admin/api_db.php?messages"
+		alarms = append(alarms, Alarm{
+			Source:            "Pi-hole",
+			BackgroundImgURL:  pihole.BackgroundImgURL,
+			BackgroundImgSize: 80,
+			Summary:           summary,
+			Property:          message.Type,
+			Time:              timestamp,
+			URL:               url,
+			Status:            "WARNING",
+		})
+	}
 
 	return alarms, nil
 }

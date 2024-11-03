@@ -18,6 +18,7 @@ type Configs struct {
 	UptimeKumaConfigs       uptimeKumaConfigs
 	NetdataConfigs          netdataConfigs
 	SpeedTestTrackerConfigs speedTestTrackerConfigs
+	Pihole                  piholeConfigs
 }
 
 type linkwardenConfigs struct {
@@ -71,6 +72,12 @@ type speedTestTrackerConfigs struct {
 	InternalAddress string
 }
 
+type piholeConfigs struct {
+	Address         string
+	InternalAddress string
+	Token           string
+}
+
 func SetConfigs(filePath string) error {
 	GlobalConfigs = &Configs{}
 
@@ -114,6 +121,10 @@ func SetConfigs(filePath string) error {
 
 	GlobalConfigs.SpeedTestTrackerConfigs.Address = os.Getenv("SPEEDTEST_TRACKER_ADDRESS")
 	GlobalConfigs.SpeedTestTrackerConfigs.InternalAddress = os.Getenv("INTERNAL_SPEEDTEST_TRACKER_ADDRESS")
+
+	GlobalConfigs.Pihole.Address = os.Getenv("PIHOLE_ADDRESS")
+	GlobalConfigs.Pihole.InternalAddress = os.Getenv("INTERNAL_PIHOLE_ADDRESS")
+	GlobalConfigs.Pihole.Token = os.Getenv("PIHOLE_TOKEN")
 
 	return nil
 }
