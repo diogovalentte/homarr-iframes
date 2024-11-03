@@ -123,7 +123,7 @@ func UptimeKumaHashHandler(c *gin.Context) {
 // @Success 200 {object} hashResponse
 // @Produce json
 // @Param limit query int false "Limits the number of items in the iFrame." Example(5)
-// @Param alarms query string true "Alarms to show. Available values: netdata, radarr, sonarr, prowlarr, speedtest-tracker, pihole" Example(netdata,radarr,sonarr)
+// @Param alarms query string true "Alarms to show. Available values: netdata, radarr, sonarr, prowlarr, speedtest-tracker, pihole, kavita" Example(netdata,radarr,sonarr)
 // @Param sort_desc query bool false "Sort alarms in descending order. Defaults to false." Example(false)
 // @Router /hash/alarms [get]
 func AlarmsHashHandler(c *gin.Context) {

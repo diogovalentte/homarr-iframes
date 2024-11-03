@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/diogovalentte/homarr-iframes/src/sources/kavita"
 	"github.com/diogovalentte/homarr-iframes/src/sources/netdata"
 	"github.com/diogovalentte/homarr-iframes/src/sources/pihole"
 	"github.com/diogovalentte/homarr-iframes/src/sources/prowlarr"
@@ -14,7 +15,7 @@ import (
 	speedtesttracker "github.com/diogovalentte/homarr-iframes/src/sources/speedtest-tracker"
 )
 
-var validAlarmNames = []string{"netdata", "prowlarr", "sonarr", "radarr", "speedtest-tracker", "pihole"}
+var validAlarmNames = []string{"netdata", "prowlarr", "sonarr", "radarr", "speedtest-tracker", "pihole", "kavita"}
 
 func (a *Alarms) GetAlarms(alarmNames []string, limit int, desc bool) ([]Alarm, error) {
 	if limit == 0 {
@@ -61,6 +62,12 @@ func (a *Alarms) GetAlarms(alarmNames []string, limit int, desc bool) ([]Alarm, 
 				return nil, err
 			}
 			alarms = append(alarms, piholeAlarms...)
+		case "kavita":
+			kavitaAlarms, err := getKavitaAlarms()
+			if err != nil {
+				return nil, err
+			}
+			alarms = append(alarms, kavitaAlarms...)
 		default:
 			return nil, fmt.Errorf("invalid alarm name: %s", alarmName)
 		}
@@ -268,6 +275,40 @@ func getPiholeAlarms() ([]Alarm, error) {
 			Time:              timestamp,
 			URL:               url,
 			Status:            "WARNING",
+		})
+	}
+
+	return alarms, nil
+}
+
+func getKavitaAlarms() ([]Alarm, error) {
+	k, err := kavita.New()
+	if err != nil {
+		return nil, err
+	}
+
+	errors, err := k.GetMediaErrors()
+	if err != nil {
+		return nil, err
+	}
+
+	var alarms []Alarm
+	for _, error := range errors {
+		layout := "2006-01-02T15:04:05.9999999"
+		timestamp, err := time.Parse(layout, error.CreatedUTC)
+		if err != nil {
+			return nil, err
+		}
+		timestamp = timestamp.Local()
+		url := k.Address + "/settings#admin-media-issues"
+		alarms = append(alarms, Alarm{
+			Source:            "Kavita",
+			BackgroundImgURL:  kavita.BackgroundImgURL,
+			BackgroundImgSize: 100,
+			Summary:           error.Comment,
+			Time:              timestamp,
+			URL:               url,
+			Status:            "ERROR",
 		})
 	}
 

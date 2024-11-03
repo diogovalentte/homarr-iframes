@@ -19,6 +19,7 @@ type Configs struct {
 	NetdataConfigs          netdataConfigs
 	SpeedTestTrackerConfigs speedTestTrackerConfigs
 	Pihole                  piholeConfigs
+	Kavita                  kavitaConfigs
 }
 
 type linkwardenConfigs struct {
@@ -78,6 +79,13 @@ type piholeConfigs struct {
 	Token           string
 }
 
+type kavitaConfigs struct {
+	Address         string
+	InternalAddress string
+	Username        string
+	Password        string
+}
+
 func SetConfigs(filePath string) error {
 	GlobalConfigs = &Configs{}
 
@@ -125,6 +133,11 @@ func SetConfigs(filePath string) error {
 	GlobalConfigs.Pihole.Address = os.Getenv("PIHOLE_ADDRESS")
 	GlobalConfigs.Pihole.InternalAddress = os.Getenv("INTERNAL_PIHOLE_ADDRESS")
 	GlobalConfigs.Pihole.Token = os.Getenv("PIHOLE_TOKEN")
+
+	GlobalConfigs.Kavita.Address = os.Getenv("KAVITA_ADDRESS")
+	GlobalConfigs.Kavita.InternalAddress = os.Getenv("INTERNAL_KAVITA_ADDRESS")
+	GlobalConfigs.Kavita.Username = os.Getenv("KAVITA_USERNAME")
+	GlobalConfigs.Kavita.Password = os.Getenv("KAVITA_PASSWORD")
 
 	return nil
 }
