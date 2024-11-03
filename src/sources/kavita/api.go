@@ -85,10 +85,33 @@ func (k *Kavita) RefreshCurrentToken() error {
 	}
 	payload := bytes.NewReader(jsonData)
 
-	var loginResponse LoginResponse
-	err = k.baseRequest("POST", fmt.Sprintf("%s/api/account/refresh-token", k.InternalAddress), payload, &loginResponse)
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/api/account/refresh-token", k.InternalAddress), payload)
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating request: %w", err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("error sending request: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("error: %s", resp.Status)
+	}
+
+	defer resp.Body.Close()
+
+	resBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("error reading response body: %w", err)
+	}
+
+	var loginResponse LoginResponse
+	if err := json.Unmarshal(resBody, &loginResponse); err != nil {
+		return fmt.Errorf("error unmarshaling JSON: %s\n. Reponse body: %s", err.Error(), string(resBody))
 	}
 
 	k.Token = loginResponse.Token
