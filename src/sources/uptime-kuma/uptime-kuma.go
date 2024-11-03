@@ -19,17 +19,17 @@ var u *UptimeKuma
 
 // UptimeKuma is the UptimeKuma source
 type UptimeKuma struct {
-	// UptimeKuma instance URL
-	Address string
+	Address         string
+	InternalAddress string
 }
 
-func New(address string) (*UptimeKuma, error) {
+func New(address, internalAddress string) (*UptimeKuma, error) {
 	if u != nil {
 		return u, nil
 	}
 
 	newU := &UptimeKuma{}
-	err := newU.Init(address)
+	err := newU.Init(address, internalAddress)
 	if err != nil {
 		return nil, err
 	}
@@ -40,14 +40,17 @@ func New(address string) (*UptimeKuma, error) {
 }
 
 // Init sets the UptimeKuma properties from the configs
-func (u *UptimeKuma) Init(address string) error {
+func (u *UptimeKuma) Init(address, internalAddress string) error {
 	if address == "" {
 		return fmt.Errorf("UPTIMEKUMA_ADDRESS variable should be set")
 	}
 
-	strings.TrimSuffix(address, "/")
-
-	u.Address = address
+	u.Address = strings.TrimSuffix(address, "/")
+	if internalAddress == "" {
+		u.InternalAddress = u.Address
+	} else {
+		u.InternalAddress = strings.TrimSuffix(internalAddress, "/")
+	}
 
 	return nil
 }

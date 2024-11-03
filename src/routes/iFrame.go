@@ -161,7 +161,7 @@ func MediaReleasesiFrameHandler(c *gin.Context) {
 // @Param orientation query string false "Orientation of the containers, defaults to horizontal." Example(vertical)
 // @Router /iframe/uptimekuma [get]
 func UptimeKumaiFrameHandler(c *gin.Context) {
-	u, err := uptimekuma.New(config.GlobalConfigs.UptimeKumaConfigs.Address)
+	u, err := uptimekuma.New(config.GlobalConfigs.UptimeKumaConfigs.Address, config.GlobalConfigs.UptimeKumaConfigs.InternalAddress)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return

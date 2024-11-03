@@ -60,7 +60,8 @@ type prowlarrConfigs struct {
 }
 
 type uptimeKumaConfigs struct {
-	Address string
+	Address         string
+	InternalAddress string
 }
 
 type netdataConfigs struct {
@@ -128,6 +129,7 @@ func SetConfigs(filePath string) error {
 	GlobalConfigs.Prowlarr.APIKey = os.Getenv("PROWLARR_API_KEY")
 
 	GlobalConfigs.UptimeKumaConfigs.Address = os.Getenv("UPTIMEKUMA_ADDRESS")
+	GlobalConfigs.UptimeKumaConfigs.InternalAddress = os.Getenv("INTERNAL_UPTIMEKUMA_ADDRESS")
 
 	GlobalConfigs.NetdataConfigs.Address = os.Getenv("NETDATA_ADDRESS")
 	GlobalConfigs.NetdataConfigs.InternalAddress = os.Getenv("INTERNAL_NETDATA_ADDRESS")

@@ -110,7 +110,7 @@ func MediaReleasesHashHandler(c *gin.Context) {
 // @Param slug query string true "You need to create a status page in Uptime Kuma and select which sites/services this status page will show. While creating the status page, it'll request **you** to create a slug, after creating the status page, provide this slug here. This iFrame will show data only of the sites/services of this specific status page!" Example(uptime-kuma-slug)
 // @Router /hash/uptimekuma [get]
 func UptimeKumaHashHandler(c *gin.Context) {
-	u, err := uptimekuma.New(config.GlobalConfigs.UptimeKumaConfigs.Address)
+	u, err := uptimekuma.New(config.GlobalConfigs.UptimeKumaConfigs.Address, config.GlobalConfigs.UptimeKumaConfigs.InternalAddress)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return

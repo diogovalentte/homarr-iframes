@@ -29,7 +29,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestUptimeKuma_GetStatusPageLastHeartbeats(t *testing.T) {
-	u, err := New(config.GlobalConfigs.UptimeKumaConfigs.Address)
+	u, err := New(config.GlobalConfigs.UptimeKumaConfigs.Address, config.GlobalConfigs.UptimeKumaConfigs.InternalAddress)
 	if err != nil {
 		t.Fatal(err)
 	}
