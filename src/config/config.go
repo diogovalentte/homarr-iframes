@@ -9,14 +9,15 @@ import (
 var GlobalConfigs *Configs
 
 type Configs struct {
-	Linkwarden        linkwardenConfigs
-	Vikunja           vikunjaConfigs
-	Overseerr         overseerrConfigs
-	Sonarr            sonarrConfigs
-	Radarr            radarrConfigs
-	Prowlarr          prowlarrConfigs
-	UptimeKumaConfigs uptimeKumaConfigs
-	NetdataConfigs    netdataConfigs
+	Linkwarden              linkwardenConfigs
+	Vikunja                 vikunjaConfigs
+	Overseerr               overseerrConfigs
+	Sonarr                  sonarrConfigs
+	Radarr                  radarrConfigs
+	Prowlarr                prowlarrConfigs
+	UptimeKumaConfigs       uptimeKumaConfigs
+	NetdataConfigs          netdataConfigs
+	SpeedTestTrackerConfigs speedTestTrackerConfigs
 }
 
 type linkwardenConfigs struct {
@@ -65,6 +66,11 @@ type netdataConfigs struct {
 	Token           string
 }
 
+type speedTestTrackerConfigs struct {
+	Address         string
+	InternalAddress string
+}
+
 func SetConfigs(filePath string) error {
 	GlobalConfigs = &Configs{}
 
@@ -105,6 +111,9 @@ func SetConfigs(filePath string) error {
 	GlobalConfigs.NetdataConfigs.Address = os.Getenv("NETDATA_ADDRESS")
 	GlobalConfigs.NetdataConfigs.InternalAddress = os.Getenv("INTERNAL_NETDATA_ADDRESS")
 	GlobalConfigs.NetdataConfigs.Token = os.Getenv("NETDATA_TOKEN")
+
+	GlobalConfigs.SpeedTestTrackerConfigs.Address = os.Getenv("SPEEDTEST_TRACKER_ADDRESS")
+	GlobalConfigs.SpeedTestTrackerConfigs.InternalAddress = os.Getenv("INTERNAL_SPEEDTEST_TRACKER_ADDRESS")
 
 	return nil
 }

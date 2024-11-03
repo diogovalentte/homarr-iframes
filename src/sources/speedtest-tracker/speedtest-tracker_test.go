@@ -1,4 +1,4 @@
-package alarms
+package speedtesttracker
 
 import (
 	"fmt"
@@ -28,12 +28,13 @@ func TestMain(m *testing.M) {
 	os.Exit(exitCode)
 }
 
-func TestGetAlarms(t *testing.T) {
-	alarms := Alarms{}
-	t.Run("get alarms", func(t *testing.T) {
-		_, err := alarms.GetAlarms([]string{"netdata", "prowlarr", "radarr", "sonarr", "speedtest-tracker"}, -1, false)
-		if err != nil {
-			t.Fatal(err)
-		}
-	})
+func TestGetLatestTest(t *testing.T) {
+	s, err := New()
+	if err != nil {
+		t.Fatalf("error creating SpeedTestTracker instance: %v", err)
+	}
+	_, err = s.GetLatestTest()
+	if err != nil {
+		t.Fatalf("error getting latest test: %v", err)
+	}
 }

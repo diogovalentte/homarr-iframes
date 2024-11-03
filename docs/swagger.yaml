@@ -22,7 +22,8 @@ paths:
         in: query
         name: limit
         type: integer
-      - description: 'Alarms to show. Available values: netdata, radarr, sonarr, prowlarr'
+      - description: 'Alarms to show. Available values: netdata, radarr, sonarr, prowlarr,
+          speedtest-tracker'
         example: netdata,radarr,sonarr
         in: query
         name: alarms
@@ -234,7 +235,8 @@ paths:
         in: query
         name: limit
         type: integer
-      - description: 'Alarms to show. Available values: netdata, radarr, sonarr, prowlarr'
+      - description: 'Alarms to show. Available values: netdata, radarr, sonarr, prowlarr,
+          speedtest-tracker'
         example: netdata,radarr,sonarr
         in: query
         name: alarms

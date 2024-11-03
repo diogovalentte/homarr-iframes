@@ -33,7 +33,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "example": "netdata,radarr,sonarr",
-                        "description": "Alarms to show. Available values: netdata, radarr, sonarr, prowlarr",
+                        "description": "Alarms to show. Available values: netdata, radarr, sonarr, prowlarr, speedtest-tracker",
                         "name": "alarms",
                         "in": "query",
                         "required": true
@@ -313,7 +313,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "example": "netdata,radarr,sonarr",
-                        "description": "Alarms to show. Available values: netdata, radarr, sonarr, prowlarr",
+                        "description": "Alarms to show. Available values: netdata, radarr, sonarr, prowlarr, speedtest-tracker",
                         "name": "alarms",
                         "in": "query",
                         "required": true

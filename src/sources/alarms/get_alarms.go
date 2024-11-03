@@ -4,14 +4,16 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/diogovalentte/homarr-iframes/src/sources/netdata"
 	"github.com/diogovalentte/homarr-iframes/src/sources/prowlarr"
 	"github.com/diogovalentte/homarr-iframes/src/sources/radarr"
 	"github.com/diogovalentte/homarr-iframes/src/sources/sonarr"
+	speedtesttracker "github.com/diogovalentte/homarr-iframes/src/sources/speedtest-tracker"
 )
 
-var validAlarmNames = []string{"netdata", "prowlarr", "sonarr", "radarr"}
+var validAlarmNames = []string{"netdata", "prowlarr", "sonarr", "radarr", "speedtest-tracker"}
 
 func (a *Alarms) GetAlarms(alarmNames []string, limit int, desc bool) ([]Alarm, error) {
 	if limit == 0 {
@@ -46,6 +48,12 @@ func (a *Alarms) GetAlarms(alarmNames []string, limit int, desc bool) ([]Alarm, 
 				return nil, err
 			}
 			alarms = append(alarms, sonarrAlarms...)
+		case "speedtest-tracker":
+			speedTestTrackerAlarms, err := getSpeedTestTrackerAlarms()
+			if err != nil {
+				return nil, err
+			}
+			alarms = append(alarms, speedTestTrackerAlarms...)
 		default:
 			return nil, fmt.Errorf("invalid alarm name: %s", alarmName)
 		}
@@ -185,6 +193,45 @@ func getProwlarrAlarms() ([]Alarm, error) {
 			Property:          alarm.Source,
 		})
 	}
+
+	return alarms, nil
+}
+
+func getSpeedTestTrackerAlarms() ([]Alarm, error) {
+	s, err := speedtesttracker.New()
+	if err != nil {
+		return nil, err
+	}
+
+	test, err := s.GetLatestTest()
+	if err != nil {
+		return nil, err
+	}
+
+	var alarms []Alarm
+
+	if !test.Data.Failed {
+		return alarms, nil
+	}
+
+	url := test.Data.URL
+	if url == "" {
+		url = s.Address + "/admin/results"
+	}
+	layout := "2006-01-02T15:04:05.999999999-07:00"
+	updatedAt, err := time.Parse(layout, test.Data.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
+	alarms = append(alarms, Alarm{
+		Source:          "SpeedTest",
+		BackgroundColor: "black",
+		Summary:         "Last Speedtest failed",
+		URL:             url,
+		Status:          "FAILED",
+		Property:        test.Data.ServerName,
+		Time:            updatedAt,
+	})
 
 	return alarms, nil
 }

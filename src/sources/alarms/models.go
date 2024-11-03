@@ -22,4 +22,6 @@ type Alarm struct {
 	BackgroundImgURL string
 	// BackgroundImgSize: Size of the background image in %, like 80 or 102.5
 	BackgroundImgSize float32
+	// BackgroundColor: Color to be used as background of the alarm card if no BackgroundImgURL is set
+	BackgroundColor string
 }

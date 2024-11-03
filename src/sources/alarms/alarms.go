@@ -308,7 +308,7 @@ func (a *Alarms) getAlarmsiFrame(alarms []Alarm, desc bool, alarmsQueryArg, them
 <body>
 {{ range .Alarms }}
     <div class="alarms-container">
-        <div class="background-image" style="background-image: url('{{ .BackgroundImgURL }}'); background-size: {{ .BackgroundImgSize }}%;"></div>
+        <div class="background-image" style="{{ if .BackgroundImgURL }}background-image: url('{{ .BackgroundImgURL }}');{{ else }}background-color: {{ .BackgroundColor }};{{ end }} background-size: {{ .BackgroundImgSize }}%;"></div>
 
         <div class="text-wrap">
             <i class="fa-solid fa-bell"></i> <a href="{{ .URL }}" target="_blank" class="alarm-summary">{{ .Summary }}</a>
@@ -360,9 +360,7 @@ func (a *Alarms) getAlarmsiFrame(alarms []Alarm, desc bool, alarmsQueryArg, them
 				return "green"
 			case "WARNING":
 				return "orange"
-			case "ERROR":
-				return "red"
-			case "CRITICAL":
+			case "ERROR", "CRITICAL", "FAILED":
 				return "red"
 			default:
 				return "gray"
