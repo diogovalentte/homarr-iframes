@@ -265,7 +265,7 @@ func getPiholeAlarms() ([]Alarm, error) {
 	for _, message := range messages.Messages {
 		summary := fmt.Sprintf("%s | %v | %v", message.Message, message.Blob1, message.Blob2)
 		timestamp := time.Unix(message.Timestamp, 0)
-		url := p.Address + "/admin/api_db.php?messages"
+		url := p.Address + "/admin/messages.php"
 		alarms = append(alarms, Alarm{
 			Source:            "Pi-hole",
 			BackgroundImgURL:  pihole.BackgroundImgURL,
