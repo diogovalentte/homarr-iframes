@@ -88,14 +88,60 @@ This source gets on display movies of specific Cinemark theaters (only in Brazil
 
 ![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/7071b022-fe90-4db7-874b-8b88d0298641)
 
-# Netdata
+# Alarms
 
-This source creates an iFrame with your alarms from your [Netdata](https://github.com/netdata/netdata) instance.
+This source shows **alarms** (warnings, errors, failed jobs notifications) from multiple services in one central place.
 
-![image](https://github.com/user-attachments/assets/1145c008-7853-4438-a154-7a1a6b8dde21)
+![image](https://github.com/user-attachments/assets/15e26b24-8d4b-4243-b239-e6f4c5056712)
 
-To use this source, you'll need to provide the following environment variables:
+To use this source, you must provide environment variables for each service from which you want to show alarms. You also need to specify the services' names in the iframe URL query parameter `alarms`.
+
+Below are the available services that you can use in this iframe and the required environment variables:
+
+## Netdata
+Shows [Netdata](https://github.com/netdata/netdata) alerts, like high RAM/CPU usage alerts.
 
 - `NETDATA_ADDRESS`: your Netdata instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `INTERNAL_NETDATA_ADDRESS`: your Netdata instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `NETDATA_TOKEN`: an access token used to access your Netdata instance API to get your alarms. See how to get it [here](https://learn.netdata.cloud/docs/netdata-cloud/authentication-&-authorization/api-tokens).
+
+## Radarr, Sonarr, and Prowlarr
+Shows health messages from your [Sonarr](https://github.com/Sonarr/Sonarr), [Radarr](https://github.com/Radarr/Radarr), and [Prowlarr](https://github.com/Prowlarr/Prowlarr) instances, like when an index fails or Sonarr can't connect to a download client.
+
+- `SONARR_ADDRESS`: your Sonarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+- `INTERNAL_SONARR_ADDRESS`: your Sonarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+- `SONARR_API_KEY`: an access API key used to access your Sonarr instance API to get your media. You can get it by going to **Settings -> General -> API Key**.
+
+- `RADARR_ADDRESS`: your Radarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+- `INTERNAL_RADARR_ADDRESS`: your Radarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+- `RADARR_API_KEY`: an access API key used to access your Radarr instance API to get your media. You can get it by going to **Settings -> General -> API Key**.
+
+- `PROWLARR_ADDRESS`: your Prowlarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+- `INTERNAL_PROWLARR_ADDRESS`: your Prowlarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+- `PROWLARR_API_KEY`: an access API key used to access your Prowlarr instance API. You can get it by going to **Settings -> General -> API Key**.
+
+## Speedtest Tracker
+Shows a warning if the last speed test from your [Speedtest Tracker](https://github.com/alexjustesen/speedtest-tracker) instance failed.
+- `SPEEDTEST_TRACKER_ADDRESS`: your Speedtest Tracker instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+- `INTERNAL_SPEEDTEST_TRACKER_ADDRESS`: your Speedtest Tracker instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+
+## Pi-hole
+Shows [Pi-hole](https://github.com/pi-hole/pi-hole) diagnostic messages, like a high load.
+
+- `PIHOLE_ADDRESS`: your Pihole instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+- `INTERNAL_PIHOLE_ADDRESS`: your Pihole instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+- `PIHOLE_TOKEN`: an access API key used to access your Pihole instance API. You can get it by going to **Settings -> API -> Show API Token button**.
+
+## Kavita
+Shows your [Kavita](https://github.com/Kareadita/Kavita) instance [media issues](https://wiki.kavitareader.com/troubleshooting/media-errors) that Kavita detects when analyzing your media, like corrupted files.
+
+- `KAVITA_ADDRESS`: your Kavita instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+- `INTERNAL_KAVITA_ADDRESS`: your Kavita instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+- `KAVITA_USERNAME`: your Kavita username.
+- `KAVITA_PASSWORD`: your Kavita password.
+
+## Kaizoku
+Shows warnings if there are failed jobs in your [Kaizoku](https://github.com/oae/kaizoku) queues.
+
+- `KAIZOKU_ADDRESS`: your Kaizoku instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+- `INTERNAL_KAIZOKU_ADDRESS`: your Kaizoku instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
