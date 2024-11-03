@@ -340,7 +340,7 @@ func getKaizokuAlarms() ([]Alarm, error) {
 		}
 
 		summary := fmt.Sprintf("Queue %s has failed jobs", queue.Name)
-		url := k.InternalAddress + "/bull/queues/queue/" + queue.Name + "?status=failed"
+		url := k.Address + "/bull/queues/queue/" + queue.Name + "?status=failed"
 
 		alarms = append(alarms, Alarm{
 			Source:          "Kaizoku",

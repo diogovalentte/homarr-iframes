@@ -90,7 +90,7 @@ This source gets on display movies of specific Cinemark theaters (only in Brazil
 
 # Alarms
 
-This source shows **alarms** (warnings, errors, failed jobs notifications) from multiple services in one central place.
+This source shows **alarms** (warnings, errors, failed jobs notifications, etc.) from multiple services in one central place.
 
 ![image](https://github.com/user-attachments/assets/15e26b24-8d4b-4243-b239-e6f4c5056712)
 
