@@ -48,7 +48,7 @@ func (k *Kaizoku) Init() error {
 }
 
 func (k *Kaizoku) GetQueues() ([]*Queue, error) {
-	url := fmt.Sprintf("%s/bull/queues/api/queues", k.Address)
+	url := fmt.Sprintf("%s/bull/queues/api/queues", k.InternalAddress)
 	var queues getQueuesResponse
 	err := baseRequest(http.MethodGet, url, nil, &queues)
 	if err != nil {
