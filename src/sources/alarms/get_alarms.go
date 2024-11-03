@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/diogovalentte/homarr-iframes/src/sources/kaizoku"
 	"github.com/diogovalentte/homarr-iframes/src/sources/kavita"
 	"github.com/diogovalentte/homarr-iframes/src/sources/netdata"
 	"github.com/diogovalentte/homarr-iframes/src/sources/pihole"
@@ -15,7 +16,7 @@ import (
 	speedtesttracker "github.com/diogovalentte/homarr-iframes/src/sources/speedtest-tracker"
 )
 
-var validAlarmNames = []string{"netdata", "prowlarr", "sonarr", "radarr", "speedtest-tracker", "pihole", "kavita"}
+var validAlarmNames = []string{"netdata", "prowlarr", "sonarr", "radarr", "speedtest-tracker", "pihole", "kavita", "kaizoku"}
 
 func (a *Alarms) GetAlarms(alarmNames []string, limit int, desc bool) ([]Alarm, error) {
 	if limit == 0 {
@@ -68,6 +69,12 @@ func (a *Alarms) GetAlarms(alarmNames []string, limit int, desc bool) ([]Alarm, 
 				return nil, err
 			}
 			alarms = append(alarms, kavitaAlarms...)
+		case "kaizoku":
+			kaizokuAlarms, err := getKaizokuAlarms()
+			if err != nil {
+				return nil, err
+			}
+			alarms = append(alarms, kaizokuAlarms...)
 		default:
 			return nil, fmt.Errorf("invalid alarm name: %s", alarmName)
 		}
@@ -309,6 +316,40 @@ func getKavitaAlarms() ([]Alarm, error) {
 			Time:              timestamp,
 			URL:               url,
 			Status:            "ERROR",
+		})
+	}
+
+	return alarms, nil
+}
+
+func getKaizokuAlarms() ([]Alarm, error) {
+	k, err := kaizoku.New()
+	if err != nil {
+		return nil, err
+	}
+
+	queues, err := k.GetQueues()
+	if err != nil {
+		return nil, err
+	}
+
+	var alarms []Alarm
+	for _, queue := range queues {
+		if queue.Counts.Failed < 1 {
+			continue
+		}
+
+		summary := fmt.Sprintf("Queue %s has failed jobs", queue.Name)
+		url := k.Address + "/bull/queues/queue/" + queue.Name + "?status=failed"
+
+		alarms = append(alarms, Alarm{
+			Source:          "Kaizoku",
+			BackgroundColor: "black",
+			Summary:         summary,
+			URL:             url,
+			Status:          "FAILED",
+			Value:           fmt.Sprintf("%d jobs", queue.Counts.Failed),
+			Property:        queue.Name,
 		})
 	}
 
