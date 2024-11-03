@@ -30,49 +30,49 @@ func (a *Alarms) GetAlarms(alarmNames []string, limit int, desc bool) ([]Alarm, 
 		case "netdata":
 			netdataAlarms, err := getNetdataAlarms()
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("failed to get Netdata alarms: %w", err)
 			}
 			alarms = append(alarms, netdataAlarms...)
 		case "prowlarr":
 			prowlarrAlarms, err := getProwlarrAlarms()
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("failed to get Prowlarr alarms: %w", err)
 			}
 			alarms = append(alarms, prowlarrAlarms...)
 		case "radarr":
 			radarrAlarms, err := getRadarrAlarms()
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("failed to get Radarr alarms: %w", err)
 			}
 			alarms = append(alarms, radarrAlarms...)
 		case "sonarr":
 			sonarrAlarms, err := getSonarrAlarms()
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("failed to get Sonarr alarms: %w", err)
 			}
 			alarms = append(alarms, sonarrAlarms...)
 		case "speedtest-tracker":
 			speedTestTrackerAlarms, err := getSpeedTestTrackerAlarms()
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("failed to get SpeedTest Tracker alarms: %w", err)
 			}
 			alarms = append(alarms, speedTestTrackerAlarms...)
 		case "pihole":
 			piholeAlarms, err := getPiholeAlarms()
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("failed to get Pi-hole alarms: %w", err)
 			}
 			alarms = append(alarms, piholeAlarms...)
 		case "kavita":
 			kavitaAlarms, err := getKavitaAlarms()
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("failed to get Kavita alarms: %w", err)
 			}
 			alarms = append(alarms, kavitaAlarms...)
 		case "kaizoku":
 			kaizokuAlarms, err := getKaizokuAlarms()
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("failed to get Kaizoku alarms: %w", err)
 			}
 			alarms = append(alarms, kaizokuAlarms...)
 		default:
