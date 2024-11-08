@@ -78,7 +78,7 @@ func (Cinemark) GetiFrame(c *gin.Context) {
 	if len(movies) < 1 {
 		var apiURLPath string
 		if apiURL != "" {
-			apiURLPath = apiURL + "/v1/hash/cinemark?limit=" + strconv.Itoa(limit) + "&theaterId=" + theaterIDsStr
+			apiURLPath = apiURL + "/v1/hash/cinemark?limit=" + strconv.Itoa(limit) + "&theaterIds=" + theaterIDsStr
 		}
 		html = sources.GetBaseNothingToShowiFrame(theme, backgroundImageURL, "center", "cover", "0.3", apiURLPath)
 	} else {
@@ -252,7 +252,7 @@ func getMoviesiFrame(movies []Movie, theme, apiURL string, limit int, theaterIDs
 
         async function fetchData() {
             try {
-                var url = '{{ .APIURL }}/v1/hash/cinemark?limit={{ .APILimit }}&theaterId={{ .TheaterID }}';
+                var url = '{{ .APIURL }}/v1/hash/cinemark?limit={{ .APILimit }}&theaterIds={{ .TheaterID }}';
                 const response = await fetch(url);
                 const data = await response.json();
 
