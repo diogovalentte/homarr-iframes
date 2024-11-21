@@ -121,7 +121,7 @@ func SetConfigs(filePath string) error {
 
 	GlobalConfigs.Overseerr.Address = os.Getenv("OVERSEERR_ADDRESS")
 	GlobalConfigs.Overseerr.InternalAddress = os.Getenv("INTERNAL_OVERSEERR_ADDRESS")
-	GlobalConfigs.Overseerr.APIKey = os.Getenv("OVERSEERR_API_URL")
+	GlobalConfigs.Overseerr.APIKey = os.Getenv("OVERSEERR_API_KEY")
 
 	GlobalConfigs.Jellyseerr.Address = os.Getenv("JELLYSEERR_ADDRESS")
 	GlobalConfigs.Jellyseerr.InternalAddress = os.Getenv("INTERNAL_JELLYSEERR_ADDRESS")
