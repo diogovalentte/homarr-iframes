@@ -22,11 +22,11 @@ To use this source, you'll need to provide the following environment variables:
 
 - `LINKWARDEN_ADDRESS`: your Linkwarden instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `INTERNAL_LINKWARDEN_ADDRESS`: your Linkwarden instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `LINKWARDEN_TOKEN`: an access token used to access your Linkwarden instance API to get your links. You can get it by going to **Settings -> Access Tokens -> New Access Token**.
+- `LINKWARDEN_TOKEN`: an access token used to access your Linkwarden instance API to get your links. You can get it in **Settings -> Access Tokens -> New Access Token**.
 
 # Vikunja
 
-This source creates an iFrame with your tasks from your [Vikunja](https://github.com/go-vikunja/vikunja) instance. It has links to the tasks.
+This source creates an iFrame with links to the tasks from your [Vikunja](https://github.com/go-vikunja/vikunja) instance.
 
 - It automatically sorts the tasks by **due date** (ascendent), **end date** (ascendent), and **created date** (descendent), and also filters to return only tasks that are **not done**.
 
@@ -37,11 +37,11 @@ To use this source, you'll need to provide the following environment variables:
 - `VIKUNJA_ADDRESS`: your Vikunja instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `INTERNAL_VIKUNJA_ADDRESS`: your Vikunja instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `VIKUNJA_TOKEN`: an access token used to access your Vikunja instance API to get your tasks. You can get it by going to **Settings -> API Tokens -> Create a Token -> In "Tasks", select "Read One" and "Read All"; In "Projects", select "Read One" and "Read All" -> Create Token**.
-  - If you want to add a button to set the task as done in the iframe, also add the permission **Update**.
+  - If you want to add a button to set the task as done in the iframe, add the permission **Update**.
 
-# Overseerr
+# Media Requests
 
-This source creates an iFrame with your media requests from your [Overseerr](https://github.com/sct/overseerr) instance.
+This source creates an iFrame with your media requests from your [Overseerr](https://github.com/sct/overseerr) and [Jellyseerr](https://github.com/Fallenbagel/jellyseerr) instances.
 
 ![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/7f374beb-e392-4ee9-94fc-4d1556f65e7c)
 
@@ -49,7 +49,11 @@ To use this source, you'll need to provide the following environment variables:
 
 - `OVERSEERR_ADDRESS`: your Overseerr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`. It'll be used in the links in the iframe. If `INTERNAL_OVERSEERR_ADDRESS` is not provided, it'll also be used by the API to get the data from Overseerr.
 - `INTERNAL_OVERSEERR_ADDRESS`: your Overseerr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`. It'll be used by the API to get the data from Overseerr.
-- `OVERSEERR_TOKEN`: an access token used to access your Overseerr instance API to get your media requests. You can get it by going to **Settings -> General -> API Key**.
+- `OVERSEERR_API_KEY`: an API key used to access your Overseerr instance API to get your media requests. You can get it by going to **Settings -> General -> API Key**.
+
+- `JELLYSEERR_ADDRESS`: your Jellyseerr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`. It'll be used in the links in the iframe. If `INTERNAL_JELLYSEERR_ADDRESS` is not provided, it'll also be used by the API to get the data from Jellyseerr.
+- `INTERNAL_JELLYSEERR_ADDRESS`: your Jellyseerr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`. It'll be used by the API to get the data from Jellyseerr.
+- `JELLYSEERR_API_KEY`: an API key used to access your Jellyseerr instance API to get your media requests. You can get it by going to **Settings -> General -> API Key**.
 
 # Media Releases
 
