@@ -189,6 +189,12 @@ func getRequestsiFrame(requests []overseerr.IframeRequestData, theme, apiURL str
             text-decoration: underline;
         }
 
+        .labels-div {
+            min-height: 24px;
+            display: flex;
+            align-items: center;
+        }
+
         .info-label {
             text-decoration: none;
             font-family: ui-sans-serif, system-ui, -apple-system, BtaskMacSystemFont,
@@ -304,7 +310,7 @@ func getRequestsiFrame(requests []overseerr.IframeRequestData, theme, apiURL str
 
         <div class="text-wrap">
             <a href="{{ .Media.URL }}" target="_blank" class="request-title">{{ .Media.Name }}</a>
-            <div>
+            <div class="labels-div">
                 {{ if .Media.Year }}
                     <span class="info-label"><i class="fa-solid fa-calendar-days"></i> {{ .Media.Year }}</span>
                 {{ end }}
