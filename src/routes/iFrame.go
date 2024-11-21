@@ -11,7 +11,7 @@ import (
 	"github.com/diogovalentte/homarr-iframes/src/sources/cinemark"
 	"github.com/diogovalentte/homarr-iframes/src/sources/linkwarden"
 	"github.com/diogovalentte/homarr-iframes/src/sources/media"
-	"github.com/diogovalentte/homarr-iframes/src/sources/overseerr"
+	mediarequets "github.com/diogovalentte/homarr-iframes/src/sources/media-requets"
 	uptimekuma "github.com/diogovalentte/homarr-iframes/src/sources/uptime-kuma"
 	"github.com/diogovalentte/homarr-iframes/src/sources/vikunja"
 )
@@ -24,6 +24,7 @@ func IFrameRoutes(group *gin.RouterGroup) {
 	group.PATCH("/vikunja/set_task_done", VikunjaSetTaskDoneHandler)
 	group.GET("/overseerr", OverseerriFrameHandler)
 	group.GET("/media_releases", MediaReleasesiFrameHandler)
+	group.GET("/media_requests", MediaRequestsiFrameHandler)
 	group.GET("/uptimekuma", UptimeKumaiFrameHandler)
 	group.GET("/alarms", AlarmsiFrameHandler)
 	group.GET("/netdata", NetdataiFrameHandler)
@@ -128,12 +129,7 @@ func VikunjaSetTaskDoneHandler(c *gin.Context) {
 // @Param requestedBy query string false "If specified, only requests from that particular user ID will be returned." Example(1)
 // @Router /iframe/overseerr [get]
 func OverseerriFrameHandler(c *gin.Context) {
-	o, err := overseerr.New(config.GlobalConfigs.Overseerr.Address, config.GlobalConfigs.Overseerr.InternalAddress, config.GlobalConfigs.Overseerr.Token)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-		return
-	}
-	o.GetiFrame(c)
+	c.String(http.StatusOK, "Overseerr iFrame was removed. It's now implemented in the media requests iFrame. Please consult the media requests iFrame documentation.")
 }
 
 // @Summary Media Releases
@@ -148,6 +144,22 @@ func OverseerriFrameHandler(c *gin.Context) {
 // @Router /iframe/media_releases [get]
 func MediaReleasesiFrameHandler(c *gin.Context) {
 	media.GetiFrame(c)
+}
+
+// @Summary Overseerr and Jellyseerr Media Requests
+// @Description Returns an iFrame with Overseerr and Jellyseerr media requests list. Returns all requests if the user's API token has the ADMIN or MANAGE_REQUESTS permissions. Otherwise, only the logged-in user's requests are returned.
+// @Success 200 {string} string "HTML content"
+// @Produce html
+// @Param theme query string false "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white" Example(light)
+// @Param api_url query string true "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload. Also used by the button to set the task done, if not provided, the button will not appear." Example(https://sub.domain.com)
+// @Param limit query int false "Limits the number of items in the iFrame." Example(5)
+// @Param filter query string false "Available values : all, approved, available, pending, processing, unavailable, failed" Example(all)
+// @Param sort query string false "Available values : added, modified. Defaults to added" Example(added)
+// @Param requestedByOverseerr query string false "If specified, only requests from that particular overseerr user ID will be returned." Example(1)
+// @Param requestedByJellyseerr query string false "If specified, only requests from that particular jellyseerr user ID will be returned." Example(1)
+// @Router /iframe/media_requests [get]
+func MediaRequestsiFrameHandler(c *gin.Context) {
+	mediarequets.GetiFrame(c)
 }
 
 // @Summary Uptime Kuma iFrame

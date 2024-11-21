@@ -1,15 +1,15 @@
 package overseerr
 
 type Request struct {
+	RequestedBy RequestedBy `json:"requestedBy"`
+	Media       Media       `json:"media"`
 	ID          int         `json:"id"`
 	Status      int         `json:"status"`
-	Media       Media       `json:"media"`
-	RequestedBy RequestedBy `json:"requestedBy"`
 }
 
 type Media struct {
-	ID     int    `json:"id"`
 	Type   string `json:"mediaType"`
+	ID     int    `json:"id"`
 	Status int    `json:"status"`
 	TMDBID int    `json:"tmdbId"`
 	TVDBID int    `json:"tvdbId"`
@@ -17,15 +17,39 @@ type Media struct {
 }
 
 type RequestedBy struct {
-	ID       int    `json:"id"`
 	Username string `json:"displayName"`
 	Avatar   string `json:"avatar"`
+	ID       int    `json:"id"`
 }
 
 // GenericMedia is a generic media struct used for both movies and tv shows when requesting a media
 type GenericMedia struct {
 	Name        string
-	ID          int
 	ReleaseDate string
 	PosterPath  string
+	ID          int
+}
+
+type IframeRequestData struct {
+	Status IframeStatus
+	Media  struct {
+		Name      string
+		Type      string
+		Year      string
+		PosterURL string
+		URL       string
+		TMDBID    int
+	}
+	Request struct {
+		Username       string
+		AvatarURL      string
+		UserProfileURL string
+		UserID         int
+	}
+}
+
+type IframeStatus struct {
+	Status          string
+	Color           string
+	BackgroundColor string
 }

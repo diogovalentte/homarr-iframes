@@ -10,7 +10,7 @@ import (
 	"github.com/diogovalentte/homarr-iframes/src/sources/cinemark"
 	"github.com/diogovalentte/homarr-iframes/src/sources/linkwarden"
 	"github.com/diogovalentte/homarr-iframes/src/sources/media"
-	"github.com/diogovalentte/homarr-iframes/src/sources/overseerr"
+	mediarequets "github.com/diogovalentte/homarr-iframes/src/sources/media-requets"
 	uptimekuma "github.com/diogovalentte/homarr-iframes/src/sources/uptime-kuma"
 	"github.com/diogovalentte/homarr-iframes/src/sources/vikunja"
 )
@@ -20,8 +20,8 @@ func HashRoutes(group *gin.RouterGroup) {
 	group.GET("/linkwarden", LinkwardenHashHandler)
 	group.GET("/cinemark", CinemarkHashHandler)
 	group.GET("/vikunja", VikunjaHashHandler)
-	group.GET("/overseerr", OverseerrHashHandler)
 	group.GET("/media_releases", MediaReleasesHashHandler)
+	group.GET("/media_requests", MediaRequestsHashHandler)
 	group.GET("/uptimekuma", UptimeKumaHashHandler)
 	group.GET("/alarms", AlarmsHashHandler)
 }
@@ -74,24 +74,6 @@ func VikunjaHashHandler(c *gin.Context) {
 	v.GetHash(c)
 }
 
-// @Summary Get the hash of the Overseerr requests
-// @Description Get the hash of the Overseerr requests. Used by the iFrames to check updates and reload the iframe.
-// @Success 200 {object} hashResponse
-// @Produce json
-// @Param limit query int false "Limits the number of items in the iFrame." Example(5)
-// @Param filter query string false "Available values : all, approved, available, pending, processing, unavailable, failed" Example(all)
-// @Param sort query string false "Available values : added, modified. Defaults to added" Example(added)
-// @Param requestedBy query string false "If specified, only requests from that particular user ID will be returned." Example(1)
-// @Router /hash/overseerr [get]
-func OverseerrHashHandler(c *gin.Context) {
-	o, err := overseerr.New(config.GlobalConfigs.Overseerr.Address, config.GlobalConfigs.Overseerr.InternalAddress, config.GlobalConfigs.Overseerr.Token)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-		return
-	}
-	o.GetHash(c)
-}
-
 // @Summary Get the hash of media releases
 // @Description Get the hash of the media releases. Used by the iFrames to check updates and reload the iframe.
 // @Success 200 {object} hashResponse
@@ -101,6 +83,19 @@ func OverseerrHashHandler(c *gin.Context) {
 // @Router /hash/media_releases [get]
 func MediaReleasesHashHandler(c *gin.Context) {
 	media.GetHash(c)
+}
+
+// @Summary Get the hash of media requests
+// @Description Get the hash of the media requests. Used by the iFrames to check updates and reload the iframe.
+// @Success 200 {object} hashResponse
+// @Produce json
+// @Param radarrReleaseType query string false "Filter movies get from Radarr. Can be 'inCinemas', 'physical', or 'digital'. Defaults to 'inCinemas'" Example(physical)
+// @Param showUnmonitored query bool false "Specify if show unmonitored media. Defaults to false." Example(true)
+// @Param requestedByOverseerr query string false "If specified, only requests from that particular overseerr user ID will be returned." Example(1)
+// @Param requestedByJellyseerr query string false "If specified, only requests from that particular jellyseerr user ID will be returned." Example(1)
+// @Router /hash/media_requests [get]
+func MediaRequestsHashHandler(c *gin.Context) {
+	mediarequets.GetHash(c)
 }
 
 // @Summary Get the hash of the Uptime Kuma sites status

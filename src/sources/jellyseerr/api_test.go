@@ -1,4 +1,4 @@
-package overseerr
+package jellyseerr
 
 import (
 	"fmt"
@@ -29,13 +29,13 @@ func TestMain(m *testing.M) {
 }
 
 func TestGetRequests(t *testing.T) {
-	o, err := New(config.GlobalConfigs.Overseerr.Address, config.GlobalConfigs.Overseerr.InternalAddress, config.GlobalConfigs.Overseerr.APIKey)
+	j, err := New()
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	t.Run("get requests", func(t *testing.T) {
-		requests, err := o.GetRequests(-1, "", "", 0)
+		requests, err := j.GetRequests(-1, "", "", 0)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -49,13 +49,13 @@ func TestGetRequests(t *testing.T) {
 }
 
 func TestGetMedia(t *testing.T) {
-	o, err := New(config.GlobalConfigs.Overseerr.Address, config.GlobalConfigs.Overseerr.InternalAddress, config.GlobalConfigs.Overseerr.APIKey)
+	j, err := New()
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	t.Run("get movie", func(t *testing.T) {
-		media, err := o.GetMedia("movie", 929590) // civil war
+		media, err := j.GetMedia("movie", 929590) // civil war
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -66,7 +66,7 @@ func TestGetMedia(t *testing.T) {
 	})
 
 	t.Run("get tv show", func(t *testing.T) {
-		media, err := o.GetMedia("tv", 2316) // the office
+		media, err := j.GetMedia("tv", 2316) // the office
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -78,13 +78,13 @@ func TestGetMedia(t *testing.T) {
 }
 
 func TestGetIframeData(t *testing.T) {
-	o, err := New(config.GlobalConfigs.Overseerr.Address, config.GlobalConfigs.Overseerr.InternalAddress, config.GlobalConfigs.Overseerr.APIKey)
+	j, err := New()
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	t.Run("get iframe data", func(t *testing.T) {
-		iframeData, err := o.GetIframeData(-1, "", "", 0)
+		iframeData, err := j.GetIframeData(-1, "", "", 0)
 		if err != nil {
 			t.Fatal(err)
 		}

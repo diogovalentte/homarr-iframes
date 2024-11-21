@@ -1,4 +1,4 @@
-package overseerr
+package jellyseerr
 
 import (
 	"encoding/json"
@@ -6,11 +6,13 @@ import (
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/diogovalentte/homarr-iframes/src/sources/overseerr"
 )
 
-func (o *Overseerr) GetRequests(limit int, filter, sort string, requestedBy int) ([]Request, error) {
+func (j *Jellyseerr) GetRequests(limit int, filter, sort string, requestedBy int) ([]overseerr.Request, error) {
 	if limit == 0 {
-		return []Request{}, nil
+		return []overseerr.Request{}, nil
 	}
 	path := fmt.Sprintf("/api/v1/request?take=%d", limit)
 	if filter != "" {
@@ -24,7 +26,7 @@ func (o *Overseerr) GetRequests(limit int, filter, sort string, requestedBy int)
 	}
 
 	var responseData getRequestsResponse
-	if err := o.baseRequest(http.MethodGet, o.InternalAddress+path, nil, &responseData); err != nil {
+	if err := j.baseRequest(http.MethodGet, j.InternalAddress+path, nil, &responseData); err != nil {
 		return nil, fmt.Errorf("error getting requests: %w", err)
 	}
 
@@ -32,38 +34,38 @@ func (o *Overseerr) GetRequests(limit int, filter, sort string, requestedBy int)
 }
 
 type getRequestsResponse struct {
-	Requests []Request `json:"results"`
+	Requests []overseerr.Request `json:"results"`
 }
 
-func (o *Overseerr) GetMedia(mediaType string, tmdbID int) (GenericMedia, error) {
+func (j *Jellyseerr) GetMedia(mediaType string, tmdbID int) (overseerr.GenericMedia, error) {
 	if tmdbID == 0 {
-		return GenericMedia{}, fmt.Errorf("invalid TMDB ID")
+		return overseerr.GenericMedia{}, fmt.Errorf("invalid TMDB ID")
 	}
 	var err error
-	var media GenericMedia
+	var media overseerr.GenericMedia
 	switch mediaType {
 	case "movie":
-		media, err = o.GetMovie(tmdbID)
+		media, err = j.GetMovie(tmdbID)
 	case "tv":
-		media, err = o.GetTv(tmdbID)
+		media, err = j.GetTv(tmdbID)
 	default:
-		return GenericMedia{}, fmt.Errorf("invalid media type")
+		return overseerr.GenericMedia{}, fmt.Errorf("invalid media type")
 	}
 
 	if err != nil {
-		return GenericMedia{}, fmt.Errorf("error getting media: %w", err)
+		return overseerr.GenericMedia{}, fmt.Errorf("error getting media: %w", err)
 	}
 
 	return media, nil
 }
 
-func (o *Overseerr) GetMovie(id int) (GenericMedia, error) {
+func (j *Jellyseerr) GetMovie(id int) (overseerr.GenericMedia, error) {
 	var responseData getMovieResponse
-	if err := o.baseRequest(http.MethodGet, o.InternalAddress+"/api/v1/movie/"+fmt.Sprint(id), nil, &responseData); err != nil {
-		return GenericMedia{}, fmt.Errorf("error getting movie: %w", err)
+	if err := j.baseRequest(http.MethodGet, j.InternalAddress+"/api/v1/movie/"+fmt.Sprint(id), nil, &responseData); err != nil {
+		return overseerr.GenericMedia{}, fmt.Errorf("error getting movie: %w", err)
 	}
 
-	movie := GenericMedia{
+	movie := overseerr.GenericMedia{
 		Name:        responseData.Title,
 		ID:          responseData.ID,
 		ReleaseDate: responseData.ReleaseDate,
@@ -80,13 +82,13 @@ type getMovieResponse struct {
 	ID          int    `json:"id"`
 }
 
-func (o *Overseerr) GetTv(id int) (GenericMedia, error) {
+func (j *Jellyseerr) GetTv(id int) (overseerr.GenericMedia, error) {
 	var responseData getTvResponse
-	if err := o.baseRequest(http.MethodGet, o.InternalAddress+"/api/v1/tv/"+fmt.Sprint(id), nil, &responseData); err != nil {
-		return GenericMedia{}, fmt.Errorf("error getting tv show: %w", err)
+	if err := j.baseRequest(http.MethodGet, j.InternalAddress+"/api/v1/tv/"+fmt.Sprint(id), nil, &responseData); err != nil {
+		return overseerr.GenericMedia{}, fmt.Errorf("error getting tv show: %w", err)
 	}
 
-	tvShow := GenericMedia{
+	tvShow := overseerr.GenericMedia{
 		Name:        responseData.Name,
 		ID:          responseData.ID,
 		ReleaseDate: responseData.FirstAirDate,
@@ -103,14 +105,14 @@ type getTvResponse struct {
 	ID           int    `json:"id"`
 }
 
-func (o *Overseerr) baseRequest(method, url string, body io.Reader, target interface{}) error {
+func (j *Jellyseerr) baseRequest(method, url string, body io.Reader, target interface{}) error {
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return fmt.Errorf("error creating request: %w", err)
 	}
 
-	req.Header.Set("X-Api-Key", o.APIKey)
+	req.Header.Set("X-Api-Key", j.APIKey)
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := client.Do(req)
@@ -135,28 +137,28 @@ func (o *Overseerr) baseRequest(method, url string, body io.Reader, target inter
 	return nil
 }
 
-func (o *Overseerr) GetIframeData(limit int, filter, sort string, requestedBy int) ([]IframeRequestData, error) {
-	requests, err := o.GetRequests(limit, filter, sort, requestedBy)
+func (j *Jellyseerr) GetIframeData(limit int, filter, sort string, requestedBy int) ([]overseerr.IframeRequestData, error) {
+	requests, err := j.GetRequests(limit, filter, sort, requestedBy)
 	if err != nil {
 		return nil, err
 	}
 
-	iframeData := []IframeRequestData{}
+	iframeData := []overseerr.IframeRequestData{}
 	for _, request := range requests {
-		media, err := o.GetMedia(request.Media.Type, request.Media.TMDBID)
+		media, err := j.GetMedia(request.Media.Type, request.Media.TMDBID)
 		if err != nil {
 			return nil, err
 		}
-		var data IframeRequestData
+		var data overseerr.IframeRequestData
 		data.Media.Name = media.Name
 		data.Media.Type = request.Media.Type
 		data.Media.TMDBID = request.Media.TMDBID
 		data.Media.Year = strings.Split(media.ReleaseDate, "-")[0]
-		data.Media.URL = fmt.Sprintf("%s/%s/%d", o.Address, request.Media.Type, request.Media.TMDBID)
+		data.Media.URL = fmt.Sprintf("%s/%s/%d", j.Address, request.Media.Type, request.Media.TMDBID)
 		data.Media.PosterURL = tmdbImageBasePath + media.PosterPath
 		data.Request.Username = request.RequestedBy.Username
 		data.Request.AvatarURL = request.RequestedBy.Avatar
-		data.Request.UserProfileURL = fmt.Sprintf("%s/users/%d", o.Address, request.RequestedBy.ID)
+		data.Request.UserProfileURL = fmt.Sprintf("%s/users/%d", j.Address, request.RequestedBy.ID)
 		data.Request.UserID = request.RequestedBy.ID
 		data.Status = getRequestStatusName(request.Status, request.Media.Status)
 
@@ -168,8 +170,8 @@ func (o *Overseerr) GetIframeData(limit int, filter, sort string, requestedBy in
 
 // getRequestStatusName returns the HTML/CSS properties of the request status
 // to be used in the iframe.
-func getRequestStatusName(reqStatus, mediaStatus int) IframeStatus {
-	var status IframeStatus
+func getRequestStatusName(reqStatus, mediaStatus int) overseerr.IframeStatus {
+	var status overseerr.IframeStatus
 	switch reqStatus {
 	case 1:
 		status.Status = "Pending"

@@ -21,6 +21,7 @@ type Configs struct {
 	Pihole                  piholeConfigs
 	Kavita                  kavitaConfigs
 	Kaizoku                 kaizokuConfigs
+	Jellyseerr              jellyseerrConfigs
 }
 
 type linkwardenConfigs struct {
@@ -38,7 +39,7 @@ type vikunjaConfigs struct {
 type overseerrConfigs struct {
 	Address         string
 	InternalAddress string
-	Token           string
+	APIKey          string
 }
 
 type sonarrConfigs struct {
@@ -93,6 +94,12 @@ type kaizokuConfigs struct {
 	InternalAddress string
 }
 
+type jellyseerrConfigs struct {
+	Address         string
+	InternalAddress string
+	APIKey          string
+}
+
 func SetConfigs(filePath string) error {
 	GlobalConfigs = &Configs{}
 
@@ -114,7 +121,11 @@ func SetConfigs(filePath string) error {
 
 	GlobalConfigs.Overseerr.Address = os.Getenv("OVERSEERR_ADDRESS")
 	GlobalConfigs.Overseerr.InternalAddress = os.Getenv("INTERNAL_OVERSEERR_ADDRESS")
-	GlobalConfigs.Overseerr.Token = os.Getenv("OVERSEERR_TOKEN")
+	GlobalConfigs.Overseerr.APIKey = os.Getenv("OVERSEERR_API_URL")
+
+	GlobalConfigs.Jellyseerr.Address = os.Getenv("JELLYSEERR_ADDRESS")
+	GlobalConfigs.Jellyseerr.InternalAddress = os.Getenv("INTERNAL_JELLYSEERR_ADDRESS")
+	GlobalConfigs.Jellyseerr.APIKey = os.Getenv("JELLYSEERR_API_KEY")
 
 	GlobalConfigs.Sonarr.Address = os.Getenv("SONARR_ADDRESS")
 	GlobalConfigs.Sonarr.InternalAddress = os.Getenv("INTERNAL_SONARR_ADDRESS")
