@@ -157,7 +157,11 @@ func (j *Jellyseerr) GetIframeData(limit int, filter, sort string, requestedBy i
 		data.Media.URL = fmt.Sprintf("%s/%s/%d", j.Address, request.Media.Type, request.Media.TMDBID)
 		data.Media.PosterURL = tmdbImageBasePath + media.PosterPath
 		data.Request.Username = request.RequestedBy.Username
-		data.Request.AvatarURL = request.RequestedBy.Avatar
+		if strings.HasPrefix(request.RequestedBy.Avatar, "/avatarproxy/") {
+			data.Request.AvatarURL = j.Address + request.RequestedBy.Avatar
+		} else {
+			data.Request.AvatarURL = request.RequestedBy.Avatar
+		}
 		data.Request.UserProfileURL = fmt.Sprintf("%s/users/%d", j.Address, request.RequestedBy.ID)
 		data.Request.UserID = request.RequestedBy.ID
 		data.Status = getRequestStatusName(request.Status, request.Media.Status)
