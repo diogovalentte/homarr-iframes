@@ -23,6 +23,7 @@ To use this source, you'll need to provide the following environment variables:
 - `LINKWARDEN_ADDRESS`: your Linkwarden instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `INTERNAL_LINKWARDEN_ADDRESS`: your Linkwarden instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `LINKWARDEN_TOKEN`: an access token used to access your Linkwarden instance API to get your links. You can get it in **Settings -> Access Tokens -> New Access Token**.
+- `LINKWARDEN_BACKGROUND_IMG_URL`: an image URL to be used as the background of each bookmark card.
 
 # Vikunja
 
@@ -38,6 +39,7 @@ To use this source, you'll need to provide the following environment variables:
 - `INTERNAL_VIKUNJA_ADDRESS`: your Vikunja instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `VIKUNJA_TOKEN`: an access token used to access your Vikunja instance API to get your tasks. You can get it by going to **Settings -> API Tokens -> Create a Token -> In "Tasks", select "Read One" and "Read All"; In "Projects", select "Read One" and "Read All" -> Create Token**.
   - If you want to add a button to set the task as done in the iframe, add the permission **Update**.
+- `VIKUNJA_BACKGROUND_IMG_URL`: an image URL to be used as the background of each task card.
 
 # Media Requests
 
