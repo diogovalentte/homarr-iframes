@@ -29,7 +29,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestGetLinks(t *testing.T) {
-	v, err := New(config.GlobalConfigs.Linkwarden.Address, config.GlobalConfigs.Linkwarden.InternalAddress, config.GlobalConfigs.Linkwarden.Token)
+	v, err := New()
 	if err != nil {
 		t.Fatal(err)
 	}

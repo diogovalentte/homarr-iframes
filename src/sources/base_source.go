@@ -8,7 +8,7 @@ import (
 
 // GetBaseNothingToShowiFrame returns an HTML code for when there is nothing to show
 // The template is a background image with some message
-func GetBaseNothingToShowiFrame(backgroundColor, backgroundImageURL, backgroundPosition, backgroundSize, brightness, APIURLPath string) []byte {
+func GetBaseNothingToShowiFrame(backgroundColor, backgroundImageURL, backgroundPosition, backgroundSize, backgroundFilter, APIURLPath string) []byte {
 	html := `
 <!DOCTYPE html>
 <html lang="en">
@@ -33,7 +33,7 @@ func GetBaseNothingToShowiFrame(backgroundColor, backgroundImageURL, backgroundP
             background-position: %s;
             background-size: %s;
             position: absolute;
-            filter: brightness(%s);
+            filter: %s;
             top: 0;
             left: 0;
             right: 0;
@@ -87,7 +87,7 @@ func GetBaseNothingToShowiFrame(backgroundColor, backgroundImageURL, backgroundP
 	if APIURLPath != "" {
 		refreshIframe = "fetchAndUpdate();"
 	}
-	html = fmt.Sprintf(html, backgroundColor, backgroundImageURL, backgroundPosition, backgroundSize, brightness, APIURLPath, refreshIframe)
+	html = fmt.Sprintf(html, backgroundColor, backgroundImageURL, backgroundPosition, backgroundSize, backgroundFilter, APIURLPath, refreshIframe)
 
 	return []byte(html)
 }

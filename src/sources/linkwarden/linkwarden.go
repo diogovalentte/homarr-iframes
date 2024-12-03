@@ -12,27 +12,37 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/diogovalentte/homarr-iframes/src/config"
 	"github.com/diogovalentte/homarr-iframes/src/sources"
 )
 
 var (
-	backgroundImageURL = "https://avatars.githubusercontent.com/u/135248736?s=280&v=4"
-	l                  *Linkwarden
+	defaultBackgroundImgURL = "https://avatars.githubusercontent.com/u/135248736?s=280&v=4"
+	l                       *Linkwarden
 )
 
 type Linkwarden struct {
-	Address         string
-	InternalAddress string
-	Token           string
+	Address          string
+	InternalAddress  string
+	Token            string
+	BackgroundImgURL string
 }
 
-func New(address, internalAddress, token string) (*Linkwarden, error) {
+func New() (*Linkwarden, error) {
 	if l != nil {
 		return l, nil
 	}
 
+	address := config.GlobalConfigs.Linkwarden.Address
+	internalAddress := config.GlobalConfigs.Linkwarden.InternalAddress
+	token := config.GlobalConfigs.Linkwarden.Token
+	backgroundImgURL := config.GlobalConfigs.Vikunja.BackgroundImgURL
+	if backgroundImgURL == "" {
+		backgroundImgURL = defaultBackgroundImgURL
+	}
+
 	newL := &Linkwarden{}
-	err := newL.Init(address, internalAddress, token)
+	err := newL.Init(address, internalAddress, token, backgroundImgURL)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +52,7 @@ func New(address, internalAddress, token string) (*Linkwarden, error) {
 	return l, nil
 }
 
-func (l *Linkwarden) Init(address, internalAddress, token string) error {
+func (l *Linkwarden) Init(address, internalAddress, token, backgroundImgURL string) error {
 	if address == "" || token == "" {
 		return fmt.Errorf("LINKWARDEN_ADDRESS and LINKWARDEN_TOKEN variables should be set")
 	}
@@ -54,6 +64,7 @@ func (l *Linkwarden) Init(address, internalAddress, token string) error {
 		l.InternalAddress = strings.TrimSuffix(internalAddress, "/")
 	}
 	l.Token = token
+	l.BackgroundImgURL = backgroundImgURL
 
 	return nil
 }
@@ -82,6 +93,19 @@ func (l *Linkwarden) GetiFrame(c *gin.Context) {
 
 	collectionID := c.Query("collectionId")
 
+	backgroundPosition := c.Query("background_position")
+	if backgroundPosition == "" {
+		backgroundPosition = "50% 47.2%"
+	}
+	backgroundSize := c.Query("background_size")
+	if backgroundSize == "" {
+		backgroundSize = "cover"
+	}
+	backgroundFilter := c.Query("background_filter")
+	if backgroundFilter == "" {
+		backgroundFilter = "brightness(0.3)"
+	}
+
 	apiURL := c.Query("api_url")
 	if apiURL != "" {
 		_, err = url.ParseRequestURI(apiURL)
@@ -103,9 +127,9 @@ func (l *Linkwarden) GetiFrame(c *gin.Context) {
 		if apiURL != "" {
 			apiURLPath = apiURL + "/v1/hash/linkwarden?limit=" + strconv.Itoa(limit) + "&collectionId=" + collectionID
 		}
-		html = sources.GetBaseNothingToShowiFrame(theme, backgroundImageURL, "center", "cover", "0.3", apiURLPath)
+		html = sources.GetBaseNothingToShowiFrame(theme, l.BackgroundImgURL, "center", "cover", backgroundFilter, apiURLPath)
 	} else {
-		html, err = l.getLinksiFrame(links, theme, apiURL, collectionID, limit)
+		html, err = l.getLinksiFrame(links, theme, l.BackgroundImgURL, backgroundPosition, backgroundSize, backgroundFilter, apiURL, collectionID, limit)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("couldn't create HTML code: %s", err.Error())})
 			return
@@ -115,7 +139,7 @@ func (l *Linkwarden) GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func (l *Linkwarden) getLinksiFrame(links []*Link, theme, apiURL, collectionID string, limit int) ([]byte, error) {
+func (l *Linkwarden) getLinksiFrame(links []*Link, theme, backgroundImgURL, backgroundPosition, backgroundSize, backgroundFilter, apiURL, collectionID string, limit int) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -171,10 +195,10 @@ func (l *Linkwarden) getLinksiFrame(links []*Link, theme, apiURL, collectionID s
 
         .background-image {
             background-image: url('{{ .BackgroundImageURL }}');
-            background-position: 50% 47.2%;
-            background-size: cover;
+            background-position: {{ .BackgroundPosition }};
+            background-size: {{ .BackgroundSize }};
+            filter: {{ .BackgroundFilter }};
             position: absolute;
-            filter: brightness(0.3);
             top: 0;
             left: 0;
             right: 0;
@@ -308,7 +332,10 @@ func (l *Linkwarden) getLinksiFrame(links []*Link, theme, apiURL, collectionID s
 		APIURL:                        apiURL,
 		APILimit:                      limit,
 		LinkwardenAddress:             l.Address,
-		BackgroundImageURL:            backgroundImageURL,
+		BackgroundImageURL:            backgroundImgURL,
+		BackgroundPosition:            template.CSS(backgroundPosition),
+		BackgroundSize:                template.CSS(backgroundSize),
+		BackgroundFilter:              template.CSS(backgroundFilter),
 		ScrollbarThumbBackgroundColor: scrollbarThumbBackgroundColor,
 		ScrollbarTrackBackgroundColor: scrollbarTrackBackgroundColor,
 		CollectionID:                  collectionID,
@@ -326,15 +353,18 @@ func (l *Linkwarden) getLinksiFrame(links []*Link, theme, apiURL, collectionID s
 }
 
 type iframeTemplateData struct {
-	Links                         []*Link
 	Theme                         string
 	APIURL                        string
-	APILimit                      int
 	LinkwardenAddress             string
 	BackgroundImageURL            string
+	BackgroundPosition            template.CSS
+	BackgroundSize                template.CSS
+	BackgroundFilter              template.CSS
 	ScrollbarThumbBackgroundColor string
 	ScrollbarTrackBackgroundColor string
 	CollectionID                  string
+	Links                         []*Link
+	APILimit                      int
 }
 
 // GetHash returns the hash of the bookmarks

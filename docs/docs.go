@@ -421,6 +421,27 @@ const docTemplate = `{
                         "name": "api_url",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "top",
+                        "description": "Background position of each bookmark card. Use '%25' in place of '%', like '50%25 47.2%25' to get '50% 47.2%'. Defaults to 50% 47.2%.",
+                        "name": "background_position",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "cover",
+                        "description": "Background size of each bookmark card. Use '%25' in place of '%'. Defaults to cover.",
+                        "name": "background_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "blur(5px",
+                        "description": "Background filter of each bookmark card. Use '%25' in place of '%'. Defaults to brightness(0.3).",
+                        "name": "background_filter",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -769,6 +790,27 @@ const docTemplate = `{
                         "example": false,
                         "description": "Shows a start icon in favorite tasks. Defaults to true.",
                         "name": "showFavoriteIcon",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "top",
+                        "description": "Background position of each task card. Use '%25' in place of '%', like '50%25 47.2%25' to get '50% 47.2%'. Defaults to 50% 49.5%.",
+                        "name": "background_position",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "105%25",
+                        "description": "Background size of each task card. Use '%25' in place of '%'. Defaults to 105%.",
+                        "name": "background_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "blur(5px",
+                        "description": "Background filter of each task card. Use '%25' in place of '%'. Defaults to brightness(0.3).",
+                        "name": "background_filter",
                         "in": "query"
                     }
                 ],

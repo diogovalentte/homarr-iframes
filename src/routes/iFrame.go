@@ -38,9 +38,12 @@ func IFrameRoutes(group *gin.RouterGroup) {
 // @Param theme query string false "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white" Example(light)
 // @Param limit query int false "Limits the number of items in the iFrame." Example(5)
 // @Param api_url query string true "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload." Example(https://sub.domain.com)
+// @Param background_position query string false "Background position of each bookmark card. Use '%25' in place of '%', like '50%25 47.2%25' to get '50% 47.2%'. Defaults to 50% 47.2%." Example(top)
+// @Param background_size query string false "Background size of each bookmark card. Use '%25' in place of '%'. Defaults to cover." Example(cover)
+// @Param background_filter query string false "Background filter of each bookmark card. Use '%25' in place of '%'. Defaults to brightness(0.3)." Example(blur(5px))
 // @Router /iframe/linkwarden [get]
 func LinkwardeniFrameHandler(c *gin.Context) {
-	l, err := linkwarden.New(config.GlobalConfigs.Linkwarden.Address, config.GlobalConfigs.Linkwarden.InternalAddress, config.GlobalConfigs.Linkwarden.Token)
+	l, err := linkwarden.New()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -76,9 +79,12 @@ func CinemarkiFrameHandler(c *gin.Context) {
 // @Param showPriority query bool false "Shows the tasks' priority. Defaults to true." Example(false)
 // @Param showProject query bool false "Shows the tasks' project. Defaults to true." Example(false)
 // @Param showFavoriteIcon query bool false "Shows a start icon in favorite tasks. Defaults to true." Example(false)
+// @Param background_position query string false "Background position of each task card. Use '%25' in place of '%', like '50%25 47.2%25' to get '50% 47.2%'. Defaults to 50% 49.5%." Example(top)
+// @Param background_size query string false "Background size of each task card. Use '%25' in place of '%'. Defaults to 105%." Example(105%25)
+// @Param background_filter query string false "Background filter of each task card. Use '%25' in place of '%'. Defaults to brightness(0.3)." Example(blur(5px))
 // @Router /iframe/vikunja [get]
 func VikunjaiFrameHandler(c *gin.Context) {
-	v, err := vikunja.New(config.GlobalConfigs.Vikunja.Address, config.GlobalConfigs.Vikunja.InternalAddress, config.GlobalConfigs.Vikunja.Token)
+	v, err := vikunja.New()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -104,7 +110,7 @@ func VikunjaSetTaskDoneHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "taskId must be an integer"})
 	}
 
-	v, err := vikunja.New(config.GlobalConfigs.Vikunja.Address, config.GlobalConfigs.Vikunja.InternalAddress, config.GlobalConfigs.Vikunja.Token)
+	v, err := vikunja.New()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return

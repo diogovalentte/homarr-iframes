@@ -326,6 +326,24 @@ paths:
         name: api_url
         required: true
         type: string
+      - description: Background position of each bookmark card. Use '%25' in place
+          of '%', like '50%25 47.2%25' to get '50% 47.2%'. Defaults to 50% 47.2%.
+        example: top
+        in: query
+        name: background_position
+        type: string
+      - description: Background size of each bookmark card. Use '%25' in place of
+          '%'. Defaults to cover.
+        example: cover
+        in: query
+        name: background_size
+        type: string
+      - description: Background filter of each bookmark card. Use '%25' in place of
+          '%'. Defaults to brightness(0.3).
+        example: blur(5px
+        in: query
+        name: background_filter
+        type: string
       produces:
       - text/html
       responses:
@@ -614,6 +632,24 @@ paths:
         in: query
         name: showFavoriteIcon
         type: boolean
+      - description: Background position of each task card. Use '%25' in place of
+          '%', like '50%25 47.2%25' to get '50% 47.2%'. Defaults to 50% 49.5%.
+        example: top
+        in: query
+        name: background_position
+        type: string
+      - description: Background size of each task card. Use '%25' in place of '%'.
+          Defaults to 105%.
+        example: 105%25
+        in: query
+        name: background_size
+        type: string
+      - description: Background filter of each task card. Use '%25' in place of '%'.
+          Defaults to brightness(0.3).
+        example: blur(5px
+        in: query
+        name: background_filter
+        type: string
       produces:
       - text/html
       responses:

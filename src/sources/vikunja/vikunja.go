@@ -12,29 +12,39 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/diogovalentte/homarr-iframes/src/config"
 	"github.com/diogovalentte/homarr-iframes/src/sources"
 )
 
 var (
-	backgroundImageURL = "https://avatars.githubusercontent.com/u/41270016"
-	instanceProjects   = make(map[int]*Project)
+	defaultBackgroundImgURL = "https://avatars.githubusercontent.com/u/41270016"
+	instanceProjects        = make(map[int]*Project)
 )
 
 var v *Vikunja
 
 type Vikunja struct {
-	Address         string
-	InternalAddress string
-	Token           string
+	Address          string
+	InternalAddress  string
+	Token            string
+	BackgroundImgURL string
 }
 
-func New(address, internalAddress, token string) (*Vikunja, error) {
+func New() (*Vikunja, error) {
 	if v != nil {
 		return v, nil
 	}
 
+	address := config.GlobalConfigs.Vikunja.Address
+	internalAddress := config.GlobalConfigs.Vikunja.InternalAddress
+	token := config.GlobalConfigs.Vikunja.Token
+	backgroundImgURL := config.GlobalConfigs.Vikunja.BackgroundImgURL
+	if backgroundImgURL == "" {
+		backgroundImgURL = defaultBackgroundImgURL
+	}
+
 	newV := &Vikunja{}
-	err := newV.Init(address, internalAddress, token)
+	err := newV.Init(address, internalAddress, token, backgroundImgURL)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +55,7 @@ func New(address, internalAddress, token string) (*Vikunja, error) {
 }
 
 // Init sets the Vikunja properties from the configs
-func (v *Vikunja) Init(address, internalAddress, token string) error {
+func (v *Vikunja) Init(address, internalAddress, token, backgroundImageURL string) error {
 	if address == "" || token == "" {
 		return fmt.Errorf("VIKUNJA_ADDRESS and VIKUNJA_TOKEN variables should be set")
 	}
@@ -57,6 +67,7 @@ func (v *Vikunja) Init(address, internalAddress, token string) error {
 		v.InternalAddress = strings.TrimSuffix(internalAddress, "/")
 	}
 	v.Token = token
+	v.BackgroundImgURL = backgroundImageURL
 
 	err := v.SetInMemoryInstanceProjects()
 	if err != nil {
@@ -111,6 +122,19 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 			}
 			excludeProjectIDs = append(excludeProjectIDs, &excludeProjectID)
 		}
+	}
+
+	backgroundPosition := c.Query("background_position")
+	if backgroundPosition == "" {
+		backgroundPosition = "50% 49.5%"
+	}
+	backgroundSize := c.Query("background_size")
+	if backgroundSize == "" {
+		backgroundSize = "105%"
+	}
+	backgroundFilter := c.Query("background_filter")
+	if backgroundFilter == "" {
+		backgroundFilter = "brightness(0.3)"
 	}
 
 	apiURL := c.Query("api_url")
@@ -196,9 +220,9 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 		if apiURL != "" {
 			apiURLPath = apiURL + "/v1/hash/vikunja?limit=" + strconv.Itoa(limit) + "&project_id=" + strconv.Itoa(projectID) + "&exclude_project_ids=" + queryExcludeProjectIDs
 		}
-		html = sources.GetBaseNothingToShowiFrame("#226fff", backgroundImageURL, "center", "cover", "0.3", apiURLPath)
+		html = sources.GetBaseNothingToShowiFrame("#226fff", v.BackgroundImgURL, "center", "cover", backgroundFilter, apiURLPath)
 	} else {
-		html, err = v.getTasksiFrame(tasks, theme, apiURL, limit, projectID, queryExcludeProjectIDs, showCreated, showDue, showPriority, showProject, ShowFavoriteIcon)
+		html, err = v.getTasksiFrame(tasks, theme, v.BackgroundImgURL, backgroundPosition, backgroundSize, backgroundFilter, apiURL, limit, projectID, queryExcludeProjectIDs, showCreated, showDue, showPriority, showProject, ShowFavoriteIcon)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			return
@@ -208,7 +232,7 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func (v *Vikunja) getTasksiFrame(tasks []*Task, theme, apiURL string, limit, projectID int, excludeProjectIDs string, showCreated, showDue, showPriority, showProject, showFavoriteIcon bool) ([]byte, error) {
+func (v *Vikunja) getTasksiFrame(tasks []*Task, theme, backgroundImgURL, backgroundPosition, backgroundSize, backgroundFilter, apiURL string, limit, projectID int, excludeProjectIDs string, showCreated, showDue, showPriority, showProject, showFavoriteIcon bool) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -260,10 +284,10 @@ func (v *Vikunja) getTasksiFrame(tasks []*Task, theme, apiURL string, limit, pro
 
         .background-image {
             background-image: url('{{ .BackgroundImageURL }}');
-            background-position: 50% 49.5%;
-            background-size: 105%;
+            background-position: {{ .BackgroundPosition }};
+            background-size: {{ .BackgroundSize }};
+            filter: {{ .BackgroundFilter }};
             position: absolute;
-            filter: brightness(0.3);
             top: 0;
             left: 0;
             right: 0;
@@ -516,7 +540,10 @@ func (v *Vikunja) getTasksiFrame(tasks []*Task, theme, apiURL string, limit, pro
 		APIProjectID:                  projectID,
 		APIExcludeProjectIDs:          excludeProjectIDs,
 		VikunjaAddress:                v.Address,
-		BackgroundImageURL:            backgroundImageURL,
+		BackgroundImageURL:            backgroundImgURL,
+		BackgroundPosition:            template.CSS(backgroundPosition),
+		BackgroundSize:                template.CSS(backgroundSize),
+		BackgroundFilter:              template.CSS(backgroundFilter),
 		ScrollbarThumbBackgroundColor: scrollbarThumbBackgroundColor,
 		ScrollbarTrackBackgroundColor: scrollbarTrackBackgroundColor,
 		ShowCreated:                   showCreated,
@@ -560,7 +587,7 @@ func (v *Vikunja) getTasksiFrame(tasks []*Task, theme, apiURL string, limit, pro
 				return project
 			}
 
-			v, err := New("", "", "")
+			v, err := New()
 			if err != nil {
 				return &Project{}
 			}
@@ -584,21 +611,24 @@ func (v *Vikunja) getTasksiFrame(tasks []*Task, theme, apiURL string, limit, pro
 }
 
 type iframeTemplateData struct {
-	Tasks                         []*Task
 	Theme                         string
 	APIURL                        string
-	APILimit                      int
-	APIProjectID                  int
 	APIExcludeProjectIDs          string
 	VikunjaAddress                string
 	BackgroundImageURL            string
+	BackgroundPosition            template.CSS
+	BackgroundSize                template.CSS
+	BackgroundFilter              template.CSS
 	ScrollbarThumbBackgroundColor string
 	ScrollbarTrackBackgroundColor string
+	Tasks                         []*Task
 	ShowCreated                   bool
 	ShowDue                       bool
 	ShowPriority                  bool
 	ShowProject                   bool
 	ShowFavoriteIcon              bool
+	APILimit                      int
+	APIProjectID                  int
 }
 
 // GetHash returns the hash of the tasks

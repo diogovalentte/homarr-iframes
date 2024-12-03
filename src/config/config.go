@@ -25,15 +25,17 @@ type Configs struct {
 }
 
 type linkwardenConfigs struct {
-	Address         string
-	InternalAddress string
-	Token           string
+	Address          string
+	InternalAddress  string
+	Token            string
+	BackgroundImgURL string
 }
 
 type vikunjaConfigs struct {
-	Address         string
-	InternalAddress string
-	Token           string
+	Address          string
+	InternalAddress  string
+	Token            string
+	BackgroundImgURL string
 }
 
 type overseerrConfigs struct {
@@ -114,10 +116,12 @@ func SetConfigs(filePath string) error {
 	GlobalConfigs.Linkwarden.Address = os.Getenv("LINKWARDEN_ADDRESS")
 	GlobalConfigs.Linkwarden.InternalAddress = os.Getenv("INTERNAL_LINKWARDEN_ADDRESS")
 	GlobalConfigs.Linkwarden.Token = os.Getenv("LINKWARDEN_TOKEN")
+	GlobalConfigs.Linkwarden.BackgroundImgURL = os.Getenv("LINKWARDEN_BACKGROUND_IMG_URL")
 
 	GlobalConfigs.Vikunja.Address = os.Getenv("VIKUNJA_ADDRESS")
 	GlobalConfigs.Vikunja.InternalAddress = os.Getenv("INTERNAL_VIKUNJA_ADDRESS")
 	GlobalConfigs.Vikunja.Token = os.Getenv("VIKUNJA_TOKEN")
+	GlobalConfigs.Vikunja.BackgroundImgURL = os.Getenv("VIKUNJA_BACKGROUND_IMG_URL")
 
 	GlobalConfigs.Overseerr.Address = os.Getenv("OVERSEERR_ADDRESS")
 	GlobalConfigs.Overseerr.InternalAddress = os.Getenv("INTERNAL_OVERSEERR_ADDRESS")

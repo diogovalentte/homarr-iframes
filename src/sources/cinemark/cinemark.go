@@ -80,7 +80,7 @@ func (Cinemark) GetiFrame(c *gin.Context) {
 		if apiURL != "" {
 			apiURLPath = apiURL + "/v1/hash/cinemark?limit=" + strconv.Itoa(limit) + "&theaterIds=" + theaterIDsStr
 		}
-		html = sources.GetBaseNothingToShowiFrame(theme, backgroundImageURL, "center", "cover", "0.3", apiURLPath)
+		html = sources.GetBaseNothingToShowiFrame(theme, backgroundImageURL, "center", "cover", "brightness(0.3)", apiURLPath)
 	} else {
 		html, err = getMoviesiFrame(movies, theme, apiURL, limit, theaterIDsStr)
 		if err != nil {

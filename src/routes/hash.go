@@ -34,7 +34,7 @@ func HashRoutes(group *gin.RouterGroup) {
 // @Param limit query int false "Limits the number of items in the iFrame." Example(5)
 // @Router /hash/linkwarden [get]
 func LinkwardenHashHandler(c *gin.Context) {
-	l, err := linkwarden.New(config.GlobalConfigs.Linkwarden.Address, config.GlobalConfigs.Linkwarden.InternalAddress, config.GlobalConfigs.Linkwarden.Token)
+	l, err := linkwarden.New()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -66,7 +66,7 @@ type hashResponse struct {
 // @Param project_id query int false "Project ID to get tasks from. You can get it by going to the project page in Vikunja, the project ID should be on the URL. Example project page URL: https://vikunja.com/projects/2, the project ID is 2. Inbox tasks = 1, Favorite tasks = -1." Example(1)
 // @Router /hash/vikunja [get]
 func VikunjaHashHandler(c *gin.Context) {
-	v, err := vikunja.New(config.GlobalConfigs.Vikunja.Address, config.GlobalConfigs.Vikunja.InternalAddress, config.GlobalConfigs.Vikunja.Token)
+	v, err := vikunja.New()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
