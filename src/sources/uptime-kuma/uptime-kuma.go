@@ -122,7 +122,7 @@ func getUpDownSitesiFrame(upDownSites *UpDownSites, theme, apiURL, slug, contain
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="referrer" content="no-referrer"> <!-- If not set, can't load some images when behind a domain or reverse proxy -->
-    <meta name="color-scheme" content="COLOR-SCHEME">
+    <meta name="color-scheme" content="{{ .Theme }}">
     <title>UptimeKuma iFrame</title>
     <style>
       ::-webkit-scrollbar {
@@ -130,7 +130,7 @@ func getUpDownSitesiFrame(upDownSites *UpDownSites, theme, apiURL, slug, contain
       }
 
       ::-webkit-scrollbar-thumb {
-        background-color: SCROLLBAR-THUMB-BACKGROUND-COLOR;
+        background-color: {{ .ScrollbarThumbBackgroundColor }};
         border-radius: 2.3px;
       }
 
@@ -139,57 +139,11 @@ func getUpDownSitesiFrame(upDownSites *UpDownSites, theme, apiURL, slug, contain
       }
 
       ::-webkit-scrollbar-track:hover {
-        background-color: SCROLLBAR-TRACK-BACKGROUND-COLOR;
+        background-color: {{ .ScrollbarTrackBackgroundColor }};
       }
     </style>
     <style>
-        body {
-            background: transparent !important;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-        }
-
-        .title-container {
-            font-size: 30px;
-            color: TITLE-COLOR;
-            align-items: center;
-            text-align: center;
-            font-weight: bold;
-            margin-bottom: 30px;
-            width: 100%;
-        }
-
-        .info-containers {
-            display: CONTAINERS-DISPLAY;
-        }
-
-        .info-container {
-            box-sizing: border-box;
-            border: 1px solid transparent;
-            border-radius: 5px;
-            background-color: rgba(9, 12, 16, 0.3);
-
-            padding: 10px;
-            margin: CONTAINER-MARGIN;
-            width: 100%;
-
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .info-container:last-child {
-            margin-bottom: 0 !important;
-            margin-right: 0 !important;
-        }
-
-        .stats {
-            color: STATS-COLOR;
-        }
-
-
+        {{ .CSSCode }}
     </style>
 
     <script>
@@ -197,7 +151,7 @@ func getUpDownSitesiFrame(upDownSites *UpDownSites, theme, apiURL, slug, contain
 
         async function fetchData() {
             try {
-                var url = 'API-URL/v1/hash/uptimekuma?slug=SLUG';
+                var url = '{{ .APIURL }}/v1/hash/uptimekuma?slug={{ .Slug }}';
                 const response = await fetch(url);
                 const data = await response.json();
 
@@ -219,19 +173,20 @@ func getUpDownSitesiFrame(upDownSites *UpDownSites, theme, apiURL, slug, contain
             setTimeout(fetchAndUpdate, 5000); // 5 seconds
         }
 
-        fetchAndUpdate();
-        
+        {{ if .APIURL }}
+            fetchAndUpdate();
+        {{ end }}
     </script>
 
 </head>
 <body>
-<div>
-    IFRAME-TITLE
+<div class="main">
+    {{ .Title }}
 
     <div class="info-containers">
         <div class="info-container">
             <div class="stats">
-                {{ .Up }}
+                {{ .UpSites }}
             </div>
             <div>
                 Up
@@ -239,7 +194,7 @@ func getUpDownSitesiFrame(upDownSites *UpDownSites, theme, apiURL, slug, contain
         </div>
         <div class="info-container">
             <div class="stats">
-                {{ .Down }}
+                {{ .DownSites }}
             </div>
             <div>
                 Down
@@ -247,7 +202,7 @@ func getUpDownSitesiFrame(upDownSites *UpDownSites, theme, apiURL, slug, contain
         </div>
         <div class="info-container">
             <div class="stats">
-                UPTIME-PERCENTAGE%
+                {{ .UptimePercentage }}%
             </div>
             <div>
                 Uptime
@@ -271,25 +226,243 @@ func getUpDownSitesiFrame(upDownSites *UpDownSites, theme, apiURL, slug, contain
 		statsColor = "#949f9b"
 	}
 
-	if apiURL != "" {
-		html = strings.ReplaceAll(html, "API-URL", apiURL)
-		html = strings.ReplaceAll(html, "SLUG", slug)
-	} else {
-		html = strings.ReplaceAll(html, "fetchAndUpdate();", "// fetchAndUpdate")
-	}
-
-	if !showTitle {
-		html = strings.ReplaceAll(html, "IFRAME-TITLE", "")
-	} else {
-		html = strings.ReplaceAll(html, "IFRAME-TITLE", `<div><div class="title-container">Uptime Kuma</div></div>`)
-	}
-
+	var CSSCode string
 	if containersDisplay == "horizontal" {
-		html = strings.ReplaceAll(html, "CONTAINERS-DISPLAY", "flex")
-		html = strings.ReplaceAll(html, "CONTAINER-MARGIN", "0px 10px 0px 0px")
+		if showTitle {
+			CSSCode = `
+                body {
+                    background: transparent !important;
+                    margin: 0;
+                    padding: 0;
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    width: 100vw;
+                    overflow: hidden;
+                }
+
+                div.main {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    width: 100%;
+                    height: 100%;
+                    max-width: 1200px;
+                    padding: 0;
+                    box-sizing: border-box;
+                    text-align: center;
+                }
+
+                .title-container {
+                    display: flex;
+                    font-size: 30px;
+                    color: {{ .TitleColor }};
+                    align-items: center;
+                    justify-content: center;
+                    text-align: center;
+                    font-weight: bold;
+                    width: 100%;
+                    height: 50%;
+                }
+
+                .info-containers {
+                    display: flex;
+                    justify-content: space-between;
+                    width: 100%;
+                    height: 50%;
+                    box-sizing: border-box;
+                }
+
+                .info-container {
+                    height: 33.33%;
+                    flex: 1;
+                    align-items: center;
+                    justify-content: center;
+                    text-align: center;
+                    font-weight: bold;
+                    padding: 10px;
+                    margin: 5px;
+                    box-sizing: border-box;
+                    border: 1px solid transparent;
+                    border-radius: 5px;
+                    background-color: rgba(9, 12, 16, 0.3);
+                }
+
+                .stats {
+                    color: {{ .StatsColor }};
+                }
+            `
+		} else {
+			CSSCode = `
+                body {
+                    background: transparent !important;
+                    margin: 0;
+                    padding: 0;
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    width: 100vw;
+                    overflow: hidden;
+                }
+
+                div.main {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    width: 100%;
+                    height: 100%;
+                    max-width: 1200px;
+                    padding: 0;
+                    box-sizing: border-box;
+                    text-align: center;
+                }
+
+                .info-containers {
+                    display: flex;
+                    justify-content: space-between;
+                    width: 100%;
+                    box-sizing: border-box;
+                }
+
+                .info-container {
+                    flex: 1;
+                    align-items: center;
+                    justify-content: center;
+                    text-align: center;
+                    font-weight: bold;
+                    padding: 10px;
+                    margin: 5px;
+                    box-sizing: border-box;
+                    border: 1px solid transparent;
+                    border-radius: 5px;
+                    background-color: rgba(9, 12, 16, 0.3);
+                }
+
+                .stats {
+                    color: {{ .StatsColor }};
+                }
+            `
+		}
 	} else {
-		html = strings.ReplaceAll(html, "CONTAINERS-DISPLAY", "block")
-		html = strings.ReplaceAll(html, "CONTAINER-MARGIN", "0px 0px 10px 0px")
+		if showTitle {
+			CSSCode = `
+                body {
+                    background: transparent !important;
+                    margin: 0;
+                    padding: 0;
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    width: 100vw;
+                    overflow: hidden;
+                }
+
+                div.main {
+                    height: 100%;
+                    width: 100%;
+                }
+
+                .title-container {
+                    font-size: 30px;
+                    color: {{ .TitleColor }};
+                    text-align: center;
+                    font-weight: bold;
+                    margin: 0;
+                    padding: 0;
+                    height: 25%;
+                    line-height: normal;
+                    width: 100%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+
+                .info-containers {
+                    display: flex;
+                    flex-direction: column;
+                    width: 100%;
+                    height: 75%;
+                    box-sizing: border-box;
+                }
+
+                .info-container {
+                    height: 33.33%;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    text-align: center;
+                    font-weight: bold;
+                    padding: 10px;
+                    margin: 5px 0;
+                    box-sizing: border-box;
+                    border: 1px solid transparent;
+                    border-radius: 5px;
+                    background-color: rgba(9, 12, 16, 0.3);
+                }
+
+                .stats {
+                    color: {{ .StatsColor }};
+                }
+            `
+		} else {
+			CSSCode = `
+                body {
+                    background: transparent !important;
+                    margin: 0;
+                    padding: 0;
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    width: 100vw;
+                    overflow: hidden;
+                }
+
+                div.main {
+                    height: 100%;
+                    width: 100%;
+                }
+
+                .info-containers {
+                    display: flex;
+                    flex-direction: column;
+                    width: 100%;
+                    height: 100%;
+                    box-sizing: border-box;
+                }
+
+                .info-container {
+                    height: 33.33%;
+                    display: flex;
+                    flex-direction: column;
+
+                    align-items: center;
+                    justify-content: center;
+                    text-align: center;
+                    font-weight: bold;
+                    padding: 10px;
+                    margin: 5px 0;
+                    box-sizing: border-box;
+                    border: 1px solid transparent;
+                    border-radius: 5px;
+                    background-color: rgba(9, 12, 16, 0.3);
+                }
+
+                .stats {
+                    color: {{ .StatsColor }};
+                }
+            `
+		}
 	}
 
 	var uptimePercentage int
@@ -298,22 +471,50 @@ func getUpDownSitesiFrame(upDownSites *UpDownSites, theme, apiURL, slug, contain
 	} else {
 		uptimePercentage = 0
 	}
-	html = strings.Replace(html, "COLOR-SCHEME", theme, -1)
-	html = strings.Replace(html, "TITLE-COLOR", titleColor, -1)
-	html = strings.Replace(html, "STATS-COLOR", statsColor, -1)
-	html = strings.Replace(html, "UPTIME-PERCENTAGE", strconv.Itoa(uptimePercentage), -1)
-	html = strings.Replace(html, "SCROLLBAR-THUMB-BACKGROUND-COLOR", scrollbarThumbBackgroundColor, -1)
-	html = strings.Replace(html, "SCROLLBAR-TRACK-BACKGROUND-COLOR", scrollbarTrackBackgroundColor, -1)
+
+	templateData := iframeTemplateData{
+		Theme:                         theme,
+		APIURL:                        apiURL,
+		Slug:                          slug,
+		ScrollbarThumbBackgroundColor: scrollbarThumbBackgroundColor,
+		ScrollbarTrackBackgroundColor: scrollbarTrackBackgroundColor,
+		CSSCode:                       template.CSS(CSSCode),
+		TitleColor:                    titleColor,
+		Title:                         template.HTML(`<div class="title-container">Uptime Kuma</div>`),
+		StatsColor:                    statsColor,
+		UptimePercentage:              uptimePercentage,
+		UpSites:                       upDownSites.Up,
+		DownSites:                     upDownSites.Down,
+	}
+
+	if !showTitle {
+		templateData.Title = ""
+	}
 
 	tmpl := template.Must(template.New("uptime").Parse(html))
 
 	var buf bytes.Buffer
-	err := tmpl.Execute(&buf, upDownSites)
+	err := tmpl.Execute(&buf, &templateData)
 	if err != nil {
 		return []byte{}, err
 	}
 
 	return buf.Bytes(), nil
+}
+
+type iframeTemplateData struct {
+	Theme                         string
+	APIURL                        string
+	Slug                          string
+	ScrollbarThumbBackgroundColor string
+	ScrollbarTrackBackgroundColor string
+	CSSCode                       template.CSS
+	TitleColor                    string
+	Title                         template.HTML
+	StatsColor                    string
+	UptimePercentage              int
+	UpSites                       int
+	DownSites                     int
 }
 
 // GetHash returns the hash of the up/down sites
