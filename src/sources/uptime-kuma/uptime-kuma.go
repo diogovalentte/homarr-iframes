@@ -254,6 +254,7 @@ func getUpDownSitesiFrame(upDownSites *UpDownSites, theme, apiURL, slug, contain
                     padding: 0;
                     box-sizing: border-box;
                     text-align: center;
+                    margin-bottom: 20px;
                 }
 
                 .title-container {
@@ -277,7 +278,9 @@ func getUpDownSitesiFrame(upDownSites *UpDownSites, theme, apiURL, slug, contain
                 }
 
                 .info-container {
-                    height: 33.33%;
+                    display: flex;
+                    flex-direction: column;
+                    height: 100%;
                     flex: 1;
                     align-items: center;
                     justify-content: center;
