@@ -144,6 +144,10 @@ func getUpDownSitesiFrame(upDownSites *UpDownSites, theme, apiURL, slug, contain
     </style>
     <style>
         {{ .CSSCode }}
+
+        .stats {
+            color: {{ .StatsColor }};
+        }
     </style>
 
     <script>
@@ -293,10 +297,6 @@ func getUpDownSitesiFrame(upDownSites *UpDownSites, theme, apiURL, slug, contain
                     border-radius: 5px;
                     background-color: rgba(9, 12, 16, 0.3);
                 }
-
-                .stats {
-                    color: {{ .StatsColor }};
-                }
             `
 		} else {
 			CSSCode = `
@@ -345,10 +345,6 @@ func getUpDownSitesiFrame(upDownSites *UpDownSites, theme, apiURL, slug, contain
                     border: 1px solid transparent;
                     border-radius: 5px;
                     background-color: rgba(9, 12, 16, 0.3);
-                }
-
-                .stats {
-                    color: {{ .StatsColor }};
                 }
             `
 		}
@@ -411,10 +407,6 @@ func getUpDownSitesiFrame(upDownSites *UpDownSites, theme, apiURL, slug, contain
                     border-radius: 5px;
                     background-color: rgba(9, 12, 16, 0.3);
                 }
-
-                .stats {
-                    color: {{ .StatsColor }};
-                }
             `
 		} else {
 			CSSCode = `
@@ -461,9 +453,6 @@ func getUpDownSitesiFrame(upDownSites *UpDownSites, theme, apiURL, slug, contain
                     background-color: rgba(9, 12, 16, 0.3);
                 }
 
-                .stats {
-                    color: {{ .StatsColor }};
-                }
             `
 		}
 	}
