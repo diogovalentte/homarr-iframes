@@ -290,7 +290,7 @@ func getUpDownSitesiFrame(upDownSites *UpDownSites, theme, apiURL, slug, contain
                     justify-content: center;
                     text-align: center;
                     font-weight: bold;
-                    padding: 10px;
+                    padding: 0px;
                     margin: 5px;
                     box-sizing: border-box;
                     border: 1px solid transparent;
