@@ -21,6 +21,9 @@ func (u *UptimeKuma) GetStatusPageLastUpDownCount(slug string) (*UpDownSites, er
 	upDownSites := &UpDownSites{}
 
 	for _, site := range target.HeartbeatList {
+		if len(site) == 0 {
+			continue
+		}
 		lastHeartbeat := site[len(site)-1]
 		if lastHeartbeat.Status == 1 {
 			upDownSites.Up++
