@@ -24,21 +24,23 @@ type RequestedBy struct {
 
 // GenericMedia is a generic media struct used for both movies and tv shows when requesting a media
 type GenericMedia struct {
-	Name        string
-	ReleaseDate string
-	PosterPath  string
-	ID          int
+	Name         string
+	ReleaseDate  string
+	PosterPath   string
+	BackdropPath string
+	ID           int
 }
 
 type IframeRequestData struct {
 	Status IframeStatus
 	Media  struct {
-		Name      string
-		Type      string
-		Year      string
-		PosterURL string
-		URL       string
-		TMDBID    int
+		Name        string
+		Type        string
+		Year        string
+		BackdropURL string
+		PosterURL   string
+		URL         string
+		TMDBID      int
 	}
 	Request struct {
 		Username       string

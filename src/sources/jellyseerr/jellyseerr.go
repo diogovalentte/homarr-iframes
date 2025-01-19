@@ -9,7 +9,6 @@ import (
 
 var (
 	j                  *Jellyseerr
-	tmdbImageBasePath  = "https://image.tmdb.org/t/p/w600_and_h900_bestv2/"
 	backgroundImageURL = "https://github.com/Fallenbagel/jellyseerr/blob/develop/public/logo_full.png"
 )
 

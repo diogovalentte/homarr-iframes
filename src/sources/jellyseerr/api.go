@@ -66,20 +66,22 @@ func (j *Jellyseerr) GetMovie(id int) (overseerr.GenericMedia, error) {
 	}
 
 	movie := overseerr.GenericMedia{
-		Name:        responseData.Title,
-		ID:          responseData.ID,
-		ReleaseDate: responseData.ReleaseDate,
-		PosterPath:  responseData.PosterPath,
+		Name:         responseData.Title,
+		ID:           responseData.ID,
+		ReleaseDate:  responseData.ReleaseDate,
+		PosterPath:   responseData.PosterPath,
+		BackdropPath: responseData.BackdropPath,
 	}
 
 	return movie, nil
 }
 
 type getMovieResponse struct {
-	Title       string `json:"originalTitle"`
-	ReleaseDate string `json:"releaseDate"`
-	PosterPath  string `json:"posterPath"`
-	ID          int    `json:"id"`
+	Title        string `json:"originalTitle"`
+	ReleaseDate  string `json:"releaseDate"`
+	BackdropPath string `json:"backdropPath"`
+	PosterPath   string `json:"posterPath"`
+	ID           int    `json:"id"`
 }
 
 func (j *Jellyseerr) GetTv(id int) (overseerr.GenericMedia, error) {
@@ -89,10 +91,11 @@ func (j *Jellyseerr) GetTv(id int) (overseerr.GenericMedia, error) {
 	}
 
 	tvShow := overseerr.GenericMedia{
-		Name:        responseData.Name,
-		ID:          responseData.ID,
-		ReleaseDate: responseData.FirstAirDate,
-		PosterPath:  responseData.PosterPath,
+		Name:         responseData.Name,
+		ID:           responseData.ID,
+		ReleaseDate:  responseData.FirstAirDate,
+		PosterPath:   responseData.PosterPath,
+		BackdropPath: responseData.BackdropPath,
 	}
 
 	return tvShow, nil
@@ -101,6 +104,7 @@ func (j *Jellyseerr) GetTv(id int) (overseerr.GenericMedia, error) {
 type getTvResponse struct {
 	Name         string `json:"originalName"`
 	FirstAirDate string `json:"firstAirDate"`
+	BackdropPath string `json:"backdropPath"`
 	PosterPath   string `json:"posterPath"`
 	ID           int    `json:"id"`
 }
@@ -155,7 +159,12 @@ func (j *Jellyseerr) GetIframeData(limit int, filter, sort string, requestedBy i
 		data.Media.TMDBID = request.Media.TMDBID
 		data.Media.Year = strings.Split(media.ReleaseDate, "-")[0]
 		data.Media.URL = fmt.Sprintf("%s/%s/%d", j.Address, request.Media.Type, request.Media.TMDBID)
-		data.Media.PosterURL = tmdbImageBasePath + media.PosterPath
+		data.Media.PosterURL = overseerr.TMDBPosterImageBasePath + media.PosterPath
+		if media.BackdropPath != "" {
+			data.Media.BackdropURL = overseerr.TMDBBackdropImageBasePath + media.BackdropPath
+		} else {
+			data.Media.BackdropURL = overseerr.TMDBPosterImageBasePath + media.PosterPath
+		}
 		data.Request.Username = request.RequestedBy.Username
 		if strings.HasPrefix(request.RequestedBy.Avatar, "/avatarproxy/") {
 			data.Request.AvatarURL = j.Address + request.RequestedBy.Avatar

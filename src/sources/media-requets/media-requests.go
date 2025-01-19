@@ -143,7 +143,7 @@ func getRequestsiFrame(requests []overseerr.IframeRequestData, theme, apiURL str
 
         .background-image { 
             background-position: 50% 49.5%;
-            background-size: 105%;
+            background-size: 100%;
             position: absolute;
             filter: brightness(0.3);
             top: 0;
@@ -301,7 +301,7 @@ func getRequestsiFrame(requests []overseerr.IframeRequestData, theme, apiURL str
 {{ range .Requests }}
     <div class="requests-container">
 
-        <div class="background-image" style="background-image: url('{{ .Media.PosterURL }}');"></div>
+        <div class="background-image" style="background-image: url('{{ .Media.BackdropURL }}');"></div>
         <img
             class="request-cover"
             src="{{ .Media.PosterURL }}"
@@ -437,10 +437,11 @@ func getIframeData(limit int, filter, sort string, requestedByOverseerr, request
 			return nil, err
 		}
 	} else {
-		requests, err = o.GetIframeData(limit, filter, sort, requestedByOverseerr)
+		ORequests, err := o.GetIframeData(limit, filter, sort, requestedByOverseerr)
 		if err != nil {
 			return nil, err
 		}
+		requests = append(requests, ORequests...)
 	}
 	j, err := jellyseerr.New()
 	if err != nil {
@@ -448,10 +449,11 @@ func getIframeData(limit int, filter, sort string, requestedByOverseerr, request
 			return nil, err
 		}
 	} else {
-		requests, err = j.GetIframeData(limit, filter, sort, requestedByJellyseerr)
+		JRequests, err := j.GetIframeData(limit, filter, sort, requestedByJellyseerr)
 		if err != nil {
 			return nil, err
 		}
+		requests = append(requests, JRequests...)
 	}
 
 	return requests, nil

@@ -64,20 +64,22 @@ func (o *Overseerr) GetMovie(id int) (GenericMedia, error) {
 	}
 
 	movie := GenericMedia{
-		Name:        responseData.Title,
-		ID:          responseData.ID,
-		ReleaseDate: responseData.ReleaseDate,
-		PosterPath:  responseData.PosterPath,
+		Name:         responseData.Title,
+		ID:           responseData.ID,
+		ReleaseDate:  responseData.ReleaseDate,
+		PosterPath:   responseData.PosterPath,
+		BackdropPath: responseData.BackdropPath,
 	}
 
 	return movie, nil
 }
 
 type getMovieResponse struct {
-	Title       string `json:"originalTitle"`
-	ReleaseDate string `json:"releaseDate"`
-	PosterPath  string `json:"posterPath"`
-	ID          int    `json:"id"`
+	Title        string `json:"originalTitle"`
+	ReleaseDate  string `json:"releaseDate"`
+	BackdropPath string `json:"backdropPath"`
+	PosterPath   string `json:"posterPath"`
+	ID           int    `json:"id"`
 }
 
 func (o *Overseerr) GetTv(id int) (GenericMedia, error) {
@@ -87,10 +89,11 @@ func (o *Overseerr) GetTv(id int) (GenericMedia, error) {
 	}
 
 	tvShow := GenericMedia{
-		Name:        responseData.Name,
-		ID:          responseData.ID,
-		ReleaseDate: responseData.FirstAirDate,
-		PosterPath:  responseData.PosterPath,
+		Name:         responseData.Name,
+		ID:           responseData.ID,
+		ReleaseDate:  responseData.FirstAirDate,
+		PosterPath:   responseData.PosterPath,
+		BackdropPath: responseData.BackdropPath,
 	}
 
 	return tvShow, nil
@@ -99,6 +102,7 @@ func (o *Overseerr) GetTv(id int) (GenericMedia, error) {
 type getTvResponse struct {
 	Name         string `json:"originalName"`
 	FirstAirDate string `json:"firstAirDate"`
+	BackdropPath string `json:"backdropPath"`
 	PosterPath   string `json:"posterPath"`
 	ID           int    `json:"id"`
 }
@@ -153,7 +157,12 @@ func (o *Overseerr) GetIframeData(limit int, filter, sort string, requestedBy in
 		data.Media.TMDBID = request.Media.TMDBID
 		data.Media.Year = strings.Split(media.ReleaseDate, "-")[0]
 		data.Media.URL = fmt.Sprintf("%s/%s/%d", o.Address, request.Media.Type, request.Media.TMDBID)
-		data.Media.PosterURL = tmdbImageBasePath + media.PosterPath
+		data.Media.PosterURL = TMDBPosterImageBasePath + media.PosterPath
+		if media.BackdropPath != "" {
+			data.Media.BackdropURL = TMDBBackdropImageBasePath + media.BackdropPath
+		} else {
+			data.Media.BackdropURL = TMDBPosterImageBasePath + media.PosterPath
+		}
 		data.Request.Username = request.RequestedBy.Username
 		data.Request.AvatarURL = request.RequestedBy.Avatar
 		data.Request.UserProfileURL = fmt.Sprintf("%s/users/%d", o.Address, request.RequestedBy.ID)
