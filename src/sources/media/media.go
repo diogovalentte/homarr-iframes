@@ -119,7 +119,6 @@ func getMediaReleasesiFrame(calendar *Calendar, theme string, apiURL string, rad
             background: transparent !important;
             margin: 0;
             padding: 0;
-            width: calc(100% - 3px);
         }
 
         .releases-container {
@@ -129,7 +128,7 @@ func getMediaReleasesiFrame(calendar *Calendar, theme string, apiURL string, rad
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 14px;
+            margin: 8.50px;
 
             border-radius: 10px;
             border: 1px solid rgba(56, 58, 64, 1);
