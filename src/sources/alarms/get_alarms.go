@@ -229,32 +229,69 @@ func getSpeedTestTrackerAlarms() ([]Alarm, error) {
 		return nil, err
 	}
 
-	var alarms []Alarm
+	// test failed
+	if test.Status == "failed" {
+		layout := "2006-01-02 15:04:05"
+		updatedAt, err := time.Parse(layout, test.UpdatedAt)
+		if err != nil {
+			return nil, err
+		}
 
-	if !test.Data.Failed {
+		url := s.Address + "/admin/results"
+
+		alarms := []Alarm{{
+			Time:            updatedAt,
+			Summary:         "Last Speedtest Failed",
+			URL:             url,
+			Status:          strings.ToUpper(test.Data.Level),
+			Value:           test.Service,
+			Property:        test.Data.Message,
+			Source:          "SpeedTest",
+			BackgroundColor: "black",
+		}}
+
+		return alarms, nil
+	} else if test.Status == "running" {
+		return []Alarm{}, nil
+	}
+
+	// threshold breached
+	if !test.Healthy {
+		layout := "2006-01-02 15:04:05"
+		updatedAt, err := time.Parse(layout, test.UpdatedAt)
+		if err != nil {
+			return nil, err
+		}
+
+		url := s.Address + "/admin/results"
+
+		var status, value string
+		if !test.Benchmarks.Download.Passed {
+			status = "DOWNLOAD"
+			value = test.DownloadBitsHuman
+		} else if !test.Benchmarks.Upload.Passed {
+			status = "UPLOAD"
+			value = test.UploadBitsHuman
+		} else if !test.Benchmarks.Ping.Passed {
+			status = "PING"
+			value = fmt.Sprintf("%s ms", test.Ping)
+		}
+
+		alarms := []Alarm{{
+			Time:            updatedAt,
+			Summary:         "Speedtest Threshold Breached",
+			URL:             url,
+			Status:          status,
+			Value:           value,
+			Property:        test.Data.ISP,
+			Source:          "SpeedTest",
+			BackgroundColor: "black",
+		}}
+
 		return alarms, nil
 	}
 
-	url := test.Data.URL
-	if url == "" {
-		url = s.Address + "/admin/results"
-	}
-	layout := "2006-01-02T15:04:05.999999999-07:00"
-	updatedAt, err := time.Parse(layout, test.Data.UpdatedAt)
-	if err != nil {
-		return nil, err
-	}
-	alarms = append(alarms, Alarm{
-		Source:          "SpeedTest",
-		BackgroundColor: "black",
-		Summary:         "Last Speedtest failed",
-		URL:             url,
-		Status:          "FAILED",
-		Property:        test.Data.ServerName,
-		Time:            updatedAt,
-	})
-
-	return alarms, nil
+	return []Alarm{}, nil
 }
 
 func getPiholeAlarms() ([]Alarm, error) {

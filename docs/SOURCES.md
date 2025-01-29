@@ -105,6 +105,7 @@ To use this source, you must provide environment variables for each service from
 Below are the available services that you can use in this iframe and the required environment variables:
 
 ## Netdata
+
 Shows [Netdata](https://github.com/netdata/netdata) alerts, like high RAM/CPU usage alerts.
 
 - `NETDATA_ADDRESS`: your Netdata instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
@@ -112,6 +113,7 @@ Shows [Netdata](https://github.com/netdata/netdata) alerts, like high RAM/CPU us
 - `NETDATA_TOKEN`: an access token used to access your Netdata instance API to get your alarms. See how to get it [here](https://learn.netdata.cloud/docs/netdata-cloud/authentication-&-authorization/api-tokens).
 
 ## Radarr, Sonarr, and Prowlarr
+
 Shows health messages from your [Sonarr](https://github.com/Sonarr/Sonarr), [Radarr](https://github.com/Radarr/Radarr), and [Prowlarr](https://github.com/Prowlarr/Prowlarr) instances, like when an index fails or Sonarr can't connect to a download client.
 
 - `SONARR_ADDRESS`: your Sonarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
@@ -127,11 +129,15 @@ Shows health messages from your [Sonarr](https://github.com/Sonarr/Sonarr), [Rad
 - `PROWLARR_API_KEY`: an access API key used to access your Prowlarr instance API. You can get it by going to **Settings -> General -> API Key**.
 
 ## Speedtest Tracker
+
 Shows a warning if the last speed test from your [Speedtest Tracker](https://github.com/alexjustesen/speedtest-tracker) instance failed.
+
 - `SPEEDTEST_TRACKER_ADDRESS`: your Speedtest Tracker instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `INTERNAL_SPEEDTEST_TRACKER_ADDRESS`: your Speedtest Tracker instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+- `SPEEDTEST_TRACKER_TOKEN`: your API token used to access your Speedtest Tracker instance. You can get it by going to **Settings -> API Tokens -> Create API Token button**.
 
 ## Pi-hole
+
 Shows [Pi-hole](https://github.com/pi-hole/pi-hole) diagnostic messages, like a high load.
 
 - `PIHOLE_ADDRESS`: your Pihole instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
@@ -139,6 +145,7 @@ Shows [Pi-hole](https://github.com/pi-hole/pi-hole) diagnostic messages, like a 
 - `PIHOLE_TOKEN`: an access API key used to access your Pihole instance API. You can get it by going to **Settings -> API -> Show API Token button**.
 
 ## Kavita
+
 Shows your [Kavita](https://github.com/Kareadita/Kavita) instance [media issues](https://wiki.kavitareader.com/troubleshooting/media-errors) that Kavita detects when analyzing your media, like corrupted files.
 
 - `KAVITA_ADDRESS`: your Kavita instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
@@ -147,6 +154,7 @@ Shows your [Kavita](https://github.com/Kareadita/Kavita) instance [media issues]
 - `KAVITA_PASSWORD`: your Kavita password.
 
 ## Kaizoku
+
 Shows warnings if there are failed jobs in your [Kaizoku](https://github.com/oae/kaizoku) queues.
 
 - `KAIZOKU_ADDRESS`: your Kaizoku instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.

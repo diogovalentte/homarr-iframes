@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func baseRequest(method, url string, body io.Reader, target interface{}) error {
+func (s *SpeedTestTracker) baseRequest(method, url string, body io.Reader, target interface{}) error {
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
@@ -15,6 +15,8 @@ func baseRequest(method, url string, body io.Reader, target interface{}) error {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", "Bearer "+s.token)
 
 	resp, err := client.Do(req)
 	if err != nil {

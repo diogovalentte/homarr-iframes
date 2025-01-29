@@ -76,6 +76,7 @@ type netdataConfigs struct {
 type speedTestTrackerConfigs struct {
 	Address         string
 	InternalAddress string
+	Token           string
 }
 
 type piholeConfigs struct {
@@ -152,6 +153,7 @@ func SetConfigs(filePath string) error {
 
 	GlobalConfigs.SpeedTestTrackerConfigs.Address = os.Getenv("SPEEDTEST_TRACKER_ADDRESS")
 	GlobalConfigs.SpeedTestTrackerConfigs.InternalAddress = os.Getenv("INTERNAL_SPEEDTEST_TRACKER_ADDRESS")
+	GlobalConfigs.SpeedTestTrackerConfigs.Token = os.Getenv("SPEEDTEST_TRACKER_TOKEN")
 
 	GlobalConfigs.Pihole.Address = os.Getenv("PIHOLE_ADDRESS")
 	GlobalConfigs.Pihole.InternalAddress = os.Getenv("INTERNAL_PIHOLE_ADDRESS")

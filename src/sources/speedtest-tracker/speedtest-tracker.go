@@ -12,6 +12,7 @@ var s *SpeedTestTracker
 type SpeedTestTracker struct {
 	Address         string
 	InternalAddress string
+	token           string
 }
 
 func New() (*SpeedTestTracker, error) {
@@ -31,9 +32,9 @@ func New() (*SpeedTestTracker, error) {
 }
 
 func (r *SpeedTestTracker) Init() error {
-	address, internalAddress := config.GlobalConfigs.SpeedTestTrackerConfigs.Address, config.GlobalConfigs.SpeedTestTrackerConfigs.InternalAddress
-	if address == "" {
-		return fmt.Errorf("SPEEDTEST_TRACKER_ADDRESS variable should be set")
+	address, internalAddress, token := config.GlobalConfigs.SpeedTestTrackerConfigs.Address, config.GlobalConfigs.SpeedTestTrackerConfigs.InternalAddress, config.GlobalConfigs.SpeedTestTrackerConfigs.Token
+	if address == "" || token == "" {
+		return fmt.Errorf("SPEEDTEST_TRACKER_ADDRESS and SPEEDTEST_TRACKER_TOKEN variables should be set")
 	}
 
 	r.Address = strings.TrimSuffix(address, "/")
@@ -42,28 +43,54 @@ func (r *SpeedTestTracker) Init() error {
 	} else {
 		r.InternalAddress = strings.TrimSuffix(internalAddress, "/")
 	}
+	r.token = token
 
 	return nil
 }
 
-func (s *SpeedTestTracker) GetLatestTest() (*TestEntry, error) {
+func (s *SpeedTestTracker) GetLatestTest() (*Data, error) {
 	var test *TestEntry
-	err := baseRequest("GET", fmt.Sprintf("%s/api/speedtest/latest", s.InternalAddress), nil, &test)
+	err := s.baseRequest("GET", fmt.Sprintf("%s/api/v1/results/latest", s.InternalAddress), nil, &test)
 	if err != nil {
 		return nil, err
 	}
 
-	return test, nil
+	return test.Data, nil
 }
 
 type TestEntry struct {
-	Data    *TestData `json:"data"`
-	Message string    `json:"message"`
+	Data    *Data  `json:"data"`
+	Message string `json:"message"`
+}
+
+type Data struct {
+	ID                int    `json:"id"`
+	Service           string `json:"service"`
+	Ping              string `json:"ping"`
+	DownloadBitsHuman string `json:"download_bits_human"`
+	UploadBitsHuman   string `json:"upload_bits_human"`
+	Benchmarks        struct {
+		Download Benchmarks `json:"download"`
+		Upload   Benchmarks `json:"upload"`
+		Ping     Benchmarks `json:"ping"`
+	} `json:"benchmarks"`
+	Healthy   bool     `json:"healthy"`
+	Status    string   `json:"status"`
+	Data      TestData `json:"data"`
+	CreatedAt string   `json:"created_at"`
+	UpdatedAt string   `json:"updated_at"`
+}
+
+type Benchmarks struct {
+	Bar    string `json:"bar"`
+	Passed bool   `json:"passed"`
+	Type   string `json:"type"`
+	Value  int    `json:"value"`
+	Unit   string `json:"unit"`
 }
 
 type TestData struct {
-	URL        string `json:"url"`
-	UpdatedAt  string `json:"updated_at"`
-	ServerName string `json:"server_name"`
-	Failed     bool   `json:"failed"`
+	ISP     string `json:"isp"`
+	Message string `json:"message"`
+	Level   string `json:"level"`
 }
