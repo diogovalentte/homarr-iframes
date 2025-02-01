@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/diogovalentte/homarr-iframes/src/config"
+	"github.com/diogovalentte/homarr-iframes/src/sources/changedetectionio"
 	"github.com/diogovalentte/homarr-iframes/src/sources/kaizoku"
 	"github.com/diogovalentte/homarr-iframes/src/sources/kavita"
 	"github.com/diogovalentte/homarr-iframes/src/sources/netdata"
@@ -16,7 +18,7 @@ import (
 	speedtesttracker "github.com/diogovalentte/homarr-iframes/src/sources/speedtest-tracker"
 )
 
-var validAlarmNames = []string{"netdata", "prowlarr", "sonarr", "radarr", "speedtest-tracker", "pihole", "kavita", "kaizoku"}
+var validAlarmNames = []string{"netdata", "prowlarr", "sonarr", "radarr", "speedtest-tracker", "pihole", "kavita", "kaizoku", "changedetectionio"}
 
 func (a *Alarms) GetAlarms(alarmNames []string, limit int, desc bool) ([]Alarm, error) {
 	if limit == 0 {
@@ -75,6 +77,12 @@ func (a *Alarms) GetAlarms(alarmNames []string, limit int, desc bool) ([]Alarm, 
 				return nil, fmt.Errorf("failed to get Kaizoku alarms: %w", err)
 			}
 			alarms = append(alarms, kaizokuAlarms...)
+		case "changedetectionio":
+			changedetectionioAlarms, err := getChangedetectionioAlarms()
+			if err != nil {
+				return nil, fmt.Errorf("failed to get ChangeDetection.io alarms: %w", err)
+			}
+			alarms = append(alarms, changedetectionioAlarms...)
 		default:
 			return nil, fmt.Errorf("invalid alarm name: %s", alarmName)
 		}
@@ -388,6 +396,76 @@ func getKaizokuAlarms() ([]Alarm, error) {
 			Value:           fmt.Sprintf("%d jobs", queue.Counts.Failed),
 			Property:        queue.Name,
 		})
+	}
+
+	return alarms, nil
+}
+
+func getChangedetectionioAlarms() ([]Alarm, error) {
+	c, err := changedetectionio.New()
+	if err != nil {
+		return nil, err
+	}
+
+	watches, err := c.GetWatches()
+	if err != nil {
+		return nil, err
+	}
+
+	var alarms []Alarm
+	for ID, watch := range watches {
+		var hasError bool
+		if value, ok := watch.LastError.(bool); !ok {
+			errStr := watch.LastError.(string)
+			if errStr != "" {
+				hasError = true
+			}
+		} else if value {
+			hasError = true
+		}
+
+		if hasError {
+			errStr := watch.LastError.(string)
+			lastChecked := time.Unix(int64(watch.LastChecked), 0)
+			summary := watch.Title
+			if watch.Title == "" {
+				summary = watch.URL
+			}
+			alarms = append(alarms, Alarm{
+				Source:            "ChangeDetection.io",
+				BackgroundImgURL:  changedetectionio.BackgroundImgURL,
+				BackgroundImgSize: 100,
+				Summary:           summary,
+				URL:               c.Address,
+				Status:            "ERROR",
+				Property:          errStr,
+				Time:              lastChecked,
+			})
+		}
+
+		minChanged := time.Now().Add(-time.Hour * time.Duration(config.GlobalConfigs.ChangeDetectionIO.ChangedLastHours))
+		lastChanged := time.Unix(int64(watch.LastChanged), 0)
+		if lastChanged.After(minChanged) {
+			summary := watch.Title
+			if summary == "" {
+				summary = watch.URL
+			}
+			viewed := "Viewed"
+			if !watch.Viewed {
+				viewed = "Not Viewed"
+			}
+
+			alarms = append(alarms, Alarm{
+				Source:            "ChangeDetection.io",
+				BackgroundImgURL:  changedetectionio.BackgroundImgURL,
+				BackgroundImgSize: 100,
+				Summary:           summary,
+				URL:               c.Address + "/diff/" + ID,
+				Status:            "CHANGED",
+				Value:             viewed,
+				Time:              lastChanged,
+			})
+		}
 	}
 
 	return alarms, nil

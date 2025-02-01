@@ -2,11 +2,15 @@ package config
 
 import (
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
 
-var GlobalConfigs *Configs
+var (
+	GlobalConfigs                            *Configs
+	defaultChangeDetectionIOChangedLastHours = 24
+)
 
 type Configs struct {
 	Linkwarden              linkwardenConfigs
@@ -22,6 +26,7 @@ type Configs struct {
 	Kavita                  kavitaConfigs
 	Kaizoku                 kaizokuConfigs
 	Jellyseerr              jellyseerrConfigs
+	ChangeDetectionIO       changedetectionIOConfigs
 }
 
 type linkwardenConfigs struct {
@@ -103,6 +108,13 @@ type jellyseerrConfigs struct {
 	APIKey          string
 }
 
+type changedetectionIOConfigs struct {
+	Address          string
+	InternalAddress  string
+	APIKey           string
+	ChangedLastHours int
+}
+
 func SetConfigs(filePath string) error {
 	GlobalConfigs = &Configs{}
 
@@ -166,6 +178,19 @@ func SetConfigs(filePath string) error {
 
 	GlobalConfigs.Kaizoku.Address = os.Getenv("KAIZOKU_ADDRESS")
 	GlobalConfigs.Kaizoku.InternalAddress = os.Getenv("INTERNAL_KAIZOKU_ADDRESS")
+
+	GlobalConfigs.ChangeDetectionIO.Address = os.Getenv("CHANGEDETECTIONIO_ADDRESS")
+	GlobalConfigs.ChangeDetectionIO.InternalAddress = os.Getenv("INTERNAL_CHANGEDETECTIONIO_ADDRESS")
+	GlobalConfigs.ChangeDetectionIO.APIKey = os.Getenv("CHANGEDETECTIONIO_API_KEY")
+	changedLastHours := os.Getenv("CHANGEDETECTIONIO_CHANGED_LAST_HOURS")
+	if changedLastHours == "" {
+		GlobalConfigs.ChangeDetectionIO.ChangedLastHours = defaultChangeDetectionIOChangedLastHours
+	} else {
+		GlobalConfigs.ChangeDetectionIO.ChangedLastHours, err = strconv.Atoi(changedLastHours)
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }

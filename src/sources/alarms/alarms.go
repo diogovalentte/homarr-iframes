@@ -357,7 +357,7 @@ func (a *Alarms) getAlarmsiFrame(alarms []Alarm, desc bool, alarmsQueryArg, them
 			switch status {
 			case "CLEAR":
 				return "green"
-			case "WARNING":
+			case "WARNING", "CHANGED":
 				return "orange"
 			case "ERROR", "CRITICAL", "FAILED":
 				return "red"

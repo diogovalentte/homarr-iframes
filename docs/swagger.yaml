@@ -23,7 +23,7 @@ paths:
         name: limit
         type: integer
       - description: 'Alarms to show. Available values: netdata, radarr, sonarr, prowlarr,
-          speedtest-tracker, pihole, kavita, kaizoku'
+          speedtest-tracker, pihole, kavita, kaizoku, changedetectionio'
         example: netdata,radarr,sonarr
         in: query
         name: alarms
@@ -237,7 +237,7 @@ paths:
         name: limit
         type: integer
       - description: 'Alarms to show. Available values: netdata, radarr, sonarr, prowlarr,
-          speedtest-tracker, pihole, kavita, kaizoku'
+          speedtest-tracker, pihole, kavita, kaizoku, changedetectionio'
         example: netdata,radarr,sonarr
         in: query
         name: alarms
