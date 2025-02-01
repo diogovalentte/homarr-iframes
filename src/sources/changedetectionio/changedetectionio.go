@@ -53,7 +53,7 @@ func (c *ChangeDetectionIO) Init() error {
 
 func (c *ChangeDetectionIO) GetWatches() (map[string]*Watch, error) {
 	var watches map[string]*Watch
-	err := c.baseRequest("GET", fmt.Sprintf("%s/api/v1/watch", c.Address), nil, &watches)
+	err := c.baseRequest("GET", fmt.Sprintf("%s/api/v1/watch", c.InternalAddress), nil, &watches)
 	if err != nil {
 		return nil, err
 	}
