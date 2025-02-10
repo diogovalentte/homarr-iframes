@@ -137,7 +137,7 @@ func (v *Vikunja) SetTaskDone(taskID int) error {
 	return nil
 }
 
-func (v *Vikunja) GetProjects() (map[int]*Project, error) {
+func (v *Vikunja) GetProjects() ([]*Project, error) {
 	path := "/api/v1/projects"
 	projects := []*Project{}
 
@@ -146,12 +146,7 @@ func (v *Vikunja) GetProjects() (map[int]*Project, error) {
 		return nil, err
 	}
 
-	projectsMap := make(map[int]*Project)
-	for _, project := range projects {
-		projectsMap[project.ID] = project
-	}
-
-	return projectsMap, nil
+	return projects, nil
 }
 
 func (v *Vikunja) GetProject(projectID int) (*Project, error) {
@@ -164,18 +159,6 @@ func (v *Vikunja) GetProject(projectID int) (*Project, error) {
 	}
 
 	return project, nil
-}
-
-// SetInMemoryInstanceProjects sets the instanceProjects variable to the projects.
-func (v *Vikunja) SetInMemoryInstanceProjects() error {
-	projects, err := v.GetProjects()
-	if err != nil {
-		return err
-	}
-
-	instanceProjects = projects
-
-	return nil
 }
 
 func (v *Vikunja) baseRequest(method, url string, body io.Reader, target interface{}) error {

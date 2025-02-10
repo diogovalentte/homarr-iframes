@@ -101,3 +101,23 @@ func TestSetTaskDone(t *testing.T) {
 		}
 	})
 }
+
+func TestGetProjects(t *testing.T) {
+	v, err := New()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Run("get projects", func(t *testing.T) {
+		projects, err := v.GetProjects()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		for _, project := range projects {
+			if project.ID == 0 {
+				t.Fatal("project with ID 0")
+			}
+		}
+	})
+}

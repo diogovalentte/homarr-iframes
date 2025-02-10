@@ -16,10 +16,7 @@ import (
 	"github.com/diogovalentte/homarr-iframes/src/sources"
 )
 
-var (
-	defaultBackgroundImgURL = "https://avatars.githubusercontent.com/u/41270016"
-	instanceProjects        = make(map[int]*Project)
-)
+var defaultBackgroundImgURL = "https://avatars.githubusercontent.com/u/41270016"
 
 var v *Vikunja
 
@@ -68,11 +65,6 @@ func (v *Vikunja) Init(address, internalAddress, token, backgroundImageURL strin
 	}
 	v.Token = token
 	v.BackgroundImgURL = backgroundImageURL
-
-	err := v.SetInMemoryInstanceProjects()
-	if err != nil {
-		return fmt.Errorf("couldn't get Vikunja projects: %s", err.Error())
-	}
 
 	return nil
 }
@@ -214,6 +206,16 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 		}
 	}
 
+	projects, err := v.GetProjects()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	instanceProjects := make(map[int]*Project)
+	for _, project := range projects {
+		instanceProjects[project.ID] = project
+	}
+
 	var html []byte
 	if len(tasks) < 1 {
 		var apiURLPath string
@@ -222,7 +224,7 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 		}
 		html = sources.GetBaseNothingToShowiFrame("#226fff", v.BackgroundImgURL, "center", "cover", backgroundFilter, apiURLPath)
 	} else {
-		html, err = v.getTasksiFrame(tasks, theme, v.BackgroundImgURL, backgroundPosition, backgroundSize, backgroundFilter, apiURL, limit, projectID, queryExcludeProjectIDs, showCreated, showDue, showPriority, showProject, ShowFavoriteIcon)
+		html, err = v.getTasksiFrame(tasks, theme, v.BackgroundImgURL, backgroundPosition, backgroundSize, backgroundFilter, apiURL, limit, projectID, queryExcludeProjectIDs, showCreated, showDue, showPriority, showProject, ShowFavoriteIcon, instanceProjects)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			return
@@ -232,7 +234,7 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func (v *Vikunja) getTasksiFrame(tasks []*Task, theme, backgroundImgURL, backgroundPosition, backgroundSize, backgroundFilter, apiURL string, limit, projectID int, excludeProjectIDs string, showCreated, showDue, showPriority, showProject, showFavoriteIcon bool) ([]byte, error) {
+func (v *Vikunja) getTasksiFrame(tasks []*Task, theme, backgroundImgURL, backgroundPosition, backgroundSize, backgroundFilter, apiURL string, limit, projectID int, excludeProjectIDs string, showCreated, showDue, showPriority, showProject, showFavoriteIcon bool, instanceProjects map[int]*Project) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -678,9 +680,18 @@ func (v *Vikunja) GetHash(c *gin.Context) {
 		}
 	}
 
-	var tasks []Task
+	instanceProjects, err := v.GetProjects()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	var tasks []interface{}
 	for _, task := range pTasks {
 		tasks = append(tasks, *task)
+	}
+	for _, project := range instanceProjects {
+		tasks = append(tasks, *project)
 	}
 
 	hash := sources.GetHash(tasks, time.Now().Format("2006-01-02"))
