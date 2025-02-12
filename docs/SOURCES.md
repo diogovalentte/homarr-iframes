@@ -2,13 +2,12 @@
 
 - Each source is a route of the API that returns an iFrame.
 - Some sources need some environment variables to work.
-- Most sources have two environment variables for the address, one for the address that will be used in the iFrame links and another for the address that will be used in the API to get the data (`INTERNAL_`). If you don't provide the second one, the first one will be used in the API too.
-- Some sources need some query arguments to work, you can check the [API docs](https://github.com/diogovalentte/homarr-iframes/tree/main?tab=readme-ov-file#api-docs) to see which arguments are obligatory.
-- This API doesn't have any authentication system, so anyone who can access the API will be able to get all information from all sources, like your Vikunja tasks, Linkwarden bookmarks, etc. You can add an authentication portal like Authelia or [Authentik](https://github.com/goauthentik/authentik) in front of the API to secure it, this is how I do it.
+- Most sources have two environment variables for the address, one will be used in the iFrame links that you can click. The other will be used by this project to get the data (with the prefix `INTERNAL_`). If you don't provide the second one, the first one will be used in both cases.
+  - **Example**: you access a service using the domain `service.com` and there is an authentication system in front of it. You set the first address environment variable to `service.com` and the second one (`INTERNAL_`) to the service's docker container name or any other internal address that this project can use to connect to the service without passing by the authentication system.
+- Most sources have query arguments that can be provided in the URL. These arguments change the iframe behavior and can be very useful for customization. You can check the [API docs](https://github.com/diogovalentte/homarr-iframes/tree/main?tab=readme-ov-file#api-docs) for query arguments.
+  - Some sources **require** query arguments to work.
+- This project doesn't have any authentication system, so anyone who can access the API will be able to get all information from all sources, like your Vikunja tasks, Linkwarden bookmarks, etc. You can add an authentication portal like Authelia or [Authentik](https://github.com/goauthentik/authentik) in front of the API to secure it, this is how I do it.
 - Some iFrames display date information, set the Docker container timezone to get a better result.
-- The iFrames design is based on the Homarr widget to show media requests from apps like [Jellyseerr](https://github.com/Fallenbagel/jellyseerr) and [Overseerr](https://github.com/sct/overseerr):
-
-![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/9083c67a-9bbf-4430-8ba9-929cd9b0d0ab)
 
 ---
 
@@ -96,7 +95,7 @@ This source gets on display movies of specific Cinemark theaters (only in Brazil
 
 # Alarms
 
-This source shows **alarms** (warnings, errors, failed jobs notifications, etc.) from multiple services in one central place.
+This source shows **alarms** (*warnings, errors, notifications you don't want to miss, etc.*) from multiple services in one central place.
 
 ![image](https://github.com/user-attachments/assets/15e26b24-8d4b-4243-b239-e6f4c5056712)
 
@@ -162,7 +161,7 @@ Shows warnings if there are failed jobs in your [Kaizoku](https://github.com/oae
 
 ## ChangeDetection.io
 
-Shows cards for your watches' errors and changes from your [ChangeDetection.io](https://github.com/dgtlmoon/changedetection.io) instance.
+Shows cards for your watches' errors and changes from your [ChangeDetection.io](https://github.com/dgtlmoon/changedetection.io) instance. It'll show on the left if the change was viewed or not. A change is considered viewed by ChangeDetection.io when you look at the change's history (*to check the diffs between the last change and the actual*).
 
 - `CHANGEDETECTIONIO_ADDRESS`: your ChangeDetection.io instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `INTERNAL_CHANGEDETECTIONIO_ADDRESS`: your ChangeDetection.io instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
