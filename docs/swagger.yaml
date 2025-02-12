@@ -34,6 +34,11 @@ paths:
         in: query
         name: sort_desc
         type: boolean
+      - description: Show viewed alarms from changedetection.io. Defaults to true.
+        example: false
+        in: query
+        name: changedetectionio_show_viewed
+        type: boolean
       produces:
       - application/json
       responses:
@@ -247,6 +252,11 @@ paths:
         example: false
         in: query
         name: sort_desc
+        type: boolean
+      - description: Show viewed alarms from changedetection.io. Defaults to true.
+        example: false
+        in: query
+        name: changedetectionio_show_viewed
         type: boolean
       produces:
       - text/html

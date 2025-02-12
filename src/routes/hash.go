@@ -120,6 +120,7 @@ func UptimeKumaHashHandler(c *gin.Context) {
 // @Param limit query int false "Limits the number of items in the iFrame." Example(5)
 // @Param alarms query string true "Alarms to show. Available values: netdata, radarr, sonarr, prowlarr, speedtest-tracker, pihole, kavita, kaizoku, changedetectionio" Example(netdata,radarr,sonarr)
 // @Param sort_desc query bool false "Sort alarms in descending order. Defaults to false." Example(false)
+// @Param changedetectionio_show_viewed query bool false "Show viewed alarms from changedetection.io. Defaults to true." Example(false)
 // @Router /hash/alarms [get]
 func AlarmsHashHandler(c *gin.Context) {
 	a, err := alarms.New()

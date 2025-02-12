@@ -20,7 +20,7 @@ import (
 
 var validAlarmNames = []string{"netdata", "prowlarr", "sonarr", "radarr", "speedtest-tracker", "pihole", "kavita", "kaizoku", "changedetectionio"}
 
-func (a *Alarms) GetAlarms(alarmNames []string, limit int, desc bool) ([]Alarm, error) {
+func (a *Alarms) GetAlarms(alarmNames []string, limit int, desc, changedetectionioShowViewed bool) ([]Alarm, error) {
 	if limit == 0 {
 		return []Alarm{}, nil
 	}
@@ -78,7 +78,7 @@ func (a *Alarms) GetAlarms(alarmNames []string, limit int, desc bool) ([]Alarm, 
 			}
 			alarms = append(alarms, kaizokuAlarms...)
 		case "changedetectionio":
-			changedetectionioAlarms, err := getChangedetectionioAlarms()
+			changedetectionioAlarms, err := getChangedetectionioAlarms(changedetectionioShowViewed)
 			if err != nil {
 				return nil, fmt.Errorf("failed to get ChangeDetection.io alarms: %w", err)
 			}
@@ -401,7 +401,7 @@ func getKaizokuAlarms() ([]Alarm, error) {
 	return alarms, nil
 }
 
-func getChangedetectionioAlarms() ([]Alarm, error) {
+func getChangedetectionioAlarms(showViewed bool) ([]Alarm, error) {
 	c, err := changedetectionio.New()
 	if err != nil {
 		return nil, err
@@ -441,6 +441,12 @@ func getChangedetectionioAlarms() ([]Alarm, error) {
 				Property:          errStr,
 				Time:              lastChecked,
 			})
+
+			continue
+		}
+
+		if watch.Viewed && !showViewed {
+			continue
 		}
 
 		minChanged := time.Now().Add(-time.Hour * time.Duration(config.GlobalConfigs.ChangeDetectionIO.ChangedLastHours))

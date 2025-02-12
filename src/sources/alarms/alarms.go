@@ -96,14 +96,24 @@ func (a *Alarms) GetiFrame(c *gin.Context) {
 		}
 	}
 
-	alarms, err := a.GetAlarms(alarmNames, limit, desc)
+	changedetectionioShowViewedStr := c.Query("changedetectionio_show_viewed")
+	changedetectionioShowViewed := true
+	if changedetectionioShowViewedStr != "" {
+		changedetectionioShowViewed, err = strconv.ParseBool(changedetectionioShowViewedStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "changedetectionio_show_viewed must be a boolean"})
+			return
+		}
+	}
+
+	alarms, err := a.GetAlarms(alarmNames, limit, desc, changedetectionioShowViewed)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
 	var html []byte
-	html, err = a.getAlarmsiFrame(alarms, desc, alarmNamesStr, theme, apiURL, limit)
+	html, err = a.getAlarmsiFrame(alarms, desc, changedetectionioShowViewed, alarmNamesStr, theme, apiURL, limit)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -112,7 +122,7 @@ func (a *Alarms) GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func (a *Alarms) getAlarmsiFrame(alarms []Alarm, desc bool, alarmsQueryArg, theme, apiURL string, limit int) ([]byte, error) {
+func (a *Alarms) getAlarmsiFrame(alarms []Alarm, desc, changedetectionioShowViewed bool, alarmsQueryArg, theme, apiURL string, limit int) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -276,7 +286,7 @@ func (a *Alarms) getAlarmsiFrame(alarms []Alarm, desc bool, alarmsQueryArg, them
 
         async function fetchData() {
             try {
-                var url = '{{ .APIURL }}/v1/hash/alarms?limit={{ .APILimit }}&alarms={{ .AlarmsQueryArg }}&sort_desc={{ .SortDesc }}';
+                var url = '{{ .APIURL }}/v1/hash/alarms?limit={{ .APILimit }}&alarms={{ .AlarmsQueryArg }}&sort_desc={{ .SortDesc }}&changedetectionio_show_viewed={{ .ChangeDetectionIOShowViewed }}';
                 const response = await fetch(url);
                 const data = await response.json();
 
@@ -348,6 +358,7 @@ func (a *Alarms) getAlarmsiFrame(alarms []Alarm, desc bool, alarmsQueryArg, them
 		APIURL:                        apiURL,
 		APILimit:                      limit,
 		SortDesc:                      desc,
+		ChangeDetectionIOShowViewed:   changedetectionioShowViewed,
 		ScrollbarThumbBackgroundColor: scrollbarThumbBackgroundColor,
 		ScrollbarTrackBackgroundColor: scrollbarTrackBackgroundColor,
 	}
@@ -387,6 +398,7 @@ type iframeTemplateData struct {
 	APILimit                      int
 	AlarmsQueryArg                string
 	SortDesc                      bool
+	ChangeDetectionIOShowViewed   bool
 }
 
 // GetHash returns the hash of the alarms
@@ -435,7 +447,17 @@ func (a *Alarms) GetHash(c *gin.Context) {
 		}
 	}
 
-	alarms, err := a.GetAlarms(alarmNames, limit, desc)
+	changedetectionioShowViewedStr := c.Query("changedetectionio_show_viewed")
+	changedetectionioShowViewed := true
+	if changedetectionioShowViewedStr != "" {
+		changedetectionioShowViewed, err = strconv.ParseBool(changedetectionioShowViewedStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "changedetectionio_show_viewed must be a boolean"})
+			return
+		}
+	}
+
+	alarms, err := a.GetAlarms(alarmNames, limit, desc, changedetectionioShowViewed)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return

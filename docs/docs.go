@@ -44,6 +44,13 @@ const docTemplate = `{
                         "description": "Sort alarms in descending order. Defaults to false.",
                         "name": "sort_desc",
                         "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": false,
+                        "description": "Show viewed alarms from changedetection.io. Defaults to true.",
+                        "name": "changedetectionio_show_viewed",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -323,6 +330,13 @@ const docTemplate = `{
                         "example": false,
                         "description": "Sort alarms in descending order. Defaults to false.",
                         "name": "sort_desc",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": false,
+                        "description": "Show viewed alarms from changedetection.io. Defaults to true.",
+                        "name": "changedetectionio_show_viewed",
                         "in": "query"
                     }
                 ],
