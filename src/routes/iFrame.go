@@ -135,7 +135,7 @@ func VikunjaSetTaskDoneHandler(c *gin.Context) {
 // @Param requestedBy query string false "If specified, only requests from that particular user ID will be returned." Example(1)
 // @Router /iframe/overseerr [get]
 func OverseerriFrameHandler(c *gin.Context) {
-	c.String(http.StatusOK, "Overseerr iFrame was removed. It's now implemented in the media requests iFrame. Please consult the media requests iFrame documentation.")
+	c.String(http.StatusMovedPermanently, "Overseerr iFrame was removed. It's now implemented in the media requests iFrame. Please consult the media requests iFrame documentation.")
 }
 
 // @Summary Media Releases
@@ -213,7 +213,7 @@ func AlarmsiFrameHandler(c *gin.Context) {
 // @Produce html
 // @Router /iframe/netdata [get]
 func NetdataiFrameHandler(c *gin.Context) {
-	c.String(http.StatusOK, "Netdata iFrame was removed. It's now implemented in the alarms iFrame. Please consult the alarms iFrame documentation.")
+	c.String(http.StatusMovedPermanently, "Netdata iFrame was removed. It's now implemented in the alarms iFrame. Please consult the alarms iFrame documentation.")
 }
 
 type messsageResponse struct {
