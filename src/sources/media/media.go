@@ -36,17 +36,28 @@ func GetiFrame(c *gin.Context) {
 		}
 	}
 
-	var (
-		radarrReleaseType string
-		showUnmonitored   bool
-	)
-	showEpisodeHours := true
-
-	radarrReleaseType = c.Query("radarrReleaseType")
-	if radarrReleaseType == "" {
-		radarrReleaseType = "inCinemas"
+	var inCinemas, physical, digital bool
+	radarrReleaseTypeStr := c.Query("radarrReleaseType")
+	if radarrReleaseTypeStr != "" {
+		radarrReleaseTypes := strings.Split(radarrReleaseTypeStr, ",")
+		for _, releaseType := range radarrReleaseTypes {
+			switch releaseType {
+			case "inCinemas":
+				inCinemas = true
+			case "physical":
+				physical = true
+			case "digital":
+				digital = true
+			default:
+				c.JSON(http.StatusBadRequest, gin.H{"message": "radarrReleaseType must be 'inCinemas', 'physical', 'digital', or a combination of them separated by commas, like 'inCinemas,physical'"})
+				return
+			}
+		}
+	} else {
+		inCinemas, physical, digital = true, true, true
 	}
 
+	var showUnmonitored bool
 	queryShowUnmonitored := c.Query("showUnmonitored")
 	switch queryShowUnmonitored {
 	case "true":
@@ -58,6 +69,7 @@ func GetiFrame(c *gin.Context) {
 		return
 	}
 
+	showEpisodeHours := true
 	queryShowEpisodeHours := c.Query("showEpisodesHour")
 	switch queryShowEpisodeHours {
 	case "true":
@@ -69,14 +81,14 @@ func GetiFrame(c *gin.Context) {
 		return
 	}
 
-	iframeRequestData, err := getCalendar(radarrReleaseType, showUnmonitored)
+	iframeRequestData, err := getCalendar(showUnmonitored, inCinemas, physical, digital)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
 	var html []byte
-	html, err = getMediaReleasesiFrame(iframeRequestData, theme, apiURL, radarrReleaseType, showUnmonitored, showEpisodeHours)
+	html, err = getMediaReleasesiFrame(iframeRequestData, theme, apiURL, showUnmonitored, showEpisodeHours, inCinemas, physical, digital)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, fmt.Errorf("couldn't create iFrame: %s", err.Error()))
 		return
@@ -85,7 +97,7 @@ func GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func getMediaReleasesiFrame(calendar *Calendar, theme string, apiURL string, radarrReleaseType string, showUnmonitored, showEpisodeHours bool) ([]byte, error) {
+func getMediaReleasesiFrame(calendar *Calendar, theme, apiURL string, showUnmonitored, showEpisodeHours, radarrInCinemas, radarrPhysical, radarrDigital bool) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -316,12 +328,12 @@ func getMediaReleasesiFrame(calendar *Calendar, theme string, apiURL string, rad
             <p class="source-label" style="color: {{ getSourceColor .Source }};">{{ .Source }}</p>
             <div>
                 {{ if .IsDownloaded }}
-                    <p class="status-label" style="color: white; background-color: green;">Available</p>
+                    <p class="status-label" style="color: white; background-color: green;">Downloaded</p>
                 {{ else }}
                     {{ if .ShouldBeDownloaded }}
-                        <p class="status-label" style="color: white; background-color: red;">Not Available</p>
+                        <p class="status-label" style="color: white; background-color: red;">Not Downloaded</p>
                     {{ else }}
-                        <p class="status-label" style="color: white; background-color: #99b6bb;">Not Available</p>
+                        <p class="status-label" style="color: white; background-color: #99b6bb;">Not Downloaded</p>
                     {{ end }}
                 {{ end }}
             </div>
@@ -339,12 +351,24 @@ func getMediaReleasesiFrame(calendar *Calendar, theme string, apiURL string, rad
 		scrollbarTrackBackgroundColor = "rgba(37, 40, 53, 1)"
 	}
 
+	radarrReleaseTypes := []string{}
+	if radarrInCinemas {
+		radarrReleaseTypes = append(radarrReleaseTypes, "inCinemas")
+	}
+	if radarrPhysical {
+		radarrReleaseTypes = append(radarrReleaseTypes, "physical")
+	}
+	if radarrDigital {
+		radarrReleaseTypes = append(radarrReleaseTypes, "digital")
+	}
+	radarrReleaseTypeStr := strings.Join(radarrReleaseTypes, ",")
+
 	templateData := iframeTemplateData{
 		Calendar:                      calendar,
 		Theme:                         theme,
 		APIURL:                        apiURL,
 		APIShowUnmonitored:            showUnmonitored,
-		APIRadarrReleaseType:          radarrReleaseType,
+		APIRadarrReleaseType:          radarrReleaseTypeStr,
 		ShowEpisodeHours:              showEpisodeHours,
 		SonarrAddress:                 strings.TrimSuffix(config.GlobalConfigs.Sonarr.Address, "/"),
 		RadarrAddress:                 strings.TrimSuffix(config.GlobalConfigs.Radarr.Address, "/"),
@@ -394,10 +418,27 @@ type iframeTemplateData struct {
 
 // GetHash returns the hash of the media releases
 func GetHash(c *gin.Context) {
-	radarrReleaseType := c.Query("radarrReleaseType")
-	if radarrReleaseType == "" {
-		radarrReleaseType = "inCinemas"
+	var inCinemas, physical, digital bool
+	radarrReleaseTypeStr := c.Query("radarrReleaseType")
+	if radarrReleaseTypeStr != "" {
+		radarrReleaseTypes := strings.Split(radarrReleaseTypeStr, ",")
+		for _, releaseType := range radarrReleaseTypes {
+			switch releaseType {
+			case "inCinemas":
+				inCinemas = true
+			case "physical":
+				physical = true
+			case "digital":
+				digital = true
+			default:
+				c.JSON(http.StatusBadRequest, gin.H{"message": "radarrReleaseType must be 'inCinemas', 'physical', 'digital', or a combination of them separated by commas, like 'inCinemas,physical'"})
+				return
+			}
+		}
+	} else {
+		inCinemas, physical, digital = true, true, true
 	}
+
 	queryShowUnmonitored := c.Query("showUnmonitored")
 	var showUnmonitored bool
 	switch queryShowUnmonitored {
@@ -410,7 +451,7 @@ func GetHash(c *gin.Context) {
 		return
 	}
 
-	releases, err := getCalendar(radarrReleaseType, showUnmonitored)
+	releases, err := getCalendar(showUnmonitored, inCinemas, physical, digital)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return

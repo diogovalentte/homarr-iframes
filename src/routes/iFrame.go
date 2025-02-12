@@ -144,7 +144,7 @@ func OverseerriFrameHandler(c *gin.Context) {
 // @Produce html
 // @Param theme query string false "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white" Example(light)
 // @Param api_url query string true "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload. Also used by the button to set the task done, if not provided, the button will not appear." Example(https://sub.domain.com)
-// @Param radarrReleaseType query string false "Filter movies get from Radarr. Can be 'inCinemas', 'physical', or 'digital'. Defaults to 'inCinemas'" Example(physical)
+// @Param radarrReleaseType query string false "Filter movies get from Radarr. Can be 'inCinemas', 'physical', 'digital', or multiple separated by comma. Defaults to 'inCinemas,physical,digital'" Example(inCinemas,digital)
 // @Param showUnmonitored query bool false "Specify if show unmonitored media. Defaults to false." Example(true)
 // @Param showEpisodesHour query bool false "Specify if show the episodes' (Sonarr) release hour and minute. Defaults to true." Example(false)
 // @Router /iframe/media_releases [get]

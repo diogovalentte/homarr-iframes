@@ -9,7 +9,7 @@ import (
 	"github.com/diogovalentte/homarr-iframes/src/sources/sonarr"
 )
 
-func getCalendar(radarrReleaseType string, unmonitored bool) (*Calendar, error) {
+func getCalendar(unmonitored, inCinemas, physical, digital bool) (*Calendar, error) {
 	var isAnySourceValid bool
 	calendar := &Calendar{}
 	startDate := time.Now()
@@ -17,7 +17,7 @@ func getCalendar(radarrReleaseType string, unmonitored bool) (*Calendar, error) 
 
 	if config.GlobalConfigs.Radarr.Address != "" && config.GlobalConfigs.Radarr.APIKey != "" {
 		isAnySourceValid = true
-		radarrCalendar, err := getRadarrCalendar(unmonitored, startDate, endDate, radarrReleaseType)
+		radarrCalendar, err := getRadarrCalendar(unmonitored, startDate, endDate, inCinemas, physical, digital)
 		if err != nil {
 			return nil, fmt.Errorf("couldn't create Radarr calendar: %s", err.Error())
 		}
@@ -40,7 +40,7 @@ func getCalendar(radarrReleaseType string, unmonitored bool) (*Calendar, error) 
 	return calendar, nil
 }
 
-func getRadarrCalendar(unmonitored bool, startDate, endDate time.Time, releaseType string) (*Calendar, error) {
+func getRadarrCalendar(unmonitored bool, startDate, endDate time.Time, inCinemas, physical, digital bool) (*Calendar, error) {
 	radarr, err := radarr.New()
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create Radarr client: %s", err.Error())
@@ -53,48 +53,50 @@ func getRadarrCalendar(unmonitored bool, startDate, endDate time.Time, releaseTy
 	calendar := &Calendar{}
 
 	for _, entry := range entries {
+		var shouldBeDownloaded, found bool
 		var releaseDate time.Time
-		switch releaseType {
-		case "inCinemas":
-			if entry.InCinemas == "" {
-				continue
-			}
+
+		if inCinemas && entry.InCinemas != "" {
 			releaseDate, err = time.Parse(time.RFC3339, entry.InCinemas)
 			if err != nil {
 				return nil, fmt.Errorf("error parsing movie '%#v' in cinemas date: %w", entry, err)
 			}
 			releaseDate = releaseDate.In(time.Local)
-			if !IsReleaseDateWithinDateRange(releaseDate, startDate, endDate) {
-				continue
+			if IsReleaseDateWithinDateRange(releaseDate, startDate, endDate) {
+				found = true
 			}
-		case "physical":
-			if entry.PhysicalRelease == "" {
-				continue
+		}
+		if !found && digital && entry.DigitalRelease != "" {
+			digitalReleaseDate, err := time.Parse(time.RFC3339, entry.DigitalRelease)
+			if err != nil {
+				return nil, fmt.Errorf("error parsing movie '%#v' digital release date: %w", entry, err)
 			}
+			releaseDate = digitalReleaseDate.In(time.Local)
+			if IsReleaseDateWithinDateRange(releaseDate, startDate, endDate) {
+				found = true
+			}
+		}
+		if !found && physical && entry.PhysicalRelease != "" {
 			releaseDate, err = time.Parse(time.RFC3339, entry.InCinemas)
 			if err != nil {
 				return nil, fmt.Errorf("error parsing movie '%#v' physical release date: %w", entry, err)
 			}
 			releaseDate = releaseDate.In(time.Local)
-			if !IsReleaseDateWithinDateRange(releaseDate, startDate, endDate) {
-				continue
+			if IsReleaseDateWithinDateRange(releaseDate, startDate, endDate) {
+				found = true
 			}
-		case "digital":
-			if entry.DigitalRelease == "" {
-				continue
-			}
-			releaseDate, err = time.Parse(time.RFC3339, entry.InCinemas)
+		}
+		if !found {
+			continue
+		}
+		if entry.DigitalRelease != "" {
+			digitalReleaseDate, err := time.Parse(time.RFC3339, entry.DigitalRelease)
 			if err != nil {
 				return nil, fmt.Errorf("error parsing movie '%#v' digital release date: %w", entry, err)
 			}
-			releaseDate = releaseDate.In(time.Local)
-			if !IsReleaseDateWithinDateRange(releaseDate, startDate, endDate) {
-				continue
-			}
-		default:
-			return nil, fmt.Errorf("invalid release type: %s", releaseType)
+			digitalReleaseDate = digitalReleaseDate.In(time.Local)
+			shouldBeDownloaded = digitalReleaseDate.Before(time.Now()) && !digitalReleaseDate.IsZero()
 		}
-		shouldBeDownloaded := releaseDate.Before(time.Now())
 
 		coverImageURL := GetReleaseCoverImageURL(entry.Images)
 

@@ -128,8 +128,8 @@ paths:
         updates and reload the iframe.
       parameters:
       - description: Filter movies get from Radarr. Can be 'inCinemas', 'physical',
-          or 'digital'. Defaults to 'inCinemas'
-        example: physical
+          'digital', or multiple separated by comma. Defaults to 'inCinemas,physical,digital'
+        example: inCinemas,digital
         in: query
         name: radarrReleaseType
         type: string
@@ -383,8 +383,8 @@ paths:
         required: true
         type: string
       - description: Filter movies get from Radarr. Can be 'inCinemas', 'physical',
-          or 'digital'. Defaults to 'inCinemas'
-        example: physical
+          'digital', or multiple separated by comma. Defaults to 'inCinemas,physical,digital'
+        example: inCinemas,digital
         in: query
         name: radarrReleaseType
         type: string

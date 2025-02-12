@@ -173,8 +173,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "example": "physical",
-                        "description": "Filter movies get from Radarr. Can be 'inCinemas', 'physical', or 'digital'. Defaults to 'inCinemas'",
+                        "example": "inCinemas,digital",
+                        "description": "Filter movies get from Radarr. Can be 'inCinemas', 'physical', 'digital', or multiple separated by comma. Defaults to 'inCinemas,physical,digital'",
                         "name": "radarrReleaseType",
                         "in": "query"
                     },
@@ -493,8 +493,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "example": "physical",
-                        "description": "Filter movies get from Radarr. Can be 'inCinemas', 'physical', or 'digital'. Defaults to 'inCinemas'",
+                        "example": "inCinemas,digital",
+                        "description": "Filter movies get from Radarr. Can be 'inCinemas', 'physical', 'digital', or multiple separated by comma. Defaults to 'inCinemas,physical,digital'",
                         "name": "radarrReleaseType",
                         "in": "query"
                     },

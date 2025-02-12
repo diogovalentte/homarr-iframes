@@ -56,11 +56,11 @@ func (r *Radarr) Init() error {
 // To get the calendar of a specific day, set the startDate and endDate to the same day.
 // To get the calendar of a specific week, set the startDate to the first day of the week and endDate to the last day of the week.
 // It considers only the date, not the time, so it'll get all releases that are released on that day.
-func (r *Radarr) GetCalendar(unmonitored bool, startDate, endDate time.Time) ([]*getRadarrCalendarEntryResponse, error) {
+func (r *Radarr) GetCalendar(unmonitored bool, startDate, endDate time.Time) ([]*GetRadarrCalendarEntryResponse, error) {
 	startDate = time.Date(startDate.Year(), startDate.Month(), startDate.Day(), 0, 0, 0, 0, startDate.Location())
 	endDate = time.Date(endDate.Year(), endDate.Month(), endDate.Day(), 23, 59, 59, int(time.Second-time.Nanosecond), endDate.Location())
 
-	var entries []*getRadarrCalendarEntryResponse
+	var entries []*GetRadarrCalendarEntryResponse
 	err := baseRequest("GET", fmt.Sprintf("%s/api/v3/calendar?start=%s&end=%s&unmonitored=%v&includeSeries=true", r.InternalAddress, startDate.Format("2006-01-02"), endDate.Format("2006-01-02"), unmonitored), nil, &entries)
 	if err != nil {
 		return nil, err
@@ -69,7 +69,7 @@ func (r *Radarr) GetCalendar(unmonitored bool, startDate, endDate time.Time) ([]
 	return entries, nil
 }
 
-type getRadarrCalendarEntryResponse struct {
+type GetRadarrCalendarEntryResponse struct {
 	OriginalTitle   string                         `json:"originalTitle"`
 	TitleSlug       string                         `json:"titleSlug"`
 	InCinemas       string                         `json:"inCinemas"`
