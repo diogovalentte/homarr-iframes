@@ -29,7 +29,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestGetCalendar(t *testing.T) {
-	_, err := getCalendar("release", false)
+	_, err := getCalendar(false, true, true, true)
 	if err != nil {
 		t.Fatalf("error getting calendar: %v", err)
 	}
