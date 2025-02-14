@@ -50,6 +50,9 @@ func getRadarrCalendar(unmonitored bool, startDate, endDate time.Time, inCinemas
 		return nil, fmt.Errorf("couldn't get Radarr calendar: %s", err.Error())
 	}
 
+	startDate = time.Date(startDate.Year(), startDate.Month(), startDate.Day(), 0, 0, 0, 0, startDate.Location())
+	endDate = time.Date(endDate.Year(), endDate.Month(), endDate.Day(), 23, 59, 59, int(time.Second-time.Nanosecond), endDate.Location())
+
 	calendar := &Calendar{}
 
 	for _, entry := range entries {
@@ -67,11 +70,11 @@ func getRadarrCalendar(unmonitored bool, startDate, endDate time.Time, inCinemas
 			}
 		}
 		if !found && digital && entry.DigitalRelease != "" {
-			digitalReleaseDate, err := time.Parse(time.RFC3339, entry.DigitalRelease)
+			releaseDate, err := time.Parse(time.RFC3339, entry.DigitalRelease)
 			if err != nil {
 				return nil, fmt.Errorf("error parsing movie '%#v' digital release date: %w", entry, err)
 			}
-			releaseDate = digitalReleaseDate.In(time.Local)
+			releaseDate = releaseDate.In(time.Local)
 			if IsReleaseDateWithinDateRange(releaseDate, startDate, endDate) {
 				found = true
 			}
