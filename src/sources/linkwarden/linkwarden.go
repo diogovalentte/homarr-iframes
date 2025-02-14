@@ -149,6 +149,7 @@ func (l *Linkwarden) getLinksiFrame(links []*Link, theme, backgroundImgURL, back
     <meta name="referrer" content="no-referrer"> <!-- If not set, can't load some images when behind a domain or reverse proxy -->
     <meta name="color-scheme" content="{{ .Theme }}">
     <script src="https://kit.fontawesome.com/3f763b063a.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
     <title>Linkwarden iFrame</title>
     <style>
       ::-webkit-scrollbar {
@@ -307,7 +308,11 @@ func (l *Linkwarden) getLinksiFrame(links []*Link, theme, backgroundImgURL, back
             <div>
                 <span style="margin-right: 7px;" class="info-label"><i class="fa-solid fa-calendar-days"></i> {{ .CreatedAt.Format "Jan 2, 2006" }}</span>
                 {{ if .CollectionID }}
-                    <i style="color: {{ .Collection.Color }};" class="fa-solid fa-folder-closed"></i> <a href="{{ with . }}{{ $.LinkwardenAddress }}{{ end }}/collections/{{ .CollectionID }}" target="_blank" class="info-label">{{ .Collection.Name }}</a>
+                    {{ if .Collection.Icon }}
+                        <i style="color: {{ .Collection.Color }}; font-size: 18px; vertical-align: text-top;" class="ph{{ if ne .Collection.IconWeight "regular" }}-{{ .Collection.IconWeight }}{{ end }} ph-{{ lowerString .Collection.Icon }}"></i> <a href="{{ with . }}{{ $.LinkwardenAddress }}{{ end }}/collections/{{ .CollectionID }}" target="_blank" class="info-label">{{ .Collection.Name }}</a>
+                    {{ else }}
+                        <i style="color: {{ .Collection.Color }};" class="fa-solid fa-folder-closed"></i> <a href="{{ with . }}{{ $.LinkwardenAddress }}{{ end }}/collections/{{ .CollectionID }}" target="_blank" class="info-label">{{ .Collection.Name }}</a>
+                    {{ end }}
                 {{ end }}
             </div>
         </div>
@@ -340,7 +345,11 @@ func (l *Linkwarden) getLinksiFrame(links []*Link, theme, backgroundImgURL, back
 		CollectionID:                  collectionID,
 	}
 
-	tmpl := template.Must(template.New("links").Parse(html))
+	templateFuncs := template.FuncMap{
+		"lowerString": strings.ToLower,
+	}
+
+	tmpl := template.Must(template.New("links").Funcs(templateFuncs).Parse(html))
 
 	var buf bytes.Buffer
 	err := tmpl.Execute(&buf, templateData)

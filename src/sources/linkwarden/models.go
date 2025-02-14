@@ -19,6 +19,8 @@ type Link struct {
 
 // Collection represents a Linkwarden collection
 type Collection struct {
-	Name  string `json:"name"`
-	Color string `json:"color"`
+	Name       string `json:"name"`
+	Color      string `json:"color"`
+	Icon       string `json:"icon"`
+	IconWeight string `json:"iconWeight"`
 }
