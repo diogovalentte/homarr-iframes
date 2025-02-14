@@ -77,7 +77,7 @@ func getRadarrCalendar(unmonitored bool, startDate, endDate time.Time, inCinemas
 			}
 		}
 		if !found && physical && entry.PhysicalRelease != "" {
-			releaseDate, err = time.Parse(time.RFC3339, entry.InCinemas)
+			releaseDate, err = time.Parse(time.RFC3339, entry.PhysicalRelease)
 			if err != nil {
 				return nil, fmt.Errorf("error parsing movie '%#v' physical release date: %w", entry, err)
 			}
