@@ -13,7 +13,6 @@ import (
 
 	"github.com/diogovalentte/homarr-iframes/src/config"
 	"github.com/diogovalentte/homarr-iframes/src/sources"
-	"github.com/diogovalentte/homarr-iframes/src/sources/radarr"
 )
 
 // GetiFrame returns an HTML/CSS code to be used as an iFrame
@@ -216,6 +215,7 @@ func getMediaReleasesiFrame(calendar *Calendar, theme, apiURL string, showUnmoni
             font-weight: 600;
             font-size: 1rem;
             line-height: 1.5rem;
+            color: #99b6bb;
 
             margin-right: 7px;
         }
@@ -306,7 +306,7 @@ func getMediaReleasesiFrame(calendar *Calendar, theme, apiURL string, showUnmoni
         <div class="background-image" style="background-image: url('{{ .CoverImageURL }}');"></div>
         <img
             class="release-cover"
-            src="{{ .CoverImageURL }}"
+            src="{{ .PosterImageURL }}"
             alt="Media Release Poster"
         />
 
@@ -321,22 +321,34 @@ func getMediaReleasesiFrame(calendar *Calendar, theme, apiURL string, showUnmoni
                 </div>
             {{ else if eq .Source "Radarr" }}
                 <a href="{{ with . }}{{ $.RadarrAddress }}{{ end }}/movie/{{ .Slug }}" target="_blank" class="release-title">{{ .Title }}</a>
+            {{ else if eq .Source "Lidarr" }}
+                <a href="{{ with . }}{{ $.LidarrAddress }}{{ end }}/album/{{ .Slug }}" target="_blank" class="release-title">{{ .Title }}</a>
+                <div class="more-info-container">
+                    <span class="info-label"><i class="fa-solid fa-compact-disc"></i> {{ .AlbumType }}</span>
+                    <span class="info-label"><i class="fa-solid fa-user"></i> <a href="{{ with . }}{{ $.LidarrAddress }}{{ end }}/artist/{{ .ArtistDetails.Slug }}" target="_blank" class="info-label">{{ .ArtistDetails.ArtistName }}</a></span>
+                </div>
             {{ end }}
         </div>
 
         <div class="source-info-container">
             <p class="source-label" style="color: {{ getSourceColor .Source }};">{{ .Source }}</p>
-            <div>
-                {{ if .IsDownloaded }}
-                    <p class="status-label" style="color: white; background-color: green;">Downloaded</p>
-                {{ else }}
-                    {{ if .ShouldBeDownloaded }}
-                        <p class="status-label" style="color: white; background-color: red;">Not Downloaded</p>
+            {{ if ne .Source "Lidarr" }}
+                <div>
+                    {{ if .IsDownloaded }}
+                        <p class="status-label" style="color: white; background-color: green;">Downloaded</p>
                     {{ else }}
-                        <p class="status-label" style="color: white; background-color: #99b6bb;">Not Downloaded</p>
+                        {{ if .ShouldBeDownloaded }}
+                            <p class="status-label" style="color: white; background-color: red;">Not Downloaded</p>
+                        {{ else }}
+                            <p class="status-label" style="color: white; background-color: #99b6bb;">Not Downloaded</p>
+                        {{ end }}
                     {{ end }}
-                {{ end }}
-            </div>
+                </div>
+            {{ else }}
+                <div>
+                    <p class="status-label" style="color: white; background-color: {{ if eq .TrackFileCount .TotalTrackCount }}green{{ else }}red{{ end }};">{{ .TrackFileCount }}/{{ .TotalTrackCount }}</p>
+                </div>
+            {{ end }}
         </div>
     </div>
 {{ end }}
@@ -372,6 +384,7 @@ func getMediaReleasesiFrame(calendar *Calendar, theme, apiURL string, showUnmoni
 		ShowEpisodeHours:              showEpisodeHours,
 		SonarrAddress:                 strings.TrimSuffix(config.GlobalConfigs.Sonarr.Address, "/"),
 		RadarrAddress:                 strings.TrimSuffix(config.GlobalConfigs.Radarr.Address, "/"),
+		LidarrAddress:                 strings.TrimSuffix(config.GlobalConfigs.Lidarr.Address, "/"),
 		ScrollbarThumbBackgroundColor: scrollbarThumbBackgroundColor,
 		ScrollbarTrackBackgroundColor: scrollbarTrackBackgroundColor,
 	}
@@ -383,6 +396,8 @@ func getMediaReleasesiFrame(calendar *Calendar, theme, apiURL string, showUnmoni
 				return "#1c7ed6"
 			case "Radarr":
 				return "#f59f00"
+			case "Lidarr":
+				return "#009252"
 			default:
 				return "#99b6bb"
 			}
@@ -410,6 +425,7 @@ type iframeTemplateData struct {
 	APIRadarrReleaseType          string
 	SonarrAddress                 string
 	RadarrAddress                 string
+	LidarrAddress                 string
 	ScrollbarThumbBackgroundColor string
 	ScrollbarTrackBackgroundColor string
 	ShowEpisodeHours              bool
@@ -459,24 +475,4 @@ func GetHash(c *gin.Context) {
 	hash := sources.GetHash(*releases, time.Now().Format("2006-01-02"))
 
 	c.JSON(http.StatusOK, gin.H{"hash": fmt.Sprintf("%x", hash)})
-}
-
-func GetReleaseCoverImageURL(images []radarr.DefaultReleaseImagesResponse) string {
-	if len(images) == 0 {
-		return ""
-	}
-
-	for _, image := range images {
-		if image.CoverType == "poster" {
-			return image.RemoteURL
-		}
-	}
-
-	return images[0].RemoteURL
-}
-
-// IsReleaseDateWithinDateRange checks if it's within a given date range.
-// startDate is inclusive, endDate is exclusive.
-func IsReleaseDateWithinDateRange(releaseDate, startDate, endDate time.Time) bool {
-	return (releaseDate.After(startDate) || releaseDate.Equal(startDate)) && releaseDate.Before(endDate)
 }

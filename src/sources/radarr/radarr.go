@@ -81,6 +81,7 @@ type GetRadarrCalendarEntryResponse struct {
 
 type DefaultReleaseImagesResponse struct {
 	CoverType string `json:"coverType"`
+	URL       string `json:"url"`
 	RemoteURL string `json:"remoteUrl"`
 }
 

@@ -18,6 +18,7 @@ type Configs struct {
 	Overseerr               overseerrConfigs
 	Sonarr                  sonarrConfigs
 	Radarr                  radarrConfigs
+	Lidarr                  lidarrConfigs
 	Prowlarr                prowlarrConfigs
 	UptimeKumaConfigs       uptimeKumaConfigs
 	NetdataConfigs          netdataConfigs
@@ -56,6 +57,12 @@ type sonarrConfigs struct {
 }
 
 type radarrConfigs struct {
+	Address         string
+	InternalAddress string
+	APIKey          string
+}
+
+type lidarrConfigs struct {
 	Address         string
 	InternalAddress string
 	APIKey          string
@@ -153,6 +160,10 @@ func SetConfigs(filePath string) error {
 	GlobalConfigs.Radarr.InternalAddress = os.Getenv("INTERNAL_RADARR_ADDRESS")
 	GlobalConfigs.Radarr.APIKey = os.Getenv("RADARR_API_KEY")
 
+	GlobalConfigs.Lidarr.Address = os.Getenv("LIDARR_ADDRESS")
+	GlobalConfigs.Lidarr.InternalAddress = os.Getenv("INTERNAL_LIDARR_ADDRESS")
+	GlobalConfigs.Lidarr.APIKey = os.Getenv("LIDARR_API_KEY")
+
 	GlobalConfigs.Prowlarr.Address = os.Getenv("PROWLARR_ADDRESS")
 	GlobalConfigs.Prowlarr.InternalAddress = os.Getenv("INTERNAL_PROWLARR_ADDRESS")
 	GlobalConfigs.Prowlarr.APIKey = os.Getenv("PROWLARR_API_KEY")
@@ -171,7 +182,7 @@ func SetConfigs(filePath string) error {
 	GlobalConfigs.Pihole.Address = os.Getenv("PIHOLE_ADDRESS")
 	GlobalConfigs.Pihole.InternalAddress = os.Getenv("INTERNAL_PIHOLE_ADDRESS")
 	GlobalConfigs.Pihole.Token = os.Getenv("PIHOLE_TOKEN")
-    GlobalConfigs.Pihole.Password = os.Getenv("PIHOLE_PASSWORD")
+	GlobalConfigs.Pihole.Password = os.Getenv("PIHOLE_PASSWORD")
 
 	GlobalConfigs.Kavita.Address = os.Getenv("KAVITA_ADDRESS")
 	GlobalConfigs.Kavita.InternalAddress = os.Getenv("INTERNAL_KAVITA_ADDRESS")

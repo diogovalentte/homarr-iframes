@@ -18,14 +18,25 @@ type MediaRelease struct {
 	// Source is a string that can be:
 	// - Radarr
 	// - Sonarr
+	// - Lidarr
 	Source         string
+	PosterImageURL string
 	CoverImageURL  string
+	IsDownloaded   bool
+	// A media should be downloaded when the its release date is after now.
+	ShouldBeDownloaded bool
+	// Sonnar specific
 	EpisodeDetails struct {
 		EpisodeName   string
 		SeasonNumber  int
 		EpisodeNumber int
 	}
-	IsDownloaded bool
-	// A media should be downloaded when the its release date is after now.
-	ShouldBeDownloaded bool
+	// Lidarr specific
+	ArtistDetails struct {
+		ArtistName string
+		Slug       string
+	}
+	AlbumType       string
+	TrackFileCount  int
+	TotalTrackCount int
 }

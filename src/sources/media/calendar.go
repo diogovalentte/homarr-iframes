@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/diogovalentte/homarr-iframes/src/config"
+	"github.com/diogovalentte/homarr-iframes/src/sources/lidarr"
 	"github.com/diogovalentte/homarr-iframes/src/sources/radarr"
 	"github.com/diogovalentte/homarr-iframes/src/sources/sonarr"
 )
@@ -22,6 +23,15 @@ func getCalendar(unmonitored, inCinemas, physical, digital bool) (*Calendar, err
 			return nil, fmt.Errorf("couldn't create Radarr calendar: %s", err.Error())
 		}
 		calendar.Releases = append(calendar.Releases, radarrCalendar.Releases...)
+	}
+
+	if config.GlobalConfigs.Lidarr.Address != "" && config.GlobalConfigs.Lidarr.APIKey != "" {
+		isAnySourceValid = true
+		lidarrCalendar, err := getLidarrCalendar(unmonitored, startDate, endDate)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't create Lidarr calendar: %s", err.Error())
+		}
+		calendar.Releases = append(calendar.Releases, lidarrCalendar.Releases...)
 	}
 
 	if config.GlobalConfigs.Sonarr.Address != "" && config.GlobalConfigs.Sonarr.APIKey != "" {
@@ -101,7 +111,7 @@ func getRadarrCalendar(unmonitored bool, startDate, endDate time.Time, inCinemas
 			shouldBeDownloaded = digitalReleaseDate.Before(time.Now()) && !digitalReleaseDate.IsZero()
 		}
 
-		coverImageURL := GetReleaseCoverImageURL(entry.Images)
+		posterImageURL, coverImageURL := GetReleaseImagesURL(entry.Images)
 
 		calendar.Releases = append(calendar.Releases, MediaRelease{
 			Title:              entry.OriginalTitle,
@@ -109,6 +119,7 @@ func getRadarrCalendar(unmonitored bool, startDate, endDate time.Time, inCinemas
 			ReleaseDate:        releaseDate,
 			Slug:               entry.TitleSlug,
 			CoverImageURL:      coverImageURL,
+			PosterImageURL:     posterImageURL,
 			IsDownloaded:       entry.HasFile,
 			ShouldBeDownloaded: shouldBeDownloaded,
 		})
@@ -130,7 +141,7 @@ func getSonarrCalendar(unmonitored bool, startDate, endDate time.Time) (*Calenda
 	calendar := &Calendar{}
 
 	for _, entry := range entries {
-		coverImageURL := GetReleaseCoverImageURL(entry.Series.Images)
+		posterImageURL, coverImageURL := GetReleaseImagesURL(entry.Series.Images)
 		airDate, err := time.Parse(time.RFC3339, entry.AirDateUTC)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing episode '%#v' air date: %w", entry, err)
@@ -145,6 +156,7 @@ func getSonarrCalendar(unmonitored bool, startDate, endDate time.Time) (*Calenda
 			ReleaseDate:        airDate,
 			Slug:               entry.Series.TitleSlug,
 			CoverImageURL:      coverImageURL,
+			PosterImageURL:     posterImageURL,
 			IsDownloaded:       entry.HasFile,
 			ShouldBeDownloaded: shouldBeDownloaded,
 			EpisodeDetails: struct {
@@ -160,4 +172,98 @@ func getSonarrCalendar(unmonitored bool, startDate, endDate time.Time) (*Calenda
 	}
 
 	return calendar, nil
+}
+
+func getLidarrCalendar(unmonitored bool, startDate, endDate time.Time) (*Calendar, error) {
+	lidarr, err := lidarr.New()
+	if err != nil {
+		return nil, fmt.Errorf("couldn't create Lidarr client: %s", err.Error())
+	}
+	entries, err := lidarr.GetCalendar(unmonitored, startDate, endDate)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't get Lidarr calendar: %s", err.Error())
+	}
+
+	calendar := &Calendar{}
+
+	for _, entry := range entries {
+		posterImageURL, coverImageURL := GetReleaseImagesURL(entry.Images)
+		if posterImageURL == "" {
+			posterImageURL, coverImageURL = GetReleaseImagesURL(entry.Artist.Images)
+		}
+		airDate, err := time.Parse(time.RFC3339, entry.ReleaseDate)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing album '%#v' release date: %w", entry, err)
+		}
+		airDate = airDate.In(time.Local)
+
+		calendar.Releases = append(calendar.Releases, MediaRelease{
+			Title:          entry.Title,
+			Source:         "Lidarr",
+			ReleaseDate:    airDate,
+			Slug:           entry.ForeignAlbumID,
+			CoverImageURL:  coverImageURL,
+			PosterImageURL: posterImageURL,
+			IsDownloaded:   false,
+			ArtistDetails: struct {
+				ArtistName string
+				Slug       string
+			}{
+				ArtistName: entry.Artist.ArtistName,
+				Slug:       entry.Artist.ForeignArtistID,
+			},
+			AlbumType:       entry.AlbumType,
+			TrackFileCount:  entry.Statistics.TrackFileCount,
+			TotalTrackCount: entry.Statistics.TotalTrackCount,
+		})
+	}
+
+	return calendar, nil
+}
+
+func GetReleaseImagesURL(images []radarr.DefaultReleaseImagesResponse) (string, string) {
+	if len(images) == 0 {
+		return "", ""
+	}
+
+	var posterURL, coverURL string
+	for _, image := range images {
+		if image.CoverType == "poster" {
+			if image.RemoteURL != "" {
+				posterURL = image.RemoteURL
+			} else {
+				posterURL = image.URL
+			}
+		} else if image.CoverType == "banner" {
+			if image.RemoteURL != "" {
+				coverURL = image.RemoteURL
+			} else {
+				coverURL = image.URL
+			}
+		} else if image.CoverType == "cover" {
+			if image.RemoteURL != "" {
+				coverURL = image.RemoteURL
+			} else {
+				coverURL = image.URL
+			}
+		}
+	}
+
+	if posterURL == "" && coverURL == "" {
+		if images[0].RemoteURL != "" {
+			posterURL, coverURL = images[0].RemoteURL, images[0].RemoteURL
+		}
+	} else if coverURL == "" {
+		coverURL = posterURL
+	} else if posterURL == "" {
+		posterURL = coverURL
+	}
+
+	return posterURL, coverURL
+}
+
+// IsReleaseDateWithinDateRange checks if it's within a given date range.
+// startDate is inclusive, endDate is exclusive.
+func IsReleaseDateWithinDateRange(releaseDate, startDate, endDate time.Time) bool {
+	return (releaseDate.After(startDate) || releaseDate.Equal(startDate)) && releaseDate.Before(endDate)
 }
