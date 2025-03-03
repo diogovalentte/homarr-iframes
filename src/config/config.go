@@ -87,7 +87,8 @@ type speedTestTrackerConfigs struct {
 type piholeConfigs struct {
 	Address         string
 	InternalAddress string
-	Token           string
+	Token           string // <v6.0
+	Password        string
 }
 
 type kavitaConfigs struct {
@@ -170,6 +171,7 @@ func SetConfigs(filePath string) error {
 	GlobalConfigs.Pihole.Address = os.Getenv("PIHOLE_ADDRESS")
 	GlobalConfigs.Pihole.InternalAddress = os.Getenv("INTERNAL_PIHOLE_ADDRESS")
 	GlobalConfigs.Pihole.Token = os.Getenv("PIHOLE_TOKEN")
+    GlobalConfigs.Pihole.Password = os.Getenv("PIHOLE_PASSWORD")
 
 	GlobalConfigs.Kavita.Address = os.Getenv("KAVITA_ADDRESS")
 	GlobalConfigs.Kavita.InternalAddress = os.Getenv("INTERNAL_KAVITA_ADDRESS")

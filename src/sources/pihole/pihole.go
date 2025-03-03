@@ -3,6 +3,7 @@ package pihole
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/diogovalentte/homarr-iframes/src/config"
 )
@@ -15,7 +16,10 @@ var (
 type Pihole struct {
 	Address         string
 	InternalAddress string
-	Token           string
+	Token           string // <v6.0
+	SID             string
+	Password        string
+	ValidityTime    time.Time
 }
 
 func New() (*Pihole, error) {
@@ -35,9 +39,9 @@ func New() (*Pihole, error) {
 }
 
 func (p *Pihole) Init() error {
-	address, internalAddress, APIToken := config.GlobalConfigs.Pihole.Address, config.GlobalConfigs.Pihole.InternalAddress, config.GlobalConfigs.Pihole.Token
-	if address == "" || APIToken == "" {
-		return fmt.Errorf("PIHOLE_ADDRESS and PIHOLE_TOKEN variables should be set")
+	address, internalAddress, APIToken, APIPassword := config.GlobalConfigs.Pihole.Address, config.GlobalConfigs.Pihole.InternalAddress, config.GlobalConfigs.Pihole.Token, config.GlobalConfigs.Pihole.Password
+	if address == "" || (APIToken == "" && APIPassword == "") {
+		return fmt.Errorf("PIHOLE_ADDRESS and PIHOLE_TOKEN or PIHOLE_PASSWORD variables should be set")
 	}
 
 	p.Address = strings.TrimSuffix(address, "/")
@@ -46,7 +50,16 @@ func (p *Pihole) Init() error {
 	} else {
 		p.InternalAddress = strings.TrimSuffix(internalAddress, "/")
 	}
-	p.Token = APIToken
+
+	if APIToken != "" {
+		p.Token = APIToken
+	} else {
+		p.Password = APIPassword
+		err := p.Login()
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
@@ -54,7 +67,13 @@ func (p *Pihole) Init() error {
 // GetMessages gets the messages that appear in the "Pi-hole diagnostic" page
 func (p *Pihole) GetMessages() (*Messages, error) {
 	var messages Messages
-	err := baseRequest("GET", fmt.Sprintf("%s/admin/api_db.php?messages&auth=%s", p.InternalAddress, p.Token), nil, &messages)
+	var url string
+	if p.Token != "" {
+		url = fmt.Sprintf("%s/admin/api.php?messages?auth=%s", p.InternalAddress, p.Token)
+	} else {
+		url = fmt.Sprintf("%s/api/info/messages", p.InternalAddress)
+	}
+	err := p.baseRequest("GET", url, nil, &messages)
 	if err != nil {
 		return nil, err
 	}
@@ -67,9 +86,8 @@ type Messages struct {
 }
 
 type Message struct {
-	Blob1     interface{} `json:"blob1"`
-	Blob2     interface{} `json:"blob2"`
-	Type      string      `json:"type"`
-	Message   string      `json:"message"`
-	Timestamp int64       `json:"timestamp"`
+	Type      string `json:"type"`
+	Plain     string `json:"plain"`
+	HTML      string `json:"html"`
+	Timestamp int64  `json:"timestamp"`
 }

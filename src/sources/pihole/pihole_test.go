@@ -38,3 +38,21 @@ func TestGetMessages(t *testing.T) {
 		t.Fatalf("error getting messages: %v", err)
 	}
 }
+
+func TestLogin(t *testing.T) {
+	_, err := New()
+	if err != nil {
+		t.Fatalf("error creating Pi-hole instance: %v", err)
+	}
+}
+
+func TestLogout(t *testing.T) {
+	p, err := New()
+	if err != nil {
+		t.Fatalf("error creating Pi-hole instance: %v", err)
+	}
+	err = p.Logout()
+	if err != nil {
+		t.Fatalf("error logging out: %v", err)
+	}
+}

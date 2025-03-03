@@ -315,14 +315,18 @@ func getPiholeAlarms() ([]Alarm, error) {
 
 	var alarms []Alarm
 	for _, message := range messages.Messages {
-		summary := fmt.Sprintf("%s | %v | %v", message.Message, message.Blob1, message.Blob2)
 		timestamp := time.Unix(message.Timestamp, 0)
-		url := p.Address + "/admin/messages.php"
+		var url string
+		if p.Token != "" {
+			url = p.Address + "/admin/messages.php"
+		} else {
+			url = p.Address + "/admin/messages"
+		}
 		alarms = append(alarms, Alarm{
 			Source:            "Pi-hole",
 			BackgroundImgURL:  pihole.BackgroundImgURL,
 			BackgroundImgSize: 80,
-			Summary:           summary,
+			Summary:           message.Plain,
 			Property:          message.Type,
 			Time:              timestamp,
 			URL:               url,
