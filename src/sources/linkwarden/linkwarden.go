@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/gin-gonic/gin"
 
@@ -309,7 +310,7 @@ func (l *Linkwarden) getLinksiFrame(links []*Link, theme, backgroundImgURL, back
                 <span style="margin-right: 7px;" class="info-label"><i class="fa-solid fa-calendar-days"></i> {{ .CreatedAt.Format "Jan 2, 2006" }}</span>
                 {{ if .CollectionID }}
                     {{ if .Collection.Icon }}
-                        <i style="color: {{ .Collection.Color }}; font-size: 18px; vertical-align: text-top;" class="ph{{ if ne .Collection.IconWeight "regular" }}-{{ .Collection.IconWeight }}{{ end }} ph-{{ lowerString .Collection.Icon }}"></i> <a href="{{ with . }}{{ $.LinkwardenAddress }}{{ end }}/collections/{{ .CollectionID }}" target="_blank" class="info-label">{{ .Collection.Name }}</a>
+                        <i style="color: {{ .Collection.Color }}; font-size: 18px; vertical-align: text-top;" class="ph{{ if ne .Collection.IconWeight "regular" }}-{{ .Collection.IconWeight }}{{ end }} ph-{{ getCollectionIcon .Collection.Icon }}"></i> <a href="{{ with . }}{{ $.LinkwardenAddress }}{{ end }}/collections/{{ .CollectionID }}" target="_blank" class="info-label">{{ .Collection.Name }}</a>
                     {{ else }}
                         <i style="color: {{ .Collection.Color }};" class="fa-solid fa-folder-closed"></i> <a href="{{ with . }}{{ $.LinkwardenAddress }}{{ end }}/collections/{{ .CollectionID }}" target="_blank" class="info-label">{{ .Collection.Name }}</a>
                     {{ end }}
@@ -346,7 +347,28 @@ func (l *Linkwarden) getLinksiFrame(links []*Link, theme, backgroundImgURL, back
 	}
 
 	templateFuncs := template.FuncMap{
-		"lowerString": strings.ToLower,
+		// Convert uppercase letter to lowercase and add a dash before it,
+		// except for the first letter
+		"getCollectionIcon": func(icon string) string {
+			var builder strings.Builder
+			first := true
+
+			for _, r := range icon {
+				if unicode.IsUpper(r) {
+					if first {
+						builder.WriteRune(unicode.ToLower(r))
+					} else {
+						builder.WriteRune('-')
+						builder.WriteRune(unicode.ToLower(r))
+					}
+				} else {
+					builder.WriteRune(r)
+				}
+				first = false
+
+			}
+			return builder.String()
+		},
 	}
 
 	tmpl := template.Must(template.New("links").Funcs(templateFuncs).Parse(html))
