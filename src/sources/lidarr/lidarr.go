@@ -11,7 +11,7 @@ import (
 
 var (
 	l                  *Lidarr
-	BackgroundImageURL = "https://avatars.githubusercontent.com/u/25025331"
+	BackgroundImageURL = "https://avatars.githubusercontent.com/u/28475832"
 )
 
 type Lidarr struct {

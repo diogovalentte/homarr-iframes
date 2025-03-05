@@ -10,6 +10,7 @@ import (
 	"github.com/diogovalentte/homarr-iframes/src/sources/changedetectionio"
 	"github.com/diogovalentte/homarr-iframes/src/sources/kaizoku"
 	"github.com/diogovalentte/homarr-iframes/src/sources/kavita"
+	"github.com/diogovalentte/homarr-iframes/src/sources/lidarr"
 	"github.com/diogovalentte/homarr-iframes/src/sources/netdata"
 	"github.com/diogovalentte/homarr-iframes/src/sources/pihole"
 	"github.com/diogovalentte/homarr-iframes/src/sources/prowlarr"
@@ -18,7 +19,7 @@ import (
 	speedtesttracker "github.com/diogovalentte/homarr-iframes/src/sources/speedtest-tracker"
 )
 
-var validAlarmNames = []string{"netdata", "prowlarr", "sonarr", "radarr", "speedtest-tracker", "pihole", "kavita", "kaizoku", "changedetectionio"}
+var validAlarmNames = []string{"netdata", "prowlarr", "sonarr", "radarr", "lidarr", "speedtest-tracker", "pihole", "kavita", "kaizoku", "changedetectionio"}
 
 func (a *Alarms) GetAlarms(alarmNames []string, limit int, desc, changedetectionioShowViewed bool) ([]Alarm, error) {
 	if limit == 0 {
@@ -47,6 +48,12 @@ func (a *Alarms) GetAlarms(alarmNames []string, limit int, desc, changedetection
 				return nil, fmt.Errorf("failed to get Radarr alarms: %w", err)
 			}
 			alarms = append(alarms, radarrAlarms...)
+		case "lidarr":
+			lidarrAlarms, err := getLidarrAlarms()
+			if err != nil {
+				return nil, fmt.Errorf("failed to get Lidarr alarms: %w", err)
+			}
+			alarms = append(alarms, lidarrAlarms...)
 		case "sonarr":
 			sonarrAlarms, err := getSonarrAlarms()
 			if err != nil {
@@ -153,6 +160,37 @@ func getRadarrAlarms() ([]Alarm, error) {
 		alarms = append(alarms, Alarm{
 			Source:            "Radarr",
 			BackgroundImgURL:  radarr.BackgroundImageURL,
+			BackgroundImgSize: 120,
+			Summary:           alarm.Message,
+			URL:               url,
+			Status:            strings.ToUpper(alarm.Type),
+			Property:          alarm.Source,
+		})
+	}
+
+	return alarms, nil
+}
+
+func getLidarrAlarms() ([]Alarm, error) {
+	l, err := lidarr.New()
+	if err != nil {
+		return nil, err
+	}
+
+	lidarrAlarms, err := l.GetHealth()
+	if err != nil {
+		return nil, err
+	}
+
+	var alarms []Alarm
+	for _, alarm := range lidarrAlarms {
+		url := fmt.Sprintf("%s/system/status", l.Address)
+		if alarm.WikiURL != "" {
+			url = alarm.WikiURL
+		}
+		alarms = append(alarms, Alarm{
+			Source:            "Lidarr",
+			BackgroundImgURL:  lidarr.BackgroundImageURL,
 			BackgroundImgSize: 120,
 			Summary:           alarm.Message,
 			URL:               url,

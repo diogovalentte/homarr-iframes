@@ -124,9 +124,9 @@ Shows [Netdata](https://github.com/netdata/netdata) alerts, such as high RAM/CPU
 - `INTERNAL_NETDATA_ADDRESS`: your Netdata instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `NETDATA_TOKEN`: an access token used to access your Netdata instance API to get your alarms. See how to get it [here](https://learn.netdata.cloud/docs/netdata-cloud/authentication-&-authorization/api-tokens).
 
-## Radarr, Sonarr, and Prowlarr
+## Radarr, Sonarr, Lidarr, and Prowlarr
 
-Shows health messages from your [Sonarr](https://github.com/Sonarr/Sonarr), [Radarr](https://github.com/Radarr/Radarr), and [Prowlarr](https://github.com/Prowlarr/Prowlarr) instances, like when an index fails or Sonarr can't connect to a download client.
+Shows health messages from your [Sonarr](https://github.com/Sonarr/Sonarr), [Radarr](https://github.com/Radarr/Radarr), [Lidarr](https://github.com/Lidarr/Lidarr), and [Prowlarr](https://github.com/Prowlarr/Prowlarr) instances, like when an index fails or Sonarr can't connect to a download client.
 
 - `SONARR_ADDRESS`: your Sonarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `INTERNAL_SONARR_ADDRESS`: your Sonarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
@@ -135,6 +135,10 @@ Shows health messages from your [Sonarr](https://github.com/Sonarr/Sonarr), [Rad
 - `RADARR_ADDRESS`: your Radarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `INTERNAL_RADARR_ADDRESS`: your Radarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `RADARR_API_KEY`: an access API key used to access your Radarr instance API to get your media. You can get it by going to **Settings -> General -> API Key**.
+
+- `LIDARR_ADDRESS`: your Lidarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+- `INTERNAL_LIDARR_ADDRESS`: your Lidarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+- `LIDARR_API_KEY`: an access API key used to access your Lidarr instance API to get your media. You can get it by going to **Settings -> General -> API Key**.
 
 - `PROWLARR_ADDRESS`: your Prowlarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `INTERNAL_PROWLARR_ADDRESS`: your Prowlarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.

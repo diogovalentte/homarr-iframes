@@ -139,7 +139,7 @@ func OverseerriFrameHandler(c *gin.Context) {
 }
 
 // @Summary Media Releases
-// @Description Returns an iFrame with the media releases of today. The media releases are from Radarr/Sonarr.
+// @Description Returns an iFrame with the media releases of today. The media releases are from Radarr/Sonarr/Lidarr.
 // @Success 200 {string} string "HTML content"
 // @Produce html
 // @Param theme query string false "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white" Example(light)
@@ -194,7 +194,7 @@ func UptimeKumaiFrameHandler(c *gin.Context) {
 // @Param theme query string false "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white" Example(light)
 // @Param api_url query string true "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload." Example(https://sub.domain.com)
 // @Param limit query int false "Limits the number of items in the iFrame." Example(5)
-// @Param alarms query string true "Alarms to show. Available values: netdata, radarr, sonarr, prowlarr, speedtest-tracker, pihole, kavita, kaizoku, changedetectionio" Example(netdata,radarr,sonarr)
+// @Param alarms query string true "Alarms to show. Available values: netdata, radarr, lidarr, sonarr, prowlarr, speedtest-tracker, pihole, kavita, kaizoku, changedetectionio" Example(netdata,radarr,sonarr)
 // @Param sort_desc query bool false "Sort alarms in descending order. Defaults to false." Example(false)
 // @Param changedetectionio_show_viewed query bool false "Show viewed alarms from changedetection.io. Defaults to true." Example(false)
 // @Router /iframe/alarms [get]

@@ -67,7 +67,7 @@ func TestGetHashes(t *testing.T) {
 		}
 	})
 	t.Run("Get Alarms hash", func(t *testing.T) {
-		r, err := requestHelper(http.MethodGet, "/v1/hash/alarms?alarms=sonarr,radarr,prowlarr,kavita,pihole,speedtest-tracker,netdata,changedetectionio,kaizoku", nil)
+		r, err := requestHelper(http.MethodGet, "/v1/hash/alarms?alarms=sonarr,radarr,lidarr,prowlarr,kavita,pihole,speedtest-tracker,netdata,changedetectionio,kaizoku", nil)
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -31,7 +31,7 @@ func TestMain(m *testing.M) {
 func TestGetAlarms(t *testing.T) {
 	alarms := Alarms{}
 	t.Run("get alarms", func(t *testing.T) {
-		_, err := alarms.GetAlarms([]string{"netdata", "prowlarr", "radarr", "sonarr", "speedtest-tracker"}, -1, false, true)
+		_, err := alarms.GetAlarms([]string{"netdata", "prowlarr", "radarr", "lidarr", "sonarr", "speedtest-tracker", "kavita", "pihole", "changedetectionio", "kaizoku"}, -1, false, true)
 		if err != nil {
 			t.Fatal(err)
 		}

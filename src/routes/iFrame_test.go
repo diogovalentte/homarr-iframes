@@ -104,7 +104,7 @@ func TestGetIFrames(t *testing.T) {
 		}
 	})
 	t.Run("Get Alarms iFrame", func(t *testing.T) {
-		r, err := requestHelper(http.MethodGet, "/v1/iframe/alarms?alarms=sonarr,radarr,prowlarr,kavita,pihole,speedtest-tracker,netdata,changedetectionio,kaizoku", nil)
+		r, err := requestHelper(http.MethodGet, "/v1/iframe/alarms?alarms=sonarr,radarr,lidarr,prowlarr,kavita,pihole,speedtest-tracker,netdata,changedetectionio,kaizoku", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
