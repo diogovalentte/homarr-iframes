@@ -302,6 +302,7 @@ func getSpeedTestTrackerAlarms() ([]Alarm, error) {
 	}
 
 	// threshold breached
+	alarms := []Alarm{}
 	if !test.Healthy {
 		layout := "2006-01-02 15:04:05"
 		updatedAt, err := time.Parse(layout, test.UpdatedAt)
@@ -311,33 +312,46 @@ func getSpeedTestTrackerAlarms() ([]Alarm, error) {
 
 		url := s.Address + "/admin/results"
 
-		var status, value string
 		if !test.Benchmarks.Download.Passed {
-			status = "DOWNLOAD"
-			value = test.DownloadBitsHuman
-		} else if !test.Benchmarks.Upload.Passed {
-			status = "UPLOAD"
-			value = test.UploadBitsHuman
-		} else if !test.Benchmarks.Ping.Passed {
-			status = "PING"
-			value = fmt.Sprintf("%s ms", test.Ping)
+			alarms = append(alarms, Alarm{
+				Time:            updatedAt,
+				Summary:         "Speedtest Threshold Breached",
+				URL:             url,
+				Status:          "DOWNLOAD",
+				Value:           test.DownloadBitsHuman,
+				Property:        test.Data.ISP,
+				Source:          "SpeedTest",
+				BackgroundColor: "black",
+			})
+		}
+		if !test.Benchmarks.Upload.Passed {
+			alarms = append(alarms, Alarm{
+				Time:            updatedAt,
+				Summary:         "Speedtest Threshold Breached",
+				URL:             url,
+				Status:          "UPLOAD",
+				Value:           test.UploadBitsHuman,
+				Property:        test.Data.ISP,
+				Source:          "SpeedTest",
+				BackgroundColor: "black",
+			})
+		}
+		if !test.Benchmarks.Ping.Passed {
+			alarms = append(alarms, Alarm{
+				Time:            updatedAt,
+				Summary:         "Speedtest Threshold Breached",
+				URL:             url,
+				Status:          "PING",
+				Value:           fmt.Sprintf("%s ms", test.Ping),
+				Property:        test.Data.ISP,
+				Source:          "SpeedTest",
+				BackgroundColor: "black",
+			})
 		}
 
-		alarms := []Alarm{{
-			Time:            updatedAt,
-			Summary:         "Speedtest Threshold Breached",
-			URL:             url,
-			Status:          status,
-			Value:           value,
-			Property:        test.Data.ISP,
-			Source:          "SpeedTest",
-			BackgroundColor: "black",
-		}}
-
-		return alarms, nil
 	}
 
-	return []Alarm{}, nil
+	return alarms, nil
 }
 
 func getPiholeAlarms() ([]Alarm, error) {
