@@ -73,7 +73,7 @@ func (p *Pihole) GetMessages() (*Messages, error) {
 	} else {
 		url = fmt.Sprintf("%s/api/info/messages", p.InternalAddress)
 	}
-	err := p.baseRequest("GET", url, nil, &messages)
+	err := p.baseRequest("GET", url, nil, &messages, 1)
 	if err != nil {
 		return nil, err
 	}

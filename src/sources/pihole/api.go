@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func (p *Pihole) baseRequest(method, url string, body io.Reader, target interface{}) error {
+func (p *Pihole) baseRequest(method, url string, body io.Reader, target any, unauthorizedRetries int) error {
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
@@ -40,7 +40,25 @@ func (p *Pihole) baseRequest(method, url string, body io.Reader, target interfac
 
 	resBody, err := io.ReadAll(resp.Body)
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("error: %s | %s", resp.Status, string(resBody))
+		var jsonErr struct {
+			Error struct {
+				Message string `json:"message"`
+			} `json:"error"`
+		}
+		if err := json.Unmarshal(resBody, &jsonErr); err == nil {
+			if jsonErr.Error.Message == "Unauthorized" && unauthorizedRetries > 0 {
+				err = p.Logout()
+				if err != nil {
+					return err
+				}
+				err = p.Login()
+				if err != nil {
+					return err
+				}
+				return p.baseRequest(method, url, body, target, unauthorizedRetries-1)
+			}
+		}
+		return fmt.Errorf("error: %s / Response body: %s", resp.Status, string(resBody))
 	}
 
 	if err != nil {
