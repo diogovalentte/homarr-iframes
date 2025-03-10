@@ -75,6 +75,7 @@ func (Cinemark) baseRequest(method, url string, body io.Reader, target interface
 	}
 
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Referer", "https://www.cinemark.com.br")
 
 	resp, err := client.Do(req)
 	if err != nil {
