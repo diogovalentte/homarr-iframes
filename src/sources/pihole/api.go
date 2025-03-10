@@ -128,7 +128,18 @@ func (p *Pihole) Logout() error {
 	}
 
 	if resp.StatusCode != http.StatusNoContent {
-		return fmt.Errorf("error: %s / Response body: %s", resp.Status, string(resBody))
+		var jsonErr struct {
+			Session struct {
+				Message string `json:"message"`
+			} `json:"session"`
+		}
+		if err := json.Unmarshal(resBody, &jsonErr); err == nil {
+			if jsonErr.Session.Message != "session unknown" {
+				return fmt.Errorf("error: %s / Response body: %s", resp.Status, string(resBody))
+			}
+		} else {
+			return fmt.Errorf("error: %s / Response body: %s", resp.Status, string(resBody))
+		}
 	}
 
 	p.SID = ""
