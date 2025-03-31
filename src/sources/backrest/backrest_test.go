@@ -1,4 +1,4 @@
-package alarms
+package backrest
 
 import (
 	"fmt"
@@ -28,12 +28,13 @@ func TestMain(m *testing.M) {
 	os.Exit(exitCode)
 }
 
-func TestGetAlarms(t *testing.T) {
-	alarms := Alarms{}
-	t.Run("get alarms", func(t *testing.T) {
-		_, err := alarms.GetAlarms([]string{"netdata", "prowlarr", "radarr", "lidarr", "sonarr", "speedtest-tracker", "kavita", "pihole", "changedetectionio", "kaizoku", "backrest"}, false, true)
-		if err != nil {
-			t.Fatal(err)
-		}
-	})
+func TestGetSummaryDashboard(t *testing.T) {
+	b, err := New()
+	if err != nil {
+		t.Fatalf("error creating Backrest instance: %v", err)
+	}
+	_, err = b.GetSummaryDashboard()
+	if err != nil {
+		t.Fatalf("error getting summary dashboard: %v", err)
+	}
 }

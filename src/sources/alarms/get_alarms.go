@@ -3,10 +3,12 @@ package alarms
 import (
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/diogovalentte/homarr-iframes/src/config"
+	"github.com/diogovalentte/homarr-iframes/src/sources/backrest"
 	"github.com/diogovalentte/homarr-iframes/src/sources/changedetectionio"
 	"github.com/diogovalentte/homarr-iframes/src/sources/kaizoku"
 	"github.com/diogovalentte/homarr-iframes/src/sources/kavita"
@@ -19,13 +21,9 @@ import (
 	speedtesttracker "github.com/diogovalentte/homarr-iframes/src/sources/speedtest-tracker"
 )
 
-var validAlarmNames = []string{"netdata", "prowlarr", "sonarr", "radarr", "lidarr", "speedtest-tracker", "pihole", "kavita", "kaizoku", "changedetectionio"}
+var validAlarmNames = []string{"netdata", "prowlarr", "sonarr", "radarr", "lidarr", "speedtest-tracker", "pihole", "kavita", "kaizoku", "changedetectionio", "backrest"}
 
-func (a *Alarms) GetAlarms(alarmNames []string, limit int, desc, changedetectionioShowViewed bool) ([]Alarm, error) {
-	if limit == 0 {
-		return []Alarm{}, nil
-	}
-
+func (a *Alarms) GetAlarms(alarmNames []string, desc, changedetectionioShowViewed bool) ([]Alarm, error) {
 	var alarms []Alarm
 
 	for _, alarmName := range alarmNames {
@@ -90,13 +88,15 @@ func (a *Alarms) GetAlarms(alarmNames []string, limit int, desc, changedetection
 				return nil, fmt.Errorf("failed to get ChangeDetection.io alarms: %w", err)
 			}
 			alarms = append(alarms, changedetectionioAlarms...)
+		case "backrest":
+			backrestAlarms, err := getBackrestAlarms()
+			if err != nil {
+				return nil, fmt.Errorf("failed to get Backrest alarms: %w", err)
+			}
+			alarms = append(alarms, backrestAlarms...)
 		default:
 			return nil, fmt.Errorf("invalid alarm name: %s", alarmName)
 		}
-	}
-
-	if len(alarms) > limit && limit > 0 {
-		alarms = alarms[:limit]
 	}
 
 	sortAlarms(alarms, desc)
@@ -526,6 +526,77 @@ func getChangedetectionioAlarms(showViewed bool) ([]Alarm, error) {
 				Status:            "CHANGED",
 				Value:             viewed,
 				Time:              lastChanged,
+			})
+		}
+	}
+
+	return alarms, nil
+}
+
+func getBackrestAlarms() ([]Alarm, error) {
+	b, err := backrest.New()
+	if err != nil {
+		return nil, err
+	}
+
+	summary, err := b.GetSummaryDashboard()
+	if err != nil {
+		return nil, err
+	}
+
+	var alarms []Alarm
+	for _, planSummary := range summary.PlanSummaries {
+		if planSummary.ID == "" {
+			planSummary.ID = "Unknown"
+		}
+
+		if planSummary.BackupsFailed30days == "0" {
+			continue
+		}
+
+		for i := range planSummary.RecentBackups.FlowID {
+			status := "Unknown"
+			switch planSummary.RecentBackups.Status[i] {
+			case "STATUS_SUCCESS":
+				continue
+			case "STATUS_WARNING":
+				status = "WARNING"
+			case "STATUS_ERROR":
+				status = "ERROR"
+			}
+
+			t, err := strconv.ParseInt(planSummary.RecentBackups.TimeStampMs[i], 10, 64)
+			if err != nil {
+				return nil, err
+			}
+			timestamp := time.UnixMilli(t)
+			timestamp = timestamp.In(time.Local)
+			last24Hours := time.Now().Add(-24 * time.Hour)
+			if timestamp.Before(last24Hours) {
+				continue
+			}
+
+			durationMilliseconds, err := strconv.ParseFloat(planSummary.RecentBackups.DurationMs[i], 64)
+			if err != nil {
+				return nil, err
+			}
+			durationFormated := "00:00:00 min"
+			if durationMilliseconds != 0 {
+				duration := time.Duration(durationMilliseconds) * time.Millisecond
+				hours := int(duration.Hours())
+				minutes := int(duration.Minutes())
+				seconds := int(duration.Seconds()) % 60
+				durationFormated = fmt.Sprintf("%02d:%02d:%02d min", hours, minutes, seconds)
+			}
+
+			alarms = append(alarms, Alarm{
+				Source:          "Backrest",
+				BackgroundColor: "black",
+				Summary:         fmt.Sprintf("Plan %s was not successful", planSummary.ID),
+				URL:             b.Address + "/#/plan/" + planSummary.ID,
+				Status:          status,
+				Property:        durationFormated,
+				Time:            timestamp,
 			})
 		}
 	}

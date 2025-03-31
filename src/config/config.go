@@ -28,6 +28,7 @@ type Configs struct {
 	Kaizoku                 kaizokuConfigs
 	Jellyseerr              jellyseerrConfigs
 	ChangeDetectionIO       changedetectionIOConfigs
+	Backrest                BackrestConfigs
 }
 
 type linkwardenConfigs struct {
@@ -123,6 +124,13 @@ type changedetectionIOConfigs struct {
 	ChangedLastHours int
 }
 
+type BackrestConfigs struct {
+	Address         string
+	InternalAddress string
+	Username        string
+	Password        string
+}
+
 func SetConfigs(filePath string) error {
 	GlobalConfigs = &Configs{}
 
@@ -204,6 +212,11 @@ func SetConfigs(filePath string) error {
 			return err
 		}
 	}
+
+	GlobalConfigs.Backrest.Address = os.Getenv("BACKREST_ADDRESS")
+	GlobalConfigs.Backrest.InternalAddress = os.Getenv("INTERNAL_BACKREST_ADDRESS")
+	GlobalConfigs.Backrest.Username = os.Getenv("BACKREST_USERNAME")
+	GlobalConfigs.Backrest.Password = os.Getenv("BACKREST_PASSWORD")
 
 	return nil
 }
