@@ -24,16 +24,9 @@ const docTemplate = `{
                 "summary": "Get the hash of the alarms",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "example": 5,
-                        "description": "Limits the number of items in the iFrame.",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
                         "type": "string",
                         "example": "netdata,radarr,sonarr",
-                        "description": "Alarms to show. Available values: netdata, radarr, sonarr, prowlarr, speedtest-tracker, pihole, kavita, kaizoku, changedetectionio",
+                        "description": "Alarms to show. Available values: netdata, radarr, lidarr, sonarr, prowlarr, speedtest-tracker, pihole, kavita, kaizoku, changedetectionio, backrest",
                         "name": "alarms",
                         "in": "query",
                         "required": true
@@ -311,16 +304,9 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "integer",
-                        "example": 5,
-                        "description": "Limits the number of items in the iFrame.",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
                         "type": "string",
                         "example": "netdata,radarr,sonarr",
-                        "description": "Alarms to show. Available values: netdata, radarr, sonarr, prowlarr, speedtest-tracker, pihole, kavita, kaizoku, changedetectionio",
+                        "description": "Alarms to show. Available values: netdata, radarr, lidarr, sonarr, prowlarr, speedtest-tracker, pihole, kavita, kaizoku, changedetectionio, backrest",
                         "name": "alarms",
                         "in": "query",
                         "required": true
@@ -470,7 +456,7 @@ const docTemplate = `{
         },
         "/iframe/media_releases": {
             "get": {
-                "description": "Returns an iFrame with the media releases of today. The media releases are from Radarr/Sonarr.",
+                "description": "Returns an iFrame with the media releases of today. The media releases are from Radarr/Sonarr/Lidarr.",
                 "produces": [
                     "text/html"
                 ],

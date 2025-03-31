@@ -17,13 +17,9 @@ paths:
       description: Get the hash of the alarms. Used by the iFrames to check updates
         and reload the iframe.
       parameters:
-      - description: Limits the number of items in the iFrame.
-        example: 5
-        in: query
-        name: limit
-        type: integer
-      - description: 'Alarms to show. Available values: netdata, radarr, sonarr, prowlarr,
-          speedtest-tracker, pihole, kavita, kaizoku, changedetectionio'
+      - description: 'Alarms to show. Available values: netdata, radarr, lidarr, sonarr,
+          prowlarr, speedtest-tracker, pihole, kavita, kaizoku, changedetectionio,
+          backrest'
         example: netdata,radarr,sonarr
         in: query
         name: alarms
@@ -236,13 +232,9 @@ paths:
         name: api_url
         required: true
         type: string
-      - description: Limits the number of items in the iFrame.
-        example: 5
-        in: query
-        name: limit
-        type: integer
-      - description: 'Alarms to show. Available values: netdata, radarr, sonarr, prowlarr,
-          speedtest-tracker, pihole, kavita, kaizoku, changedetectionio'
+      - description: 'Alarms to show. Available values: netdata, radarr, lidarr, sonarr,
+          prowlarr, speedtest-tracker, pihole, kavita, kaizoku, changedetectionio,
+          backrest'
         example: netdata,radarr,sonarr
         in: query
         name: alarms
@@ -365,7 +357,7 @@ paths:
   /iframe/media_releases:
     get:
       description: Returns an iFrame with the media releases of today. The media releases
-        are from Radarr/Sonarr.
+        are from Radarr/Sonarr/Lidarr.
       parameters:
       - description: Homarr theme, defaults to light. If it's different from your
           Homarr theme, the background turns white
