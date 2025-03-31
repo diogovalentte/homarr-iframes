@@ -4,14 +4,14 @@
 
 - Some sources need some environment variables to work.
 
-- Most sources have two environment variables for the address, one will be used in the iFrame links that you can click. The other will be used by this project to get the data (with the prefix `INTERNAL_`). If you don't provide the second one, the first one will be used in both cases.
+- Most sources have two environment variables for the address. One will be used in the iFrame links that you can click. The other will be used by this project to get the data (with the prefix `INTERNAL_`). If you don't provide the second one, the first one will be used in both cases.
 
-  - **Example**: you access a service using the domain `service.com` and there is an authentication system in front of it. You set the first address environment variable to `service.com` and the second one (`INTERNAL_`) to the service's docker container name or any other internal address that this project can use to connect to the service without passing by the authentication system.
+  - **Example**: You access a service using the domain `service.com` and there is an authentication system in front of it. You set the first address environment variable to `service.com` and the second one (`INTERNAL_`) to the service's docker container name or any other internal address that this project can use to connect to the service without passing by the authentication system.
 
 - Most sources have query arguments that can be provided in the URL. These arguments change the iframe behavior and can be very useful for customization. You can check the [API docs](https://github.com/diogovalentte/homarr-iframes/tree/main?tab=readme-ov-file#api-docs) for query arguments.
   - Some sources **require** query arguments to work.
 - This project doesn't have any authentication system, so anyone who can access the API will be able to get all information from all sources, like your Vikunja tasks, Linkwarden bookmarks, etc. You can add an authentication portal like Authelia or [Authentik](https://github.com/goauthentik/authentik) in front of the API to secure it, this is how I do it.
-- Some iFrames display date information, set the Docker container timezone to get a better result.
+- Some iFrames display date information; set the Docker container timezone to get a better result.
 
 ---
 
@@ -101,7 +101,7 @@ To use this source, you'll need to provide the following environment variables:
 
 This source gets on display movies of specific Cinemark theaters (only in Brazil) and creates an iFrame. It shows some info about the films and has links to their pages.
 
-- You have to specify which theaters to get movies from. I recommend specifying all theaters in your city.
+- You have to specify which theaters to get movies from. I recommend specifying all the theaters in your city.
 
 ![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/7071b022-fe90-4db7-874b-8b88d0298641)
 
@@ -158,7 +158,7 @@ Shows [Pi-hole](https://github.com/pi-hole/pi-hole) diagnostic messages, like a 
 
 - `PIHOLE_ADDRESS`: your Pihole instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `INTERNAL_PIHOLE_ADDRESS`: your Pihole instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `PIHOLE_PASSWORD`: a password to access your Pi-hole instance API in Pi-hole versions after v6.0. It can be the password you use to login into the Pi-hole interface, but I recommend using the **app password**, as it's the only one that works if you enable **2FA**. You can get the app password on **Settings -> Web interface / API**. Make sure you're on the **Expert** mode, and click on **Configure app password**.
+- `PIHOLE_PASSWORD`: a password to access your Pi-hole instance API in Pi-hole versions after v6.0. It can be the password you use to log in to the Pi-hole interface, but I recommend using the **app password**, as it's the only one that works if you enable **2FA**. You can get the app password on **Settings -> Web interface / API**. Make sure you're on the **Expert** mode, and click on **Configure app password**.
 - `PIHOLE_TOKEN`: a token to access your Pi-hole instance API in Pi-hole versions previous to v6.0. You can get it by going to **Settings -> API -> Show API Token button**.
 
 ## Kavita
@@ -185,3 +185,11 @@ Shows cards for your watches' errors and changes from your [ChangeDetection.io](
 - `INTERNAL_CHANGEDETECTIONIO_ADDRESS`: your ChangeDetection.io instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `CHANGEDETECTIONIO_API_KEY`: an access API key used to access your ChangeDetection.io instance API. You can get it by going to **Settings -> API -> Generate API Key button**.
 - `CHANGEDETECTIONIO_CHANGED_LAST_HOURS`: number of hours to indicate if the iframe should show a watch change. If the watch's last changed time is within the last `x` hours, it'll show the watch, else no. Defaults to 24.
+
+## Backrest
+Show [Backrest](https://github.com/garethgeorge/backrest) backup plans with error or warning status in the last 24 hours. Username and password are only required if you activated Backrest authentication.
+
+- `BACKREST_ADDRESS`: your Backrest instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+- `INTERNAL_BACKREST_ADDRESS`: your Backrest instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+- `BACKREST_USERNAME`: your Backrest username.
+- `BACKREST_PASSWORD`: your Backrest password.
