@@ -31,7 +31,7 @@ func TestMain(m *testing.M) {
 func TestGetAlarms(t *testing.T) {
 	alarms := Alarms{}
 	t.Run("get alarms", func(t *testing.T) {
-		_, err := alarms.GetAlarms([]string{"netdata", "prowlarr", "radarr", "lidarr", "sonarr", "speedtest-tracker", "kavita", "pihole", "changedetectionio", "kaizoku", "backrest"}, false, true)
+		_, err := alarms.GetAlarms([]string{"netdata", "prowlarr", "radarr", "lidarr", "sonarr", "speedtest-tracker", "kavita", "pihole", "changedetectionio", "kaizoku", "backrest"}, false, config.GlobalConfigs.IFrames.AlarmsRegex, true, true)
 		if err != nil {
 			t.Fatal(err)
 		}

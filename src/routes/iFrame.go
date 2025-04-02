@@ -195,6 +195,7 @@ func UptimeKumaiFrameHandler(c *gin.Context) {
 // @Param api_url query string true "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload." Example(https://sub.domain.com)
 // @Param alarms query string true "Alarms to show. Available values: netdata, radarr, lidarr, sonarr, prowlarr, speedtest-tracker, pihole, kavita, kaizoku, changedetectionio, backrest" Example(netdata,radarr,sonarr)
 // @Param sort_desc query bool false "Sort alarms in descending order. Defaults to false." Example(false)
+// @Param regex_include query bool false "Show only alarms that match or not the regex. Default to true." Example(false)
 // @Param changedetectionio_show_viewed query bool false "Show viewed alarms from changedetection.io. Defaults to true." Example(false)
 // @Router /iframe/alarms [get]
 func AlarmsiFrameHandler(c *gin.Context) {

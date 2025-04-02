@@ -73,7 +73,6 @@ services:
       - BACKREST_PASSWORD=${BACKREST_PASSWORD:-}
 
       - ALARMS_REGEX=${ALARMS_REGEX:-}
-      - ALARMS_REGEX_INCLUDED=${ALARMS_REGEX_INCLUDED:-}
     logging:
       driver: "json-file"
       options:

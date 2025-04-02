@@ -35,8 +35,7 @@ type Configs struct {
 }
 
 type iframesConfigs struct {
-	AlarmsRegex        *regexp.Regexp
-	AlarmsRegexInclude bool
+	AlarmsRegex *regexp.Regexp
 }
 
 type linkwardenConfigs struct {
@@ -227,17 +226,12 @@ func SetConfigs(filePath string) error {
 	GlobalConfigs.Backrest.Password = os.Getenv("BACKREST_PASSWORD")
 
 	alarmsRegex := os.Getenv("ALARMS_REGEX")
-	alarmsRegexInclude := os.Getenv("ALARMS_REGEX_INCLUDE")
 	if alarmsRegex != "" {
 		re, err := regexp.Compile(alarmsRegex)
 		if err != nil {
 			return fmt.Errorf("ALARMS_REGEX must be a valid regex: %w", err)
 		}
 		GlobalConfigs.IFrames.AlarmsRegex = re
-	}
-	GlobalConfigs.IFrames.AlarmsRegexInclude = true
-	if alarmsRegexInclude == "false" {
-		GlobalConfigs.IFrames.AlarmsRegexInclude = false
 	}
 
 	return nil

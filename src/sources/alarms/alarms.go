@@ -23,8 +23,7 @@ var (
 )
 
 type Alarms struct {
-	Regex     *regexp.Regexp
-	RegexMode bool
+	Regex *regexp.Regexp
 }
 
 func New() (*Alarms, error) {
@@ -44,7 +43,6 @@ func New() (*Alarms, error) {
 
 func (a *Alarms) Init() error {
 	a.Regex = config.GlobalConfigs.IFrames.AlarmsRegex
-	a.RegexMode = config.GlobalConfigs.IFrames.AlarmsRegexInclude
 
 	return nil
 }
@@ -100,6 +98,16 @@ func (a *Alarms) GetiFrame(c *gin.Context) {
 		}
 	}
 
+	regexInclude := true
+	regexIncludeStr := c.Query("regex_include")
+	if regexIncludeStr != "" {
+		regexInclude, err = strconv.ParseBool(regexIncludeStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "regex_include must be a boolean"})
+			return
+		}
+	}
+
 	changedetectionioShowViewedStr := c.Query("changedetectionio_show_viewed")
 	changedetectionioShowViewed := true
 	if changedetectionioShowViewedStr != "" {
@@ -110,14 +118,14 @@ func (a *Alarms) GetiFrame(c *gin.Context) {
 		}
 	}
 
-	alarms, err := a.GetAlarms(alarmNames, desc, config.GlobalConfigs.IFrames.AlarmsRegex, config.GlobalConfigs.IFrames.AlarmsRegexInclude, changedetectionioShowViewed)
+	alarms, err := a.GetAlarms(alarmNames, desc, config.GlobalConfigs.IFrames.AlarmsRegex, regexInclude, changedetectionioShowViewed)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
 	var html []byte
-	html, err = a.getAlarmsiFrame(alarms, desc, changedetectionioShowViewed, alarmNamesStr, theme, apiURL)
+	html, err = a.getAlarmsiFrame(alarms, desc, regexInclude, changedetectionioShowViewed, alarmNamesStr, theme, apiURL)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -126,7 +134,7 @@ func (a *Alarms) GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func (a *Alarms) getAlarmsiFrame(alarms []Alarm, desc, changedetectionioShowViewed bool, alarmsQueryArg, theme, apiURL string) ([]byte, error) {
+func (a *Alarms) getAlarmsiFrame(alarms []Alarm, desc, regexInclude, changedetectionioShowViewed bool, alarmsQueryArg, theme, apiURL string) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -290,7 +298,7 @@ func (a *Alarms) getAlarmsiFrame(alarms []Alarm, desc, changedetectionioShowView
 
         async function fetchData() {
             try {
-                var url = '{{ .APIURL }}/v1/hash/alarms?alarms={{ .AlarmsQueryArg }}&sort_desc={{ .SortDesc }}&changedetectionio_show_viewed={{ .ChangeDetectionIOShowViewed }}';
+                var url = '{{ .APIURL }}/v1/hash/alarms?alarms={{ .AlarmsQueryArg }}&sort_desc={{ .SortDesc }}&regex_include={{ .RegexInclude }}&changedetectionio_show_viewed={{ .ChangeDetectionIOShowViewed }}';
                 const response = await fetch(url);
                 const data = await response.json();
 
@@ -360,6 +368,7 @@ func (a *Alarms) getAlarmsiFrame(alarms []Alarm, desc, changedetectionioShowView
 		AlarmsQueryArg:                alarmsQueryArg,
 		Theme:                         theme,
 		APIURL:                        apiURL,
+		RegexInclude:                  regexInclude,
 		SortDesc:                      desc,
 		ChangeDetectionIOShowViewed:   changedetectionioShowViewed,
 		ScrollbarThumbBackgroundColor: scrollbarThumbBackgroundColor,
@@ -395,6 +404,7 @@ func (a *Alarms) getAlarmsiFrame(alarms []Alarm, desc, changedetectionioShowView
 type iframeTemplateData struct {
 	Theme                         string
 	APIURL                        string
+	RegexInclude                  bool
 	ScrollbarThumbBackgroundColor string
 	ScrollbarTrackBackgroundColor string
 	Alarms                        []Alarm
@@ -437,6 +447,16 @@ func (a *Alarms) GetHash(c *gin.Context) {
 		}
 	}
 
+	regexInclude := true
+	regexIncludeStr := c.Query("regex_include")
+	if regexIncludeStr != "" {
+		regexInclude, err = strconv.ParseBool(regexIncludeStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "regex_include must be a boolean"})
+			return
+		}
+	}
+
 	changedetectionioShowViewedStr := c.Query("changedetectionio_show_viewed")
 	changedetectionioShowViewed := true
 	if changedetectionioShowViewedStr != "" {
@@ -447,7 +467,7 @@ func (a *Alarms) GetHash(c *gin.Context) {
 		}
 	}
 
-	alarms, err := a.GetAlarms(alarmNames, desc, config.GlobalConfigs.IFrames.AlarmsRegex, config.GlobalConfigs.IFrames.AlarmsRegexInclude, changedetectionioShowViewed)
+	alarms, err := a.GetAlarms(alarmNames, desc, config.GlobalConfigs.IFrames.AlarmsRegex, regexInclude, changedetectionioShowViewed)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
