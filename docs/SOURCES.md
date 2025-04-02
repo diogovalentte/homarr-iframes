@@ -115,6 +115,16 @@ To use this source, you must provide environment variables for each service from
 
 Below are the available services that you can use in this iframe and the required environment variables:
 
+## Alarms regex filter
+You can add a regex filter to the alarms iframe, it'll match the regex with the concatenated attributes of each alarm using the style `source summary URL status property value`, but without the spaces.
+
+**Example**: "NetdataSystem requires reboot after package updateshttps://netdata.domain.comWARNINGOS / System1 status" for the alarm below:
+
+![image](https://github.com/user-attachments/assets/fbfc8053-e688-40e0-82fd-7be6a224cf89)
+
+- The regex is provided using the environment variable `ALARMS_REGEX`.
+- The alarms iframe query argument `regex_include` can have the values `true` or `false` (`true` by default). If `true` shows only alarms that match the regex. If `false` only alarms that don't match the regex.
+
 ## Netdata
 
 Shows [Netdata](https://github.com/netdata/netdata) alerts, such as high RAM/CPU usage alerts.
