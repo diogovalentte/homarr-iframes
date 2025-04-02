@@ -230,7 +230,7 @@ func getMediaReleasesiFrame(calendar *Calendar, theme, apiURL string, showUnmoni
             padding: 20px;
             justify-content: center;
             align-items: center;
-            min-width: 91.33px;
+			min-width: 109.55px;
         }
 
         .source-label {
