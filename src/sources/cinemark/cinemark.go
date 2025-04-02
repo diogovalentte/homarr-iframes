@@ -145,7 +145,6 @@ func getMoviesiFrame(movies []Movie, theme, apiURL string, limit int, theaterIDs
         }
 
         .background-image {
-            background-image: url('{{ .BackgroundImageURL }}');
             background-position: center;
             background-size: cover;
             position: absolute;
@@ -283,7 +282,7 @@ func getMoviesiFrame(movies []Movie, theme, apiURL string, limit int, theaterIDs
 {{ range .Movies }}
         <div class="movies-container">
 
-            <div class="background-image"></div>
+            <div class="background-image" style="background-image: url('{{ .CoverImgURL }}');"></div>
 
             <img
                 class="movie-cover"
