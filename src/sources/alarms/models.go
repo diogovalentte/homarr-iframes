@@ -1,6 +1,9 @@
 package alarms
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type Alarm struct {
 	// Time: time related to the alarm
@@ -24,4 +27,9 @@ type Alarm struct {
 	BackgroundColor string
 	// BackgroundImgSize: Size of the background image in %, like 80 or 102.5
 	BackgroundImgSize float32
+}
+
+func (a Alarm) String() string {
+	return fmt.Sprintf("Alarm{Time: %s, Summary: %s, URL: %s, Status: %s, Value: %s, Property: %s, Source: %s, BackgroundImgURL: %s, BackgroundColor: %s, BackgroundImgSize: %.2f}",
+		a.Time.Format(time.RFC3339), a.Summary, a.URL, a.Status, a.Value, a.Property, a.Source, a.BackgroundImgURL, a.BackgroundColor, a.BackgroundImgSize)
 }

@@ -6,12 +6,14 @@ import (
 	"html/template"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/diogovalentte/homarr-iframes/src/config"
 	"github.com/diogovalentte/homarr-iframes/src/sources"
 )
 
@@ -20,7 +22,10 @@ var (
 	backgroundImageURL = ""
 )
 
-type Alarms struct{}
+type Alarms struct {
+	Regex     *regexp.Regexp
+	RegexMode bool
+}
 
 func New() (*Alarms, error) {
 	if a != nil {
@@ -28,9 +33,20 @@ func New() (*Alarms, error) {
 	}
 
 	newN := &Alarms{}
+	err := newN.Init()
+	if err != nil {
+		return nil, err
+	}
 	a = newN
 
 	return a, nil
+}
+
+func (a *Alarms) Init() error {
+	a.Regex = config.GlobalConfigs.IFrames.AlarmsRegex
+	a.RegexMode = config.GlobalConfigs.IFrames.AlarmsRegexInclude
+
+	return nil
 }
 
 // GetiFrame returns an HTML/CSS code to be used as an iFrame
@@ -94,7 +110,7 @@ func (a *Alarms) GetiFrame(c *gin.Context) {
 		}
 	}
 
-	alarms, err := a.GetAlarms(alarmNames, desc, changedetectionioShowViewed)
+	alarms, err := a.GetAlarms(alarmNames, desc, config.GlobalConfigs.IFrames.AlarmsRegex, config.GlobalConfigs.IFrames.AlarmsRegexInclude, changedetectionioShowViewed)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -431,7 +447,7 @@ func (a *Alarms) GetHash(c *gin.Context) {
 		}
 	}
 
-	alarms, err := a.GetAlarms(alarmNames, desc, changedetectionioShowViewed)
+	alarms, err := a.GetAlarms(alarmNames, desc, config.GlobalConfigs.IFrames.AlarmsRegex, config.GlobalConfigs.IFrames.AlarmsRegexInclude, changedetectionioShowViewed)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return

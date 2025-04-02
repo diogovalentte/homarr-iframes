@@ -2,6 +2,7 @@ package alarms
 
 import (
 	"fmt"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -23,7 +24,7 @@ import (
 
 var validAlarmNames = []string{"netdata", "prowlarr", "sonarr", "radarr", "lidarr", "speedtest-tracker", "pihole", "kavita", "kaizoku", "changedetectionio", "backrest"}
 
-func (a *Alarms) GetAlarms(alarmNames []string, desc, changedetectionioShowViewed bool) ([]Alarm, error) {
+func (a *Alarms) GetAlarms(alarmNames []string, desc bool, regex *regexp.Regexp, regexInclude, changedetectionioShowViewed bool) ([]Alarm, error) {
 	var alarms []Alarm
 
 	for _, alarmName := range alarmNames {
@@ -97,6 +98,20 @@ func (a *Alarms) GetAlarms(alarmNames []string, desc, changedetectionioShowViewe
 		default:
 			return nil, fmt.Errorf("invalid alarm name: %s", alarmName)
 		}
+	}
+
+	if regex != nil {
+		var filteredAlarms []Alarm
+		for _, alarm := range alarms {
+			alarmString := fmt.Sprintf("%s%s%s%s%s%s", alarm.Source, alarm.Summary, alarm.URL, alarm.Status, alarm.Property, alarm.Value)
+			match := regex.MatchString(alarmString)
+			if regexInclude && match {
+				filteredAlarms = append(filteredAlarms, alarm)
+			} else if !regexInclude && !match {
+				filteredAlarms = append(filteredAlarms, alarm)
+			}
+		}
+		alarms = filteredAlarms
 	}
 
 	sortAlarms(alarms, desc)
