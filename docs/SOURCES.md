@@ -103,7 +103,7 @@ This source gets on display movies of specific Cinemark theaters (only in Brazil
 
 - You have to specify which theaters to get movies from. I recommend specifying all the theaters in your city.
 
-![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/7071b022-fe90-4db7-874b-8b88d0298641)
+![image](https://github.com/user-attachments/assets/aafe4a96-8b48-471d-8046-a189492e4137)
 
 # Alarms
 
