@@ -578,6 +578,8 @@ func getBackrestAlarms() ([]Alarm, error) {
 				status = "WARNING"
 			case "STATUS_ERROR":
 				status = "ERROR"
+			case "STATUS_INPROGRESS":
+				continue
 			}
 
 			t, err := strconv.ParseInt(planSummary.RecentBackups.TimeStampMs[i], 10, 64)
