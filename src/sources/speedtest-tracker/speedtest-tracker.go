@@ -69,16 +69,16 @@ type Data struct {
 	Ping              string `json:"ping"`
 	DownloadBitsHuman string `json:"download_bits_human"`
 	UploadBitsHuman   string `json:"upload_bits_human"`
-	Benchmarks        struct {
-		Download Benchmarks `json:"download"`
-		Upload   Benchmarks `json:"upload"`
-		Ping     Benchmarks `json:"ping"`
+	Benchmarks        *struct {
+		Download *Benchmarks `json:"download"`
+		Upload   *Benchmarks `json:"upload"`
+		Ping     *Benchmarks `json:"ping"`
 	} `json:"benchmarks"`
-	Healthy   bool     `json:"healthy"`
-	Status    string   `json:"status"`
-	Data      TestData `json:"data"`
-	CreatedAt string   `json:"created_at"`
-	UpdatedAt string   `json:"updated_at"`
+	Healthy   bool      `json:"healthy"`
+	Status    string    `json:"status"`
+	Data      *TestData `json:"data"`
+	CreatedAt string    `json:"created_at"`
+	UpdatedAt string    `json:"updated_at"`
 }
 
 type Benchmarks struct {
