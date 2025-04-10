@@ -297,6 +297,7 @@ func getSpeedTestTrackerAlarms() ([]Alarm, error) {
 		if err != nil {
 			return nil, err
 		}
+		updatedAt = updatedAt.In(time.Local)
 
 		url := s.Address + "/admin/results"
 
@@ -324,6 +325,7 @@ func getSpeedTestTrackerAlarms() ([]Alarm, error) {
 		if err != nil {
 			return nil, err
 		}
+		updatedAt = updatedAt.In(time.Local)
 
 		url := s.Address + "/admin/results"
 
@@ -363,7 +365,6 @@ func getSpeedTestTrackerAlarms() ([]Alarm, error) {
 				BackgroundColor: "black",
 			})
 		}
-
 	}
 
 	return alarms, nil
