@@ -299,20 +299,20 @@ func (l *Linkwarden) getLinksiFrame(links []*Link, theme, backgroundImgURL, back
 
         <div class="text-wrap">
             {{ if .Name }}
-                <a href="{{ .URL }}" target="_blank" class="link-name">{{ .Name }}</a>
+                <a href="{{ .URL }}" target="_blank" class="link-name" title="{{ .Name }}">{{ .Name }}</a>
             {{ else if .Description }}
-                <a href="{{ .URL }}" target="_blank" class="link-name">{{ .Description }}</a>
+                <a href="{{ .URL }}" target="_blank" class="link-name" title="{{ .Description }}">{{ .Description }}</a>
             {{ else }}
-                <a href="{{ .URL }}" target="_blank" class="link-name">&lt;No name or description&gt;</a>
+                <a href="{{ .URL }}" target="_blank" class="link-name" title="No name or description">&lt;No name or description&gt;</a>
             {{ end }}
 
             <div>
-                <span style="margin-right: 7px;" class="info-label"><i class="fa-solid fa-calendar-days"></i> {{ .CreatedAt.Format "Jan 2, 2006" }}</span>
+                <span style="margin-right: 7px;" class="info-label" title="{{ .CreatedAt }}"><i class="fa-solid fa-calendar-days"></i> {{ .CreatedAt.Format "Jan 2, 2006" }}</span>
                 {{ if .CollectionID }}
                     {{ if .Collection.Icon }}
-                        <i style="color: {{ .Collection.Color }}; font-size: 18px; vertical-align: text-top;" class="ph{{ if ne .Collection.IconWeight "regular" }}-{{ .Collection.IconWeight }}{{ end }} ph-{{ getCollectionIcon .Collection.Icon }}"></i> <a href="{{ with . }}{{ $.LinkwardenAddress }}{{ end }}/collections/{{ .CollectionID }}" target="_blank" class="info-label">{{ .Collection.Name }}</a>
+                        <i style="color: {{ .Collection.Color }}; font-size: 18px; vertical-align: text-top;" class="ph{{ if ne .Collection.IconWeight "regular" }}-{{ .Collection.IconWeight }}{{ end }} ph-{{ getCollectionIcon .Collection.Icon }}"></i> <a href="{{ with . }}{{ $.LinkwardenAddress }}{{ end }}/collections/{{ .CollectionID }}" target="_blank" class="info-label" title="{{ .Collection.Name }}">{{ .Collection.Name }}</a>
                     {{ else }}
-                        <i style="color: {{ .Collection.Color }};" class="fa-solid fa-folder-closed"></i> <a href="{{ with . }}{{ $.LinkwardenAddress }}{{ end }}/collections/{{ .CollectionID }}" target="_blank" class="info-label">{{ .Collection.Name }}</a>
+                        <i style="color: {{ .Collection.Color }};" class="fa-solid fa-folder-closed"></i> <a href="{{ with . }}{{ $.LinkwardenAddress }}{{ end }}/collections/{{ .CollectionID }}" target="_blank" class="info-label" title="{{ .Collection.Name }}">{{ .Collection.Name }}</a>
                     {{ end }}
                 {{ end }}
             </div>

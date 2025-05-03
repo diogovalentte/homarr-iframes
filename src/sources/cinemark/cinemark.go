@@ -291,7 +291,7 @@ func getMoviesiFrame(movies []Movie, theme, apiURL string, limit int, theaterIDs
             />
 
             <div class="text-wrap">
-                <a href="{{ .URL }}" target="_blank" class="movie-name">{{ .Name }}</a>
+                <a href="{{ .URL }}" target="_blank" class="movie-name" title="{{ .Name }}">{{ .Name }}</a>
             </div>
 
             <div>

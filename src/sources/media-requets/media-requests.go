@@ -308,12 +308,12 @@ func getRequestsiFrame(requests []overseerr.IframeRequestData, theme, apiURL str
         />
 
         <div class="text-wrap">
-            <a href="{{ .Media.URL }}" target="_blank" class="request-title">{{ .Media.Name }}</a>
+            <a href="{{ .Media.URL }}" target="_blank" class="request-title" title="{{ .Media.Name }}">{{ .Media.Name }}</a>
             <div class="labels-div">
                 {{ if .Media.Year }}
                     <span class="info-label"><i class="fa-solid fa-calendar-days"></i> {{ .Media.Year }}</span>
                 {{ end }}
-                <span class="status-label" style="color: {{ .Status.Color }}; background-color: {{ .Status.BackgroundColor }} ">{{ .Status.Status }}</span>
+                <span class="status-label" style="color: {{ .Status.Color }}; background-color: {{ .Status.BackgroundColor }}" title="{{ .Status.Status }}">{{ .Status.Status }}</span>
             </div>
         </div>
 
@@ -323,7 +323,7 @@ func getRequestsiFrame(requests []overseerr.IframeRequestData, theme, apiURL str
             alt="Requested By Avatar"
         />
         <div class="requested-by-container">
-            <a href="{{ .Request.UserProfileURL }}" target="_blank" class="username">{{ .Request.Username }}</a>
+            <a href="{{ .Request.UserProfileURL }}" target="_blank" class="username" title="{{ .Request.Username }}">{{ .Request.Username }}</a>
         </div>
     </div>
 {{ end }}

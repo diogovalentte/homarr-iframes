@@ -491,24 +491,24 @@ func (v *Vikunja) getTasksiFrame(tasks []*Task, theme, backgroundImgURL, backgro
                 {{ end }}
             {{ end }}{{ end }}
 
-            <a href="{{ with . }}{{ $.VikunjaAddress }}{{ end }}/tasks/{{ .ID }}" target="_blank" class="task-title">{{ .Title }}</a>
+            <a href="{{ with . }}{{ $.VikunjaAddress }}{{ end }}/tasks/{{ .ID }}" target="_blank" class="task-title" title="{{ .Title }}">{{ .Title }}</a>
 
             <div>
 
                 {{ with . }}{{ if $.ShowCreated }}
-                    <span class="info-label"><i class="fa-solid fa-calendar-days"></i> {{ .CreatedAt.Format "Jan 2, 2006" }}</span>
+                    <span class="info-label" title="{{ .CreatedAt }}"><i class="fa-solid fa-calendar-days"></i> {{ .CreatedAt.Format "Jan 2, 2006" }}</span>
                 {{ end }}{{ end }}
             
                 {{ with . }}{{ if $.ShowDue }}
                     {{ if not .DueDate.IsZero }}
-                        <span class="info-label" style="color: {{ getTimeColor .DueDate }};"><i class="fa-solid fa-calendar-days"></i> Due: {{ .DueDate.Format "Jan 2, 2006" }}</span>
+                        <span class="info-label" style="color: {{ getTimeColor .DueDate }};" title="{{ .DueDate }}"><i class="fa-solid fa-calendar-days"></i> Due: {{ .DueDate.Format "Jan 2, 2006" }}</span>
                     {{ else if not .EndDate.IsZero }}
-                        <span class="info-label" style="color: {{ getTimeColor .EndDate }};"><i class="fa-solid fa-calendar-days"></i> End: {{ .EndDate.Format "Jan 2, 2006" }}</span>
+                        <span class="info-label" style="color: {{ getTimeColor .EndDate }};" title="{{ .EndDate }}"><i class="fa-solid fa-calendar-days"></i> End: {{ .EndDate.Format "Jan 2, 2006" }}</span>
                     {{ else if or (ne .RepeatAfter 0) (ne .RepeatMode 0) }}
                         {{ if or (eq .RepeatMode 0) (eq .RepeatMode 2) }}
-                            <span class="info-label"><i class="fa-solid fa-calendar-days"></i> Repeats every {{ getRepeatAfter .RepeatAfter }}</span>
+                            <span class="info-label" title="Repeats every {{ getRepeatAfter .RepeatAfter }}"><i class="fa-solid fa-calendar-days"></i> Repeats every {{ getRepeatAfter .RepeatAfter }}</span>
                         {{ else if eq .RepeatMode 1 }}
-                            <span class="info-label"><i class="fa-solid fa-calendar-days"></i> Repeats monthly</span>
+                            <span class="info-label" title="Repeats monthly"><i class="fa-solid fa-calendar-days"></i> Repeats monthly</span>
                         {{ end }}
                     {{ end }}
                 {{ end }}{{ end }}
@@ -517,14 +517,14 @@ func (v *Vikunja) getTasksiFrame(tasks []*Task, theme, backgroundImgURL, backgro
                     {{ if gt .ProjectID 1 }} <!-- 1 = Inbox -->
                         {{ $project := getTaskProject .ProjectID }}
                         {{ if $project.Title }}
-                            <span class="info-label" style="color: #{{ $project.HexColor }};"><i class="fa-solid fa-layer-group"></i> <a href="{{ $.VikunjaAddress }}/projects/{{ $project.ID }}" target="_blank" class="info-label" style="color: #{{ $project.HexColor }};">{{ $project.Title }}</a></span>
+                            <span class="info-label" style="color: #{{ $project.HexColor }};" title="{{ $project.Title }}"><i class="fa-solid fa-layer-group"></i> <a href="{{ $.VikunjaAddress }}/projects/{{ $project.ID }}" target="_blank" class="info-label" style="color: #{{ $project.HexColor }};">{{ $project.Title }}</a></span>
                         {{ end }}
                     {{ end }}
                 {{ end }}{{ end }}
 
 				{{ with . }}{{ if $.ShowLabels }}
 					{{ range $label := .Labels }}
-						<span class="info-label" style="color: #{{ $label.HexColor }};"><i class="fa-solid fa-tags"></i> {{ $label.Title }}</span>	
+						<span class="info-label" style="color: #{{ $label.HexColor }};" title="{{ $label.Title }}"><i class="fa-solid fa-tags"></i> {{ $label.Title }}</span>	
 					{{ end }}
 				{{ end }}{{ end }}
 

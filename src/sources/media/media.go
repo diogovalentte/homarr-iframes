@@ -312,20 +312,20 @@ func getMediaReleasesiFrame(calendar *Calendar, theme, apiURL string, showUnmoni
 
         <div class="text-wrap">
             {{ if eq .Source "Sonarr" }}
-                <a href="{{ with . }}{{ $.SonarrAddress }}{{ end }}/series/{{ .Slug }}" target="_blank" class="release-title">{{ .Title }}</a>
+                <a href="{{ with . }}{{ $.SonarrAddress }}{{ end }}/series/{{ .Slug }}" target="_blank" class="release-title" title="{{ .Title }}">{{ .Title }}</a>
                 <div class="more-info-container">
                     {{ with . }}{{ if $.ShowEpisodeHours }}
                         <span class="info-label" style="display: inline-block; min-width: 63.25px;"><i class="fa-solid fa-calendar-days"></i> {{ .ReleaseDate.Format "15h04" }}</span>
                     {{ end }}{{ end }}
-                    <span class="info-label"><i class="fas fa-tv fa-xm"></i> S{{ .EpisodeDetails.SeasonNumber }}E{{ .EpisodeDetails.EpisodeNumber}} - {{ .EpisodeDetails.EpisodeName }}</span>
+                    <span class="info-label" title="S{{ .EpisodeDetails.SeasonNumber }}E{{ .EpisodeDetails.EpisodeNumber}} - {{ .EpisodeDetails.EpisodeName }}"><i class="fas fa-tv fa-xm"></i> S{{ .EpisodeDetails.SeasonNumber }}E{{ .EpisodeDetails.EpisodeNumber}} - {{ .EpisodeDetails.EpisodeName }}</span>
                 </div>
             {{ else if eq .Source "Radarr" }}
-                <a href="{{ with . }}{{ $.RadarrAddress }}{{ end }}/movie/{{ .Slug }}" target="_blank" class="release-title">{{ .Title }}</a>
+                <a href="{{ with . }}{{ $.RadarrAddress }}{{ end }}/movie/{{ .Slug }}" target="_blank" class="release-title" title="{{ .Title }}">{{ .Title }}</a>
             {{ else if eq .Source "Lidarr" }}
-                <a href="{{ with . }}{{ $.LidarrAddress }}{{ end }}/album/{{ .Slug }}" target="_blank" class="release-title">{{ .Title }}</a>
+                <a href="{{ with . }}{{ $.LidarrAddress }}{{ end }}/album/{{ .Slug }}" target="_blank" class="release-title" title="{{ .Title }}">{{ .Title }}</a>
                 <div class="more-info-container">
                     <span class="info-label"><i class="fa-solid fa-compact-disc"></i> {{ .AlbumType }}</span>
-                    <span class="info-label"><i class="fa-solid fa-user"></i> <a href="{{ with . }}{{ $.LidarrAddress }}{{ end }}/artist/{{ .ArtistDetails.Slug }}" target="_blank" class="info-label">{{ .ArtistDetails.ArtistName }}</a></span>
+                    <span class="info-label" title="{{ .ArtistDetails.ArtistName }}"><i class="fa-solid fa-user"></i> <a href="{{ with . }}{{ $.LidarrAddress }}{{ end }}/artist/{{ .ArtistDetails.Slug }}" target="_blank" class="info-label">{{ .ArtistDetails.ArtistName }}</a></span>
                 </div>
             {{ end }}
         </div>
@@ -338,9 +338,9 @@ func getMediaReleasesiFrame(calendar *Calendar, theme, apiURL string, showUnmoni
                         <p class="status-label" style="color: white; background-color: green;">Downloaded</p>
                     {{ else }}
                         {{ if .ShouldBeDownloaded }}
-                            <p class="status-label" style="color: white; background-color: red;">Not Downloaded</p>
+                            <p class="status-label" style="color: white; background-color: red;" title="Avaliable but not downloaded">Not Downloaded</p>
                         {{ else }}
-                            <p class="status-label" style="color: white; background-color: #99b6bb;">Not Downloaded</p>
+                            <p class="status-label" style="color: white; background-color: #99b6bb;" title="Not avaliable for download yet">Not Downloaded</p>
                         {{ end }}
                     {{ end }}
                 </div>

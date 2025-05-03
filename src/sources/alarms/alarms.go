@@ -332,14 +332,14 @@ func (a *Alarms) getAlarmsiFrame(alarms []Alarm, desc, regexInclude, changedetec
         <div class="background-image" style="{{ if .BackgroundImgURL }}background-image: url('{{ .BackgroundImgURL }}');{{ else }}background-color: {{ .BackgroundColor }};{{ end }} background-size: {{ .BackgroundImgSize }}%;"></div>
 
         <div class="text-wrap">
-            <i class="fa-solid fa-bell"></i> <a href="{{ .URL }}" target="_blank" class="alarm-summary">{{ .Summary }}</a>
+            <i class="fa-solid fa-bell"></i> <a href="{{ .URL }}" target="_blank" class="alarm-summary" title="{{ .Summary }}">{{ .Summary }}</a>
             <div class="more-info-container">
                 <span class="info-label"><i class="fa-solid fa-cube"></i> {{ .Source }}</span>
                 {{ if not .Time.IsZero }}
                     <span class="info-label"><i class="fa-solid fa-calendar-days"></i> {{ .Time.Format "2006-01-02 15h04" }}</span> 
                 {{ end }}
                 {{ if .Property }}
-                    <span class="info-label"><i class="fa-solid fa-gear"></i> {{ .Property }}</span>
+                    <span class="info-label" title="{{ .Property }}"><i class="fa-solid fa-gear"></i> {{ .Property }}</span>
                 {{ end }}
             </div>
         </div>
