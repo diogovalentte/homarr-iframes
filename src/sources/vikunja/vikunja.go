@@ -143,7 +143,8 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 		showDue          bool
 		showPriority     bool
 		showProject      bool
-		ShowFavoriteIcon bool
+		showFavoriteIcon bool
+		showLabels       bool
 	)
 	showCreatedStr := c.Query("showCreated")
 	if showCreatedStr == "" {
@@ -186,13 +187,24 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 		}
 	}
 
-	ShowFavoriteIconStr := c.Query("showFavoriteIcon")
-	if ShowFavoriteIconStr == "" {
-		ShowFavoriteIcon = true
+	showFavoriteIconStr := c.Query("showFavoriteIcon")
+	if showFavoriteIconStr == "" {
+		showFavoriteIcon = true
 	} else {
-		ShowFavoriteIcon, err = strconv.ParseBool(ShowFavoriteIconStr)
+		showFavoriteIcon, err = strconv.ParseBool(showFavoriteIconStr)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"message": "showFavoriteIcon must be a boolean"})
+			return
+		}
+	}
+
+	showLabelsStr := c.Query("showLabels")
+	if showLabelsStr == "" {
+		showLabels = true
+	} else {
+		showLabels, err = strconv.ParseBool(showLabelsStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "showLabels must be a boolean"})
 			return
 		}
 	}
@@ -224,7 +236,7 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 		}
 		html = sources.GetBaseNothingToShowiFrame("#226fff", v.BackgroundImgURL, "center", "cover", backgroundFilter, apiURLPath)
 	} else {
-		html, err = v.getTasksiFrame(tasks, theme, v.BackgroundImgURL, backgroundPosition, backgroundSize, backgroundFilter, apiURL, limit, projectID, queryExcludeProjectIDs, showCreated, showDue, showPriority, showProject, ShowFavoriteIcon, instanceProjects)
+		html, err = v.getTasksiFrame(tasks, theme, v.BackgroundImgURL, backgroundPosition, backgroundSize, backgroundFilter, apiURL, limit, projectID, queryExcludeProjectIDs, showCreated, showDue, showPriority, showProject, showFavoriteIcon, showLabels, instanceProjects)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			return
@@ -234,7 +246,7 @@ func (v *Vikunja) GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func (v *Vikunja) getTasksiFrame(tasks []*Task, theme, backgroundImgURL, backgroundPosition, backgroundSize, backgroundFilter, apiURL string, limit, projectID int, excludeProjectIDs string, showCreated, showDue, showPriority, showProject, showFavoriteIcon bool, instanceProjects map[int]*Project) ([]byte, error) {
+func (v *Vikunja) getTasksiFrame(tasks []*Task, theme, backgroundImgURL, backgroundPosition, backgroundSize, backgroundFilter, apiURL string, limit, projectID int, excludeProjectIDs string, showCreated, showDue, showPriority, showProject, showFavoriteIcon, showLabels bool, instanceProjects map[int]*Project) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -510,6 +522,12 @@ func (v *Vikunja) getTasksiFrame(tasks []*Task, theme, backgroundImgURL, backgro
                     {{ end }}
                 {{ end }}{{ end }}
 
+				{{ with . }}{{ if $.ShowLabels }}
+					{{ range $label := .Labels }}
+						<span class="info-label" style="color: #{{ $label.HexColor }};"><i class="fa-solid fa-tags"></i> {{ $label.Title }}</span>	
+					{{ end }}
+				{{ end }}{{ end }}
+
             </div>
 
         </div>
@@ -552,6 +570,7 @@ func (v *Vikunja) getTasksiFrame(tasks []*Task, theme, backgroundImgURL, backgro
 		ShowPriority:                  showPriority,
 		ShowProject:                   showProject,
 		ShowFavoriteIcon:              showFavoriteIcon,
+		ShowLabels:                    showLabels,
 	}
 
 	templateFuncs := template.FuncMap{
@@ -628,6 +647,7 @@ type iframeTemplateData struct {
 	ShowPriority                  bool
 	ShowProject                   bool
 	ShowFavoriteIcon              bool
+	ShowLabels                    bool
 	APILimit                      int
 	APIProjectID                  int
 }
@@ -686,7 +706,7 @@ func (v *Vikunja) GetHash(c *gin.Context) {
 		return
 	}
 
-	var tasks []interface{}
+	var tasks []any
 	for _, task := range pTasks {
 		tasks = append(tasks, *task)
 	}

@@ -41,6 +41,13 @@ const docTemplate = `{
                     {
                         "type": "boolean",
                         "example": false,
+                        "description": "Show only alarms that match or not the regex. Default to true.",
+                        "name": "regex_include",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": false,
                         "description": "Show viewed alarms from changedetection.io. Defaults to true.",
                         "name": "changedetectionio_show_viewed",
                         "in": "query"
@@ -316,6 +323,13 @@ const docTemplate = `{
                         "example": false,
                         "description": "Sort alarms in descending order. Defaults to false.",
                         "name": "sort_desc",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": false,
+                        "description": "Show only alarms that match or not the regex. Default to true.",
+                        "name": "regex_include",
                         "in": "query"
                     },
                     {
@@ -790,6 +804,13 @@ const docTemplate = `{
                         "example": false,
                         "description": "Shows a start icon in favorite tasks. Defaults to true.",
                         "name": "showFavoriteIcon",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": false,
+                        "description": "Shows the tasks' labels. Defaults to true.",
+                        "name": "showLabels",
                         "in": "query"
                     },
                     {

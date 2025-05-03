@@ -79,6 +79,7 @@ func CinemarkiFrameHandler(c *gin.Context) {
 // @Param showPriority query bool false "Shows the tasks' priority. Defaults to true." Example(false)
 // @Param showProject query bool false "Shows the tasks' project. Defaults to true." Example(false)
 // @Param showFavoriteIcon query bool false "Shows a start icon in favorite tasks. Defaults to true." Example(false)
+// @Param showLabels query bool false "Shows the tasks' labels. Defaults to true." Example(false)
 // @Param background_position query string false "Background position of each task card. Use '%25' in place of '%', like '50%25 47.2%25' to get '50% 47.2%'. Defaults to 50% 49.5%." Example(top)
 // @Param background_size query string false "Background size of each task card. Use '%25' in place of '%'. Defaults to 105%." Example(105%25)
 // @Param background_filter query string false "Background filter of each task card. Use '%25' in place of '%'. Defaults to brightness(0.3)." Example(blur(5px))

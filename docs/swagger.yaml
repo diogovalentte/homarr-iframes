@@ -30,6 +30,11 @@ paths:
         in: query
         name: sort_desc
         type: boolean
+      - description: Show only alarms that match or not the regex. Default to true.
+        example: false
+        in: query
+        name: regex_include
+        type: boolean
       - description: Show viewed alarms from changedetection.io. Defaults to true.
         example: false
         in: query
@@ -244,6 +249,11 @@ paths:
         example: false
         in: query
         name: sort_desc
+        type: boolean
+      - description: Show only alarms that match or not the regex. Default to true.
+        example: false
+        in: query
+        name: regex_include
         type: boolean
       - description: Show viewed alarms from changedetection.io. Defaults to true.
         example: false
@@ -633,6 +643,11 @@ paths:
         example: false
         in: query
         name: showFavoriteIcon
+        type: boolean
+      - description: Shows the tasks' labels. Defaults to true.
+        example: false
+        in: query
+        name: showLabels
         type: boolean
       - description: Background position of each task card. Use '%25' in place of
           '%', like '50%25 47.2%25' to get '50% 47.2%'. Defaults to 50% 49.5%.

@@ -32,6 +32,7 @@ type Task struct {
 	RepeatMode  int       `json:"repeat_mode"`
 	ProjectID   int       `json:"project_id"`
 	IsFavorite  bool      `json:"is_favorite"`
+	Labels      []Label   `json:"labels"`
 }
 
 // Project represents a Vikunja project
@@ -43,4 +44,15 @@ type Project struct {
 	ID       int    `json:"id"`
 	Title    string `json:"title"`
 	HexColor string `json:"hex_color"`
+}
+
+// Label represents a Vikunja label
+// ! IMPORTANT !
+// If you add a filed where the value is a pointer,
+// you have to update the Vikunja.GetHash method
+// to set it to nil.
+type Label struct {
+	ID       int    `json:"id"`
+	HexColor string `json:"hex_color"`
+	Title    string `json:"title"`
 }
