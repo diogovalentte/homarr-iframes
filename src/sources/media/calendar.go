@@ -14,7 +14,7 @@ func getCalendar(unmonitored, inCinemas, physical, digital bool) (*Calendar, err
 	var isAnySourceValid bool
 	calendar := &Calendar{}
 	startDate := time.Now()
-	endDate := startDate.AddDate(0, 0, 1)
+	endDate := startDate
 
 	if config.GlobalConfigs.Radarr.Address != "" && config.GlobalConfigs.Radarr.APIKey != "" {
 		isAnySourceValid = true
