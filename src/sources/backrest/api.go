@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func (b *Backrest) baseRequest(method, url string, body io.Reader, target interface{}) error {
+func (b *Backrest) baseRequest(method, url string, body io.Reader, target any) error {
 	client := &http.Client{}
 	if body == nil {
 		body = strings.NewReader("{}")

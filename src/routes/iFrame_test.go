@@ -147,7 +147,7 @@ func TestSetVikunjaTaskDone(t *testing.T) {
 	})
 }
 
-func requestHelper(method, url string, target interface{}) (*httptest.ResponseRecorder, error) {
+func requestHelper(method, url string, target any) (*httptest.ResponseRecorder, error) {
 	r := httptest.NewRecorder()
 	req, err := http.NewRequest(method, url, nil)
 	if err != nil {

@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func baseRequest(method, url string, body io.Reader, target interface{}) error {
+func baseRequest(method, url string, body io.Reader, target any) error {
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {

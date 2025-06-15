@@ -93,7 +93,7 @@ func GetBaseNothingToShowiFrame(backgroundColor, backgroundImageURL, backgroundP
 }
 
 // GetHash returns a SHA256 hash of a object
-func GetHash(s ...interface{}) [32]byte {
+func GetHash(s ...any) [32]byte {
 	structString := fmt.Sprintf("%v", s...)
 	return sha256.Sum256([]byte(structString))
 }

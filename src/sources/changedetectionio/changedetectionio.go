@@ -62,10 +62,10 @@ func (c *ChangeDetectionIO) GetWatches() (map[string]*Watch, error) {
 }
 
 type Watch struct {
-	Title       string      `json:"title"`
-	URL         string      `json:"url"`
-	LastChanged int         `json:"last_changed"`
-	LastChecked int         `json:"last_checked"`
-	Viewed      bool        `json:"viewed"`
-	LastError   interface{} `json:"last_error"`
+	Title       string `json:"title"`
+	URL         string `json:"url"`
+	LastChanged int    `json:"last_changed"`
+	LastChecked int    `json:"last_checked"`
+	Viewed      bool   `json:"viewed"`
+	LastError   any    `json:"last_error"`
 }

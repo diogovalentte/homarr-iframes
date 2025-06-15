@@ -109,7 +109,7 @@ type getTvResponse struct {
 	ID           int    `json:"id"`
 }
 
-func (j *Jellyseerr) baseRequest(method, url string, body io.Reader, target interface{}) error {
+func (j *Jellyseerr) baseRequest(method, url string, body io.Reader, target any) error {
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {

@@ -67,7 +67,7 @@ type onDisplayByTheaterResponse struct {
 	} `json:"dataResult"`
 }
 
-func (Cinemark) baseRequest(method, url string, body io.Reader, target interface{}) error {
+func (Cinemark) baseRequest(method, url string, body io.Reader, target any) error {
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {

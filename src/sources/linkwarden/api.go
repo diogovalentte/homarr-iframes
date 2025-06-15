@@ -33,7 +33,7 @@ func (l *Linkwarden) GetLinks(limit int, collectionID string) ([]*Link, error) {
 	return links, nil
 }
 
-func (l *Linkwarden) baseRequest(method, url string, body io.Reader, target interface{}) error {
+func (l *Linkwarden) baseRequest(method, url string, body io.Reader, target any) error {
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {

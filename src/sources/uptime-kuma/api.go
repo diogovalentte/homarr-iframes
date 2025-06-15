@@ -35,7 +35,7 @@ func (u *UptimeKuma) GetStatusPageLastUpDownCount(slug string) (*UpDownSites, er
 	return upDownSites, nil
 }
 
-func (u *UptimeKuma) baseRequest(url string, target interface{}) error {
+func (u *UptimeKuma) baseRequest(url string, target any) error {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
