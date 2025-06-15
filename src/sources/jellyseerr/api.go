@@ -186,11 +186,11 @@ func (j *Jellyseerr) GetIframeData(limit int, filter, sort string, requestedBy i
 func getRequestStatusName(reqStatus, mediaStatus int) overseerr.IframeStatus {
 	var status overseerr.IframeStatus
 	switch reqStatus {
-	case 1:
+	case 1: // Pending
 		status.Status = "Pending"
 		status.Color = "#fe99ff"
 		status.BackgroundColor = "#f000e733"
-	case 2:
+	case 2, 5: // Approved, Completed
 		switch mediaStatus {
 		case 1:
 			status.Status = "Unkown"
@@ -212,13 +212,21 @@ func getRequestStatusName(reqStatus, mediaStatus int) overseerr.IframeStatus {
 			status.Status = "Available"
 			status.Color = "#b2f2bb"
 			status.BackgroundColor = "#2f9e4433"
+		case 7:
+			status.Status = "Deleted"
+			status.Color = "#f2b2ba"
+			status.BackgroundColor = "#9e302f33"
 		default:
 			status.Status = "Approved"
 			status.Color = "#d0bfff"
 			status.BackgroundColor = "#6741d933"
 		}
-	case 3:
+	case 3: // Declined
 		status.Status = "Declined"
+		status.Color = "#f2b2ba"
+		status.BackgroundColor = "#9e302f33"
+	case 4: // Failed
+		status.Status = "Failed"
 		status.Color = "#f2b2ba"
 		status.BackgroundColor = "#9e302f33"
 	default:
