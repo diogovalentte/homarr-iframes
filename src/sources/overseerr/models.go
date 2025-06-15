@@ -9,11 +9,11 @@ type Request struct {
 
 type Media struct {
 	Type   string `json:"mediaType"`
+	IMDBID string `json:"imdbId"`
 	ID     int    `json:"id"`
 	Status int    `json:"status"`
 	TMDBID int    `json:"tmdbId"`
 	TVDBID int    `json:"tvdbId"`
-	IMDBID int    `json:"imdbId"`
 }
 
 type RequestedBy struct {
