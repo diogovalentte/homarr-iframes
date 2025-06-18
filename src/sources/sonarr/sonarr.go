@@ -62,7 +62,7 @@ func (s *Sonarr) GetCalendar(unmonitored bool, startDate, endDate time.Time) ([]
 	endDate = time.Date(endDate.Year(), endDate.Month(), endDate.Day(), 23, 59, 59, int(time.Second-time.Nanosecond), endDate.Location())
 
 	var entries []*getSonarrCalendarEntryResponse
-	err := baseRequest("GET", fmt.Sprintf("%s/api/v3/calendar?start=%s&end=%s&unmonitored=%v&includeSeries=true", s.InternalAddress, startDate.Format("2006-01-02"), endDate.Format("2006-01-02"), unmonitored), nil, &entries)
+	err := baseRequest("GET", fmt.Sprintf("%s/api/v3/calendar?start=%s&end=%s&unmonitored=%v&includeSeries=true", s.InternalAddress, startDate.Format("2006-01-02T15:04:05.000Z"), endDate.Format("2006-01-02T15:04:05.000Z"), unmonitored), nil, &entries)
 	if err != nil {
 		return nil, err
 	}
