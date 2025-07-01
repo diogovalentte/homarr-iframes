@@ -160,8 +160,8 @@ func MediaReleasesiFrameHandler(c *gin.Context) {
 // @Param theme query string false "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white" Example(light)
 // @Param api_url query string true "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload. Also used by the button to set the task done, if not provided, the button will not appear." Example(https://sub.domain.com)
 // @Param limit query int false "Limits the number of items in the iFrame." Example(5)
-// @Param filter query string false "Available values : all, approved, available, pending, processing, unavailable, failed" Example(all)
-// @Param sort query string false "Available values : added, modified. Defaults to added" Example(added)
+// @Param filter query string false "Filters for request status and media status. Available values: all, approved, available, pending, processing, unavailable, failed, deleted, completed. Defaults to all" Example(all)
+// @Param sort query string false "Available values: added, modified. Defaults to added" Example(added)
 // @Param requestedByOverseerr query string false "If specified, only requests from that particular overseerr user ID will be returned." Example(1)
 // @Param requestedByJellyseerr query string false "If specified, only requests from that particular jellyseerr user ID will be returned." Example(1)
 // @Router /iframe/media_requests [get]

@@ -435,13 +435,14 @@ paths:
         in: query
         name: limit
         type: integer
-      - description: 'Available values : all, approved, available, pending, processing,
-          unavailable, failed'
+      - description: 'Filters for request status and media status. Available values:
+          all, approved, available, pending, processing, unavailable, failed, deleted,
+          completed. Defaults to all'
         example: all
         in: query
         name: filter
         type: string
-      - description: 'Available values : added, modified. Defaults to added'
+      - description: 'Available values: added, modified. Defaults to added'
         example: added
         in: query
         name: sort

@@ -556,14 +556,14 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "example": "all",
-                        "description": "Available values : all, approved, available, pending, processing, unavailable, failed",
+                        "description": "Filters for request status and media status. Available values: all, approved, available, pending, processing, unavailable, failed, deleted, completed. Defaults to all",
                         "name": "filter",
                         "in": "query"
                     },
                     {
                         "type": "string",
                         "example": "added",
-                        "description": "Available values : added, modified. Defaults to added",
+                        "description": "Available values: added, modified. Defaults to added",
                         "name": "sort",
                         "in": "query"
                     },
