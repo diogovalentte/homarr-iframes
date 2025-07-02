@@ -54,6 +54,7 @@ func GetiFrame(c *gin.Context) {
 		sort                  string
 		requestedByOverseerr  int
 		requestedByJellyseerr int
+		showMedia             bool
 	)
 	filter = c.Query("filter")
 	sort = c.Query("sort")
@@ -75,14 +76,23 @@ func GetiFrame(c *gin.Context) {
 		}
 	}
 
-	iframeRequestData, err := getIframeData(limit, filter, sort, requestedByOverseerr, requestedByJellyseerr)
+	showMediaStr := c.Query("showMedia")
+	if showMediaStr != "" {
+		showMedia, err = strconv.ParseBool(showMediaStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "getMedia must be a boolean"})
+			return
+		}
+	}
+
+	iframeRequestData, err := getIframeData(limit, filter, sort, requestedByOverseerr, requestedByJellyseerr, showMedia)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
 	var html []byte
-	html, err = getRequestsiFrame(iframeRequestData, theme, apiURL, limit, filter, sort, requestedByOverseerr, requestedByJellyseerr)
+	html, err = getRequestsiFrame(iframeRequestData, theme, apiURL, limit, filter, sort, requestedByOverseerr, requestedByJellyseerr, showMedia)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, fmt.Errorf("couldn't create HTML code: %s", err.Error()))
 		return
@@ -91,7 +101,7 @@ func GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func getRequestsiFrame(requests []overseerr.IframeRequestData, theme, apiURL string, limit int, filter, sort string, requestedByOverseerr, requestedByJellyseerr int) ([]byte, error) {
+func getRequestsiFrame(requests []overseerr.IframeRequestData, theme, apiURL string, limit int, filter, sort string, requestedByOverseerr, requestedByJellyseerr int, showMedia bool) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -268,7 +278,7 @@ func getRequestsiFrame(requests []overseerr.IframeRequestData, theme, apiURL str
 
         async function fetchData() {
             try {
-                var url = '{{ .APIURL }}/v1/hash/media_requests?limit={{ .APILimit }}&filter={{ .APIFilter }}&sort={{ .APISort }}&requestedByOverseerr={{ .APIRequestedByOverseerr }}&requestedByJellyseerr={{ .APIRequestedByJellyseerr }}';
+                var url = '{{ .APIURL }}/v1/hash/media_requests?limit={{ .APILimit }}&filter={{ .APIFilter }}&sort={{ .APISort }}&requestedByOverseerr={{ .APIRequestedByOverseerr }}&requestedByJellyseerr={{ .APIRequestedByJellyseerr }}&showMedia={{ .APIShowMedia }}';
                 const response = await fetch(url);
                 const data = await response.json();
 
@@ -317,14 +327,16 @@ func getRequestsiFrame(requests []overseerr.IframeRequestData, theme, apiURL str
             </div>
         </div>
 
-        <img
-            class="requested-by-avatar"
-            src="{{ .Request.AvatarURL }}"
-            alt="Requested By Avatar"
-        />
-        <div class="requested-by-container">
-            <a href="{{ .Request.UserProfileURL }}" target="_blank" class="username" title="{{ .Request.Username }}">{{ .Request.Username }}</a>
-        </div>
+		{{ if .Request.Username }}
+			<img
+				class="requested-by-avatar"
+				src="{{ .Request.AvatarURL }}"
+				alt="Requested By Avatar"
+			/>
+			<div class="requested-by-container">
+				<a href="{{ .Request.UserProfileURL }}" target="_blank" class="username" title="{{ .Request.Username }}">{{ .Request.Username }}</a>
+			</div>
+		{{ end }}
     </div>
 {{ end }}
 </body>
@@ -346,6 +358,7 @@ func getRequestsiFrame(requests []overseerr.IframeRequestData, theme, apiURL str
 		APIFilter:                     filter,
 		APISort:                       sort,
 		APIRequestedByOverseerr:       requestedByOverseerr,
+		APIShowMedia:                  showMedia,
 		APIRequestedByJellyseerr:      requestedByJellyseerr,
 		ScrollbarThumbBackgroundColor: scrollbarThumbBackgroundColor,
 		ScrollbarTrackBackgroundColor: scrollbarTrackBackgroundColor,
@@ -373,6 +386,7 @@ type iframeTemplateData struct {
 	APIRequestedByOverseerr       int
 	APIRequestedByJellyseerr      int
 	APILimit                      int
+	APIShowMedia                  bool
 }
 
 // GetHash returns the hash of the requests
@@ -395,6 +409,7 @@ func GetHash(c *gin.Context) {
 		sort                  string
 		requestedByOverseerr  int
 		requestedByJellyseerr int
+		showMedia             bool
 	)
 	filter = c.Query("filter")
 	sort = c.Query("sort")
@@ -416,7 +431,16 @@ func GetHash(c *gin.Context) {
 		}
 	}
 
-	iframeRequestData, err := getIframeData(limit, filter, sort, requestedByOverseerr, requestedByJellyseerr)
+	showMediaStr := c.Query("showMedia")
+	if showMediaStr != "" {
+		showMedia, err = strconv.ParseBool(showMediaStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "getMedia must be a boolean"})
+			return
+		}
+	}
+
+	iframeRequestData, err := getIframeData(limit, filter, sort, requestedByOverseerr, requestedByJellyseerr, showMedia)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -427,7 +451,7 @@ func GetHash(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"hash": fmt.Sprintf("%x", hash)})
 }
 
-func getIframeData(limit int, filter, sort string, requestedByOverseerr, requestedByJellyseerr int) ([]overseerr.IframeRequestData, error) {
+func getIframeData(limit int, filter, sort string, requestedByOverseerr, requestedByJellyseerr int, getMedia bool) ([]overseerr.IframeRequestData, error) {
 	var requests []overseerr.IframeRequestData
 
 	o, err := overseerr.New()
@@ -436,7 +460,7 @@ func getIframeData(limit int, filter, sort string, requestedByOverseerr, request
 			return nil, err
 		}
 	} else {
-		ORequests, err := o.GetIframeData(limit, filter, sort, requestedByOverseerr)
+		ORequests, err := o.GetIframeData(limit, filter, sort, requestedByOverseerr, getMedia)
 		if err != nil {
 			return nil, err
 		}
@@ -448,7 +472,7 @@ func getIframeData(limit int, filter, sort string, requestedByOverseerr, request
 			return nil, err
 		}
 	} else {
-		JRequests, err := j.GetIframeData(limit, filter, sort, requestedByJellyseerr)
+		JRequests, err := j.GetIframeData(limit, filter, sort, requestedByJellyseerr, getMedia)
 		if err != nil {
 			return nil, err
 		}

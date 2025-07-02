@@ -154,16 +154,17 @@ func MediaReleasesiFrameHandler(c *gin.Context) {
 }
 
 // @Summary Overseerr and Jellyseerr Media Requests
-// @Description Returns an iFrame with Overseerr and Jellyseerr media requests list. Returns all requests if the user's API token has the ADMIN or MANAGE_REQUESTS permissions. Otherwise, only the logged-in user's requests are returned.
+// @Description Returns an iFrame with Overseerr and Jellyseerr media requests list. Returns all requests if the user's API token has the ADMIN or MANAGE_REQUESTS permissions. Otherwise, only the logged-in user's requests are returned. Using the query argument `showMedia=true` will return the media data instead of the requests and media data. You can combine it with `filter=allavaliable` and `sort=mediaAdded` to show the downloaded media sorted by download date, like the first row in Overseerr/Jellyseerr UI "Recently Added".
 // @Success 200 {string} string "HTML content"
 // @Produce html
 // @Param theme query string false "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white" Example(light)
 // @Param api_url query string true "API URL used by your browser. Use by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload. Also used by the button to set the task done, if not provided, the button will not appear." Example(https://sub.domain.com)
 // @Param limit query int false "Limits the number of items in the iFrame." Example(5)
-// @Param filter query string false "Filters for request status and media status. Available values: all, approved, available, pending, processing, unavailable, failed, deleted, completed. Defaults to all" Example(all)
-// @Param sort query string false "Available values: added, modified. Defaults to added" Example(added)
+// @Param filter query string false "Filters for request status and media status. Available values: all, approved, available, pending, processing, unavailable, failed, deleted, completed, allavaliable (showMedia=true). Defaults to all" Example(all)
+// @Param sort query string false "Available values: added, modified, mediaAdded (showMedia=true). Defaults to added" Example(added)
 // @Param requestedByOverseerr query string false "If specified, only requests from that particular overseerr user ID will be returned." Example(1)
 // @Param requestedByJellyseerr query string false "If specified, only requests from that particular jellyseerr user ID will be returned." Example(1)
+// @Param showMedia query string false "If true, shows the requests' media data, not the requests and media data. Defaults to false." Example(true)
 // @Router /iframe/media_requests [get]
 func MediaRequestsiFrameHandler(c *gin.Context) {
 	mediarequets.GetiFrame(c)

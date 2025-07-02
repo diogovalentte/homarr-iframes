@@ -128,17 +128,24 @@ paths:
       description: Get the hash of the media requests. Used by the iFrames to check
         updates and reload the iframe.
       parameters:
-      - description: Filter movies get from Radarr. Can be 'inCinemas', 'physical',
-          'digital', or multiple separated by comma. Defaults to 'inCinemas,physical,digital'
-        example: inCinemas,digital
+      - description: Limits the number of items in the iFrame.
+        example: 5
         in: query
-        name: radarrReleaseType
+        name: limit
+        type: integer
+      - description: 'Filters for request status and media status. Available values:
+          all, approved, available, pending, processing, unavailable, failed, deleted,
+          completed, allavaliable (showMedia=true). Defaults to all'
+        example: all
+        in: query
+        name: filter
         type: string
-      - description: Specify if show unmonitored media. Defaults to false.
-        example: true
+      - description: 'Available values: added, modified, mediaAdded (showMedia=true).
+          Defaults to added'
+        example: added
         in: query
-        name: showUnmonitored
-        type: boolean
+        name: sort
+        type: string
       - description: If specified, only requests from that particular overseerr user
           ID will be returned.
         example: "1"
@@ -150,6 +157,12 @@ paths:
         example: "1"
         in: query
         name: requestedByJellyseerr
+        type: string
+      - description: If true, shows the requests' media data, not the requests and
+          media data. Defaults to false.
+        example: "true"
+        in: query
+        name: showMedia
         type: string
       produces:
       - application/json
@@ -413,7 +426,11 @@ paths:
     get:
       description: Returns an iFrame with Overseerr and Jellyseerr media requests
         list. Returns all requests if the user's API token has the ADMIN or MANAGE_REQUESTS
-        permissions. Otherwise, only the logged-in user's requests are returned.
+        permissions. Otherwise, only the logged-in user's requests are returned. Using
+        the query argument `showMedia=true` will return the media data instead of
+        the requests and media data. You can combine it with `filter=allavaliable`
+        and `sort=mediaAdded` to show the downloaded media sorted by download date,
+        like the first row in Overseerr/Jellyseerr UI "Recently Added".
       parameters:
       - description: Homarr theme, defaults to light. If it's different from your
           Homarr theme, the background turns white
@@ -437,12 +454,13 @@ paths:
         type: integer
       - description: 'Filters for request status and media status. Available values:
           all, approved, available, pending, processing, unavailable, failed, deleted,
-          completed. Defaults to all'
+          completed, allavaliable (showMedia=true). Defaults to all'
         example: all
         in: query
         name: filter
         type: string
-      - description: 'Available values: added, modified. Defaults to added'
+      - description: 'Available values: added, modified, mediaAdded (showMedia=true).
+          Defaults to added'
         example: added
         in: query
         name: sort
@@ -458,6 +476,12 @@ paths:
         example: "1"
         in: query
         name: requestedByJellyseerr
+        type: string
+      - description: If true, shows the requests' media data, not the requests and
+          media data. Defaults to false.
+        example: "true"
+        in: query
+        name: showMedia
         type: string
       produces:
       - text/html

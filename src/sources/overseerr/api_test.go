@@ -55,7 +55,20 @@ func TestGetMedia(t *testing.T) {
 	}
 
 	t.Run("get movie", func(t *testing.T) {
-		media, err := o.GetMedia("movie", 929590) // civil war
+		media, err := o.GetMedia(-1, "", "") // civil war
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if len(media) == 0 {
+			t.Fatal("empty media list")
+		}
+	})
+}
+
+func TestGetMovieTV(t *testing.T) {
+	t.Run("get movie", func(t *testing.T) {
+		media, err := o.GetMovie(929590) // civil war
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -66,7 +79,7 @@ func TestGetMedia(t *testing.T) {
 	})
 
 	t.Run("get tv show", func(t *testing.T) {
-		media, err := o.GetMedia("tv", 2316) // the office
+		media, err := o.GetTV(2316) // the office
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -83,14 +96,25 @@ func TestGetIframeData(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	t.Run("get iframe data", func(t *testing.T) {
-		iframeData, err := o.GetIframeData(-1, "", "", 0)
+	t.Run("get iframe requests data", func(t *testing.T) {
+		iframeData, err := o.GetIframeData(-1, "", "", 0, false)
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		if len(iframeData) == 0 {
-			t.Fatal("empty iframe data")
+			t.Fatal("empty iframe requests data")
+		}
+	})
+
+	t.Run("get iframe media data", func(t *testing.T) {
+		iframeData, err := o.GetIframeData(-1, "", "", 0, true)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if len(iframeData) == 0 {
+			t.Fatal("empty iframe media data")
 		}
 	})
 }

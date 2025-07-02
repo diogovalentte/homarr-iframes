@@ -23,7 +23,7 @@ func (o *Overseerr) GetRequests(limit int, filter, sort string, requestedBy int)
 		path += fmt.Sprintf("&requestedBy=%d", requestedBy)
 	}
 
-	var responseData getRequestsResponse
+	var responseData GetRequestsResponse
 	if err := o.baseRequest(http.MethodGet, o.InternalAddress+path, nil, &responseData); err != nil {
 		return nil, fmt.Errorf("error getting requests: %w", err)
 	}
@@ -31,30 +31,32 @@ func (o *Overseerr) GetRequests(limit int, filter, sort string, requestedBy int)
 	return responseData.Requests, nil
 }
 
-type getRequestsResponse struct {
+type GetRequestsResponse struct {
 	Requests []Request `json:"results"`
 }
 
-func (o *Overseerr) GetMedia(mediaType string, tmdbID int) (GenericMedia, error) {
-	if tmdbID == 0 {
-		return GenericMedia{}, fmt.Errorf("invalid TMDB ID")
+func (o *Overseerr) GetMedia(limit int, filter, sort string) ([]Media, error) {
+	if limit == 0 {
+		return []Media{}, nil
 	}
-	var err error
-	var media GenericMedia
-	switch mediaType {
-	case "movie":
-		media, err = o.GetMovie(tmdbID)
-	case "tv":
-		media, err = o.GetTv(tmdbID)
-	default:
-		return GenericMedia{}, fmt.Errorf("invalid media type")
+	path := fmt.Sprintf("/api/v1/media?take=%d", limit)
+	if filter != "" {
+		path += fmt.Sprintf("&filter=%s", filter)
+	}
+	if sort != "" {
+		path += fmt.Sprintf("&sort=%s", sort)
 	}
 
-	if err != nil {
-		return GenericMedia{}, fmt.Errorf("error getting media: %w", err)
+	var responseData GetMediaResponse
+	if err := o.baseRequest(http.MethodGet, o.InternalAddress+path, nil, &responseData); err != nil {
+		return nil, fmt.Errorf("error getting media: %w", err)
 	}
 
-	return media, nil
+	return responseData.Media, nil
+}
+
+type GetMediaResponse struct {
+	Media []Media `json:"results"`
 }
 
 func (o *Overseerr) GetMovie(id int) (GenericMedia, error) {
@@ -82,7 +84,7 @@ type getMovieResponse struct {
 	ID           int    `json:"id"`
 }
 
-func (o *Overseerr) GetTv(id int) (GenericMedia, error) {
+func (o *Overseerr) GetTV(id int) (GenericMedia, error) {
 	var responseData getTvResponse
 	if err := o.baseRequest(http.MethodGet, o.InternalAddress+"/api/v1/tv/"+fmt.Sprint(id), nil, &responseData); err != nil {
 		return GenericMedia{}, fmt.Errorf("error getting tv show: %w", err)
@@ -139,40 +141,81 @@ func (o *Overseerr) baseRequest(method, url string, body io.Reader, target any) 
 	return nil
 }
 
-func (o *Overseerr) GetIframeData(limit int, filter, sort string, requestedBy int) ([]IframeRequestData, error) {
-	requests, err := o.GetRequests(limit, filter, sort, requestedBy)
-	if err != nil {
-		return nil, err
-	}
-
+func (o *Overseerr) GetIframeData(limit int, filter, sort string, requestedBy int, getMedia bool) ([]IframeRequestData, error) {
 	iframeData := []IframeRequestData{}
-	for _, request := range requests {
-		media, err := o.GetMedia(request.Media.Type, request.Media.TMDBID)
+
+	if !getMedia {
+		requests, err := o.GetRequests(limit, filter, sort, requestedBy)
 		if err != nil {
 			return nil, err
 		}
-		var data IframeRequestData
-		data.Media.Name = media.Name
-		data.Media.Type = request.Media.Type
-		data.Media.TMDBID = request.Media.TMDBID
-		data.Media.Year = strings.Split(media.ReleaseDate, "-")[0]
-		data.Media.URL = fmt.Sprintf("%s/%s/%d", o.Address, request.Media.Type, request.Media.TMDBID)
-		data.Media.PosterURL = TMDBPosterImageBasePath + media.PosterPath
-		if media.BackdropPath != "" {
-			data.Media.BackdropURL = TMDBBackdropImageBasePath + media.BackdropPath
-		} else {
-			data.Media.BackdropURL = TMDBPosterImageBasePath + media.PosterPath
-		}
-		data.Request.Username = request.RequestedBy.Username
-		data.Request.AvatarURL = request.RequestedBy.Avatar
-		data.Request.UserProfileURL = fmt.Sprintf("%s/users/%d", o.Address, request.RequestedBy.ID)
-		data.Request.UserID = request.RequestedBy.ID
-		data.Status = getRequestStatusName(request.Status, request.Media.Status)
 
-		iframeData = append(iframeData, data)
+		for _, request := range requests {
+			var data IframeRequestData
+			err = o.setMediaData(&request.Media, &data)
+			if err != nil {
+				return nil, fmt.Errorf("error setting media data: %w", err)
+			}
+			data.Request.Username = request.RequestedBy.Username
+			data.Request.AvatarURL = request.RequestedBy.Avatar
+			data.Request.UserProfileURL = fmt.Sprintf("%s/users/%d", o.Address, request.RequestedBy.ID)
+			data.Request.UserID = request.RequestedBy.ID
+			data.Status = getRequestStatusName(request.Status, request.Media.Status)
+
+			iframeData = append(iframeData, data)
+		}
+	} else {
+		media, err := o.GetMedia(limit, filter, sort)
+		if err != nil {
+			return nil, err
+		}
+		for _, m := range media {
+			var data IframeRequestData
+			err = o.setMediaData(&m, &data)
+			if err != nil {
+				return nil, fmt.Errorf("error setting media data: %w", err)
+			}
+			data.Status = getRequestStatusName(2, m.Status) // Default status for media
+
+			iframeData = append(iframeData, data)
+		}
 	}
 
 	return iframeData, nil
+}
+
+func (o *Overseerr) setMediaData(media *Media, iframe *IframeRequestData) error {
+	if media.TMDBID == 0 {
+		return fmt.Errorf("invalid TMDB ID for request %d", media.ID)
+	}
+
+	var err error
+	var mediaInfo GenericMedia
+	switch media.Type {
+	case "movie":
+		mediaInfo, err = o.GetMovie(media.TMDBID)
+	case "tv":
+		mediaInfo, err = o.GetTV(media.TMDBID)
+	default:
+		return fmt.Errorf("invalid media type: %s", media.Type)
+	}
+	if err != nil {
+		return err
+	}
+
+	iframe.Media.Name = mediaInfo.Name
+	iframe.Media.Type = media.Type
+	iframe.Media.TMDBID = media.TMDBID
+	iframe.Media.Year = strings.Split(mediaInfo.ReleaseDate, "-")[0]
+	iframe.Media.URL = fmt.Sprintf("%s/%s/%d", o.Address, media.Type, media.TMDBID)
+	iframe.Media.PosterURL = TMDBPosterImageBasePath + mediaInfo.PosterPath
+	if mediaInfo.BackdropPath != "" {
+		iframe.Media.BackdropURL = TMDBBackdropImageBasePath + mediaInfo.BackdropPath
+	} else {
+		iframe.Media.BackdropURL = TMDBPosterImageBasePath + mediaInfo.PosterPath
+	}
+
+	return nil
 }
 
 // getRequestStatusName returns the HTML/CSS properties of the request status

@@ -172,17 +172,24 @@ const docTemplate = `{
                 "summary": "Get the hash of media requests",
                 "parameters": [
                     {
-                        "type": "string",
-                        "example": "inCinemas,digital",
-                        "description": "Filter movies get from Radarr. Can be 'inCinemas', 'physical', 'digital', or multiple separated by comma. Defaults to 'inCinemas,physical,digital'",
-                        "name": "radarrReleaseType",
+                        "type": "integer",
+                        "example": 5,
+                        "description": "Limits the number of items in the iFrame.",
+                        "name": "limit",
                         "in": "query"
                     },
                     {
-                        "type": "boolean",
-                        "example": true,
-                        "description": "Specify if show unmonitored media. Defaults to false.",
-                        "name": "showUnmonitored",
+                        "type": "string",
+                        "example": "all",
+                        "description": "Filters for request status and media status. Available values: all, approved, available, pending, processing, unavailable, failed, deleted, completed, allavaliable (showMedia=true). Defaults to all",
+                        "name": "filter",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "added",
+                        "description": "Available values: added, modified, mediaAdded (showMedia=true). Defaults to added",
+                        "name": "sort",
                         "in": "query"
                     },
                     {
@@ -197,6 +204,13 @@ const docTemplate = `{
                         "example": "1",
                         "description": "If specified, only requests from that particular jellyseerr user ID will be returned.",
                         "name": "requestedByJellyseerr",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "true",
+                        "description": "If true, shows the requests' media data, not the requests and media data. Defaults to false.",
+                        "name": "showMedia",
                         "in": "query"
                     }
                 ],
@@ -525,7 +539,7 @@ const docTemplate = `{
         },
         "/iframe/media_requests": {
             "get": {
-                "description": "Returns an iFrame with Overseerr and Jellyseerr media requests list. Returns all requests if the user's API token has the ADMIN or MANAGE_REQUESTS permissions. Otherwise, only the logged-in user's requests are returned.",
+                "description": "Returns an iFrame with Overseerr and Jellyseerr media requests list. Returns all requests if the user's API token has the ADMIN or MANAGE_REQUESTS permissions. Otherwise, only the logged-in user's requests are returned. Using the query argument ` + "`" + `showMedia=true` + "`" + ` will return the media data instead of the requests and media data. You can combine it with ` + "`" + `filter=allavaliable` + "`" + ` and ` + "`" + `sort=mediaAdded` + "`" + ` to show the downloaded media sorted by download date, like the first row in Overseerr/Jellyseerr UI \"Recently Added\".",
                 "produces": [
                     "text/html"
                 ],
@@ -556,14 +570,14 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "example": "all",
-                        "description": "Filters for request status and media status. Available values: all, approved, available, pending, processing, unavailable, failed, deleted, completed. Defaults to all",
+                        "description": "Filters for request status and media status. Available values: all, approved, available, pending, processing, unavailable, failed, deleted, completed, allavaliable (showMedia=true). Defaults to all",
                         "name": "filter",
                         "in": "query"
                     },
                     {
                         "type": "string",
                         "example": "added",
-                        "description": "Available values: added, modified. Defaults to added",
+                        "description": "Available values: added, modified, mediaAdded (showMedia=true). Defaults to added",
                         "name": "sort",
                         "in": "query"
                     },
@@ -579,6 +593,13 @@ const docTemplate = `{
                         "example": "1",
                         "description": "If specified, only requests from that particular jellyseerr user ID will be returned.",
                         "name": "requestedByJellyseerr",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "true",
+                        "description": "If true, shows the requests' media data, not the requests and media data. Defaults to false.",
+                        "name": "showMedia",
                         "in": "query"
                     }
                 ],

@@ -89,10 +89,12 @@ func MediaReleasesHashHandler(c *gin.Context) {
 // @Description Get the hash of the media requests. Used by the iFrames to check updates and reload the iframe.
 // @Success 200 {object} hashResponse
 // @Produce json
-// @Param radarrReleaseType query string false "Filter movies get from Radarr. Can be 'inCinemas', 'physical', 'digital', or multiple separated by comma. Defaults to 'inCinemas,physical,digital'" Example(inCinemas,digital)
-// @Param showUnmonitored query bool false "Specify if show unmonitored media. Defaults to false." Example(true)
+// @Param limit query int false "Limits the number of items in the iFrame." Example(5)
+// @Param filter query string false "Filters for request status and media status. Available values: all, approved, available, pending, processing, unavailable, failed, deleted, completed, allavaliable (showMedia=true). Defaults to all" Example(all)
+// @Param sort query string false "Available values: added, modified, mediaAdded (showMedia=true). Defaults to added" Example(added)
 // @Param requestedByOverseerr query string false "If specified, only requests from that particular overseerr user ID will be returned." Example(1)
 // @Param requestedByJellyseerr query string false "If specified, only requests from that particular jellyseerr user ID will be returned." Example(1)
+// @Param showMedia query string false "If true, shows the requests' media data, not the requests and media data. Defaults to false." Example(true)
 // @Router /hash/media_requests [get]
 func MediaRequestsHashHandler(c *gin.Context) {
 	mediarequets.GetHash(c)
