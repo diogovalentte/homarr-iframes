@@ -51,11 +51,11 @@ func getCalendar(unmonitored, inCinemas, physical, digital bool) (*Calendar, err
 }
 
 func getRadarrCalendar(unmonitored bool, startDate, endDate time.Time, inCinemas, physical, digital bool) (*Calendar, error) {
-	radarr, err := radarr.New()
+	radarrInstance, err := radarr.New()
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create Radarr client: %s", err.Error())
 	}
-	entries, err := radarr.GetCalendar(unmonitored, startDate, endDate)
+	entries, err := radarrInstance.GetCalendar(unmonitored, startDate, endDate)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get Radarr calendar: %s", err.Error())
 	}
@@ -113,6 +113,13 @@ func getRadarrCalendar(unmonitored bool, startDate, endDate time.Time, inCinemas
 
 		posterImageURL, coverImageURL := GetReleaseImagesURL(entry.Images)
 
+		if coverImageURL == "" {
+			coverImageURL = radarr.BackgroundImageURL
+		}
+		if posterImageURL == "" {
+			posterImageURL = radarr.BackgroundImageURL
+		}
+
 		calendar.Releases = append(calendar.Releases, MediaRelease{
 			Title:              entry.OriginalTitle,
 			Source:             "Radarr",
@@ -129,11 +136,11 @@ func getRadarrCalendar(unmonitored bool, startDate, endDate time.Time, inCinemas
 }
 
 func getSonarrCalendar(unmonitored bool, startDate, endDate time.Time) (*Calendar, error) {
-	sonarr, err := sonarr.New()
+	sonarrInstance, err := sonarr.New()
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create Sonarr client: %s", err.Error())
 	}
-	entries, err := sonarr.GetCalendar(unmonitored, startDate, endDate)
+	entries, err := sonarrInstance.GetCalendar(unmonitored, startDate, endDate)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get Sonarr calendar: %s", err.Error())
 	}
@@ -149,6 +156,13 @@ func getSonarrCalendar(unmonitored bool, startDate, endDate time.Time) (*Calenda
 		airDate = airDate.In(time.Local)
 		now := time.Now()
 		shouldBeDownloaded := airDate.Before(now)
+
+		if coverImageURL == "" {
+			coverImageURL = sonarr.BackgroundImageURL
+		}
+		if posterImageURL == "" {
+			posterImageURL = sonarr.BackgroundImageURL
+		}
 
 		calendar.Releases = append(calendar.Releases, MediaRelease{
 			Title:              entry.Series.Title,
@@ -175,11 +189,11 @@ func getSonarrCalendar(unmonitored bool, startDate, endDate time.Time) (*Calenda
 }
 
 func getLidarrCalendar(unmonitored bool, startDate, endDate time.Time) (*Calendar, error) {
-	lidarr, err := lidarr.New()
+	lidarrInstance, err := lidarr.New()
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create Lidarr client: %s", err.Error())
 	}
-	entries, err := lidarr.GetCalendar(unmonitored, startDate, endDate)
+	entries, err := lidarrInstance.GetCalendar(unmonitored, startDate, endDate)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get Lidarr calendar: %s", err.Error())
 	}
@@ -196,6 +210,13 @@ func getLidarrCalendar(unmonitored bool, startDate, endDate time.Time) (*Calenda
 			return nil, fmt.Errorf("error parsing album '%#v' release date: %w", entry, err)
 		}
 		airDate = airDate.In(time.Local)
+
+		if coverImageURL == "" {
+			coverImageURL = lidarr.BackgroundImageURL
+		}
+		if posterImageURL == "" {
+			posterImageURL = lidarr.BackgroundImageURL
+		}
 
 		calendar.Releases = append(calendar.Releases, MediaRelease{
 			Title:          entry.Title,
