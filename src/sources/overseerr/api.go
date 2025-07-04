@@ -208,11 +208,16 @@ func (o *Overseerr) setMediaData(media *Media, iframe *IframeRequestData) error 
 	iframe.Media.TMDBID = media.TMDBID
 	iframe.Media.Year = strings.Split(mediaInfo.ReleaseDate, "-")[0]
 	iframe.Media.URL = fmt.Sprintf("%s/%s/%d", o.Address, media.Type, media.TMDBID)
-	iframe.Media.PosterURL = TMDBPosterImageBasePath + mediaInfo.PosterPath
+	if mediaInfo.PosterPath != "" {
+		iframe.Media.PosterURL = TMDBPosterImageBasePath + mediaInfo.PosterPath
+	} else {
+		iframe.Media.PosterURL = DefaultBackgroundImageURL
+	}
+
 	if mediaInfo.BackdropPath != "" {
 		iframe.Media.BackdropURL = TMDBBackdropImageBasePath + mediaInfo.BackdropPath
 	} else {
-		iframe.Media.BackdropURL = TMDBPosterImageBasePath + mediaInfo.PosterPath
+		iframe.Media.BackdropURL = iframe.Media.PosterURL
 	}
 
 	return nil

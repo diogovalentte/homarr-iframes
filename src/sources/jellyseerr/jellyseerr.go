@@ -7,10 +7,7 @@ import (
 	"github.com/diogovalentte/homarr-iframes/src/config"
 )
 
-var (
-	j                  *Jellyseerr
-	backgroundImageURL = "https://github.com/Fallenbagel/jellyseerr/blob/develop/public/logo_full.png"
-)
+var j *Jellyseerr
 
 type Jellyseerr struct {
 	Address         string

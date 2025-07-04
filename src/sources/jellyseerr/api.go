@@ -206,11 +206,16 @@ func (j *Jellyseerr) setMediaData(media *overseerr.Media, iframe *overseerr.Ifra
 	iframe.Media.TMDBID = media.TMDBID
 	iframe.Media.Year = strings.Split(mediaInfo.ReleaseDate, "-")[0]
 	iframe.Media.URL = fmt.Sprintf("%s/%s/%d", j.Address, media.Type, media.TMDBID)
-	iframe.Media.PosterURL = overseerr.TMDBPosterImageBasePath + mediaInfo.PosterPath
+	if mediaInfo.PosterPath != "" {
+		iframe.Media.PosterURL = overseerr.TMDBPosterImageBasePath + mediaInfo.PosterPath
+	} else {
+		iframe.Media.PosterURL = overseerr.DefaultBackgroundImageURL
+	}
+
 	if mediaInfo.BackdropPath != "" {
 		iframe.Media.BackdropURL = overseerr.TMDBBackdropImageBasePath + mediaInfo.BackdropPath
 	} else {
-		iframe.Media.BackdropURL = overseerr.TMDBPosterImageBasePath + mediaInfo.PosterPath
+		iframe.Media.BackdropURL = iframe.Media.PosterURL
 	}
 
 	return nil
