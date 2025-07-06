@@ -64,11 +64,11 @@ type TestEntry struct {
 }
 
 type Data struct {
-	ID                int    `json:"id"`
-	Service           string `json:"service"`
-	Ping              string `json:"ping"`
-	DownloadBitsHuman string `json:"download_bits_human"`
-	UploadBitsHuman   string `json:"upload_bits_human"`
+	ID                int     `json:"id"`
+	Service           string  `json:"service"`
+	Ping              float32 `json:"ping"`
+	DownloadBitsHuman string  `json:"download_bits_human"`
+	UploadBitsHuman   string  `json:"upload_bits_human"`
 	Benchmarks        *struct {
 		Download *Benchmarks `json:"download"`
 		Upload   *Benchmarks `json:"upload"`

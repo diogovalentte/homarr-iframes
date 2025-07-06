@@ -359,7 +359,7 @@ func getSpeedTestTrackerAlarms() ([]Alarm, error) {
 				Summary:         "Speedtest Threshold Breached",
 				URL:             url,
 				Status:          "PING",
-				Value:           fmt.Sprintf("%s ms", test.Ping),
+				Value:           fmt.Sprintf("%.2f ms", test.Ping),
 				Property:        test.Data.ISP,
 				Source:          "SpeedTest",
 				BackgroundColor: "black",
