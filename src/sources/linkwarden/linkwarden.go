@@ -118,7 +118,7 @@ func (l *Linkwarden) GetiFrame(c *gin.Context) {
 
 	links, err := l.GetLinks(limit, collectionID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("couldn't get links: %s", err.Error())})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("couldn't get links: %s", err.Error()).Error()})
 		return
 	}
 
@@ -132,7 +132,7 @@ func (l *Linkwarden) GetiFrame(c *gin.Context) {
 	} else {
 		html, err = l.getLinksiFrame(links, theme, l.BackgroundImgURL, backgroundPosition, backgroundSize, backgroundFilter, apiURL, collectionID, limit)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("couldn't create HTML code: %s", err.Error())})
+			c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("couldn't create HTML code: %s", err.Error()).Error()})
 			return
 		}
 	}
@@ -416,7 +416,7 @@ func (l *Linkwarden) GetHash(c *gin.Context) {
 
 	pLinks, err := l.GetLinks(limit, collectionID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("couldn't get links: %s", err.Error())})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("couldn't get links: %s", err.Error()).Error()})
 		return
 	}
 
