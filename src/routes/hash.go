@@ -8,6 +8,7 @@ import (
 	"github.com/diogovalentte/homarr-iframes/src/config"
 	"github.com/diogovalentte/homarr-iframes/src/sources/alarms"
 	"github.com/diogovalentte/homarr-iframes/src/sources/cinemark"
+	"github.com/diogovalentte/homarr-iframes/src/sources/jellyfin"
 	"github.com/diogovalentte/homarr-iframes/src/sources/linkwarden"
 	"github.com/diogovalentte/homarr-iframes/src/sources/media"
 	mediarequets "github.com/diogovalentte/homarr-iframes/src/sources/media-requets"
@@ -24,22 +25,43 @@ func HashRoutes(group *gin.RouterGroup) {
 	group.GET("/media_requests", MediaRequestsHashHandler)
 	group.GET("/uptimekuma", UptimeKumaHashHandler)
 	group.GET("/alarms", AlarmsHashHandler)
+	group.GET("/jellyfin/recently", JellyfinRecentlyHashHandler)
+}
+
+// @Summary Get the hash of the Jellyfin bookmarks
+// @Description Get the hash of the Jellyfin Recently Added items. Used by the iFrames to check updates and reload the iframe.
+// @Success 200 {object} hashResponse
+// @Produce json
+// @Param collectionId query int false "Get bookmarks only from this collection. You can get the collection ID by going to the collection page. The ID should be on the URL. The ID of the default collection **Unorganized** is 1 because the URL is https://domain.com/collections/1." Example(1)
+// @Param limit query int false "Limits the number of items in the iFrame." Example(5)
+// @Router /hash/jellyfin/recently [get]
+func JellyfinRecentlyHashHandler(c *gin.Context) {
+	l, err := jellyfin.New()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	l.GetHash(c)
 }
 
 // @Summary Get the hash of the Linkwarden bookmarks
 // @Description Get the hash of the Linkwarden bookmarks. Used by the iFrames to check updates and reload the iframe.
 // @Success 200 {object} hashResponse
 // @Produce json
-// @Param collectionId query int false "Get bookmarks only from this collection. You can get the collection ID by going to the collection page. The ID should be on the URL. The ID of the default collection **Unorganized** is 1 because the URL is https://domain.com/collections/1." Example(1)
-// @Param limit query int false "Limits the number of items in the iFrame." Example(5)
+// @Param theme query string false "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white." Example(light)
+// @Param limit query int false "Limits the number of items in the iFrame." Example(20)
+// @Param userId query string false "Jellyfin user ID to get items for. You can get the user ID by going to the admin users page. The ID should be on the URL when clicking on a user. The given user should have access to each library you want data to be fetched from. Defaults to environment JELLYFIN_ADMIN_USER_ID" Example(n6dcfgwiwh1m4c2vhjjm52101vrp01a5)
+// @Param parentId query string false "Jellyfin parent/library ID to filter items. You can get the user ID by going to the library page. The ID should be on the URL. The given user in userId should have access to each library you want data to be fetched from." Example(op2xj0l1qejb9g5c5z0f199tigksn1ei)
+// @Param includeItemTypes query string false "Filter by media types. Available types can be read here https://api.jellyfin.org/#tag/UserLibrary/operation/GetLatestMedia. Defaults to Movie,Series." Example(Movie,Series)
+// @Param queryLimit query int false "Maximum number of items beeing queried from Jellyfin, when fetching Series data each episode counts as one. Defaults to 100." Example(100)
 // @Router /hash/linkwarden [get]
 func LinkwardenHashHandler(c *gin.Context) {
-	l, err := linkwarden.New()
+	j, err := linkwarden.New()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
-	l.GetHash(c)
+	j.GetHash(c)
 }
 
 // @Summary Get the hash of the Cinemark movies

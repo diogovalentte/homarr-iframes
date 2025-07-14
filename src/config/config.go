@@ -123,6 +123,7 @@ type jellyfinConfigs struct {
 	Address         string
 	InternalAddress string
 	APIKey          string
+	UserId          string
 }
 
 type jellyseerrConfigs struct {
@@ -173,6 +174,7 @@ func SetConfigs(filePath string) error {
 	GlobalConfigs.Jellyfin.Address = os.Getenv("JELLYFIN_ADDRESS")
 	GlobalConfigs.Jellyfin.InternalAddress = os.Getenv("INTERNAL_JELLYFIN_ADDRESS")
 	GlobalConfigs.Jellyfin.APIKey = os.Getenv("JELLYFIN_API_KEY")
+	GlobalConfigs.Jellyfin.UserId = os.Getenv("JELLYFIN_ADMIN_USER_ID")
 
 	GlobalConfigs.Jellyseerr.Address = os.Getenv("JELLYSEERR_ADDRESS")
 	GlobalConfigs.Jellyseerr.InternalAddress = os.Getenv("INTERNAL_JELLYSEERR_ADDRESS")
