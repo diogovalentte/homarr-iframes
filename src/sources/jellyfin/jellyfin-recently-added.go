@@ -6,66 +6,18 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+
 	"sort"
 	"strconv"
 	"strings"
 	"text/template"
 	"time"
 
-	"github.com/gin-gonic/gin"
-
-	"github.com/diogovalentte/homarr-iframes/src/config"
 	"github.com/diogovalentte/homarr-iframes/src/sources"
+	"github.com/gin-gonic/gin"
 )
 
-type JellyfinRecently struct {
-	Address         string
-	InternalAddress string
-	APIKey          string
-	UserId          string
-}
-
-var j *JellyfinRecently
-
-func New() (*JellyfinRecently, error) {
-	if j != nil {
-		return j, nil
-	}
-
-	address := config.GlobalConfigs.Jellyfin.Address
-	internalAddress := config.GlobalConfigs.Jellyfin.InternalAddress
-	APIKey := config.GlobalConfigs.Jellyfin.APIKey
-	UserId := config.GlobalConfigs.Jellyfin.UserId
-
-	newj := &JellyfinRecently{}
-	err := newj.Init(address, internalAddress, APIKey, UserId)
-	if err != nil {
-		return nil, err
-	}
-
-	j = newj
-
-	return j, nil
-}
-
-func (j *JellyfinRecently) Init(address, internalAddress, APIKey, UserId string) error {
-	if address == "" || APIKey == "" {
-		return fmt.Errorf("JELLYFIN_ADDRESS and JELLYFIN_API_KEY variables should be set")
-	}
-
-	j.Address = strings.TrimSuffix(address, "/")
-	if internalAddress == "" {
-		j.InternalAddress = j.Address
-	} else {
-		j.InternalAddress = strings.TrimSuffix(internalAddress, "/")
-	}
-	j.APIKey = APIKey
-	j.UserId = UserId
-
-	return nil
-}
-
-func (j *JellyfinRecently) GetiFrame(c *gin.Context) {
+func (j *Jellyfin) GetRecentlyAddediFrame(c *gin.Context) {
 	theme := c.Query("theme")
 	if theme == "" {
 		theme = "light"
@@ -158,7 +110,7 @@ func (j *JellyfinRecently) GetiFrame(c *gin.Context) {
 		}
 	}
 
-	items, err := j.GetLatestItems(limit, userId, parentId, includeItemTypes, queryLimit)
+	items, err := j.GetLatestItems(limit, queryLimit, userId, parentId, includeItemTypes)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("couldn't get items: %s", err.Error())})
 		return
@@ -195,7 +147,7 @@ func (j *JellyfinRecently) GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func (j *JellyfinRecently) getItemsiFrame(items []*Item, theme, apiURL string, limit int, userId, parentId, includeItemTypes string, queryLimit int) ([]byte, error) {
+func (j *Jellyfin) getItemsiFrame(items []*Item, theme, apiURL string, limit int, userId, parentId, includeItemTypes string, queryLimit int) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -427,7 +379,7 @@ type iframeTemplateData struct {
 	QueryLimit                    int
 }
 
-func (j *JellyfinRecently) GetHash(c *gin.Context) {
+func (j *Jellyfin) GetHash(c *gin.Context) {
 	frameQueryLimit := c.Query("limit")
 	var limit int
 	var err error
@@ -457,7 +409,7 @@ func (j *JellyfinRecently) GetHash(c *gin.Context) {
 		}
 	}
 
-	items, err := j.GetLatestItems(limit, userId, parentId, includeItemTypes, queryLimit)
+	items, err := j.GetLatestItems(limit, queryLimit, userId, parentId, includeItemTypes)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return

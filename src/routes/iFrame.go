@@ -50,7 +50,7 @@ func JellyfinRecentlyiFrameHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
-	j.GetiFrame(c)
+	j.GetRecentlyAddediFrame(c)
 }
 
 // @Summary Linkwarden  bookmarks iFrame

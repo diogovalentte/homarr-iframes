@@ -34,7 +34,7 @@ func TestGetLatestItems(t *testing.T) {
 		t.Fatalf("error creating Jellyfin instance: %v", err)
 	}
 
-	items, err := j.GetLatestItems(20, j.UserId, "", "Movie,Episode", 100)
+	items, err := j.GetLatestItems(20, 100, j.userId, "", "Movie,Episode")
 	if err != nil {
 		t.Fatalf("error getting latest items: %v", err)
 	}
