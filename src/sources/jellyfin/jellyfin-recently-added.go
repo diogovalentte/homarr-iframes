@@ -7,9 +7,7 @@ import (
 	"net/url"
 	"regexp"
 
-	"sort"
 	"strconv"
-	"strings"
 	"text/template"
 	"time"
 
@@ -67,36 +65,6 @@ func (j *Jellyfin) GetRecentlyAddediFrame(c *gin.Context) {
 	}
 
 	includeItemTypes := c.Query("includeItemTypes")
-	if includeItemTypes != "" {
-		allowedTypes := map[string]bool{
-			"AggregateFolder": true, "Audio": true, "AudioBook": true, "BasePluginFolder": true,
-			"Book": true, "BoxSet": true, "Channel": true, "ChannelFolderItem": true,
-			"CollectionFolder": true, "Episode": true, "Folder": true, "Genre": true,
-			"ManualPlaylistsFolder": true, "Movie": true, "LiveTvChannel": true, "LiveTvProgram": true,
-			"MusicAlbum": true, "MusicArtist": true, "MusicGenre": true, "MusicVideo": true,
-			"Person": true, "Photo": true, "PhotoAlbum": true, "Playlist": true,
-			"PlaylistsFolder": true, "Program": true, "Recording": true, "Season": true,
-			"Series": true, "Studio": true, "Trailer": true, "TvChannel": true,
-			"TvProgram": true, "UserRootFolder": true, "UserView": true, "Video": true, "Year": true,
-		}
-		itemTypesList := strings.Split(includeItemTypes, ",")
-		for _, itemType := range itemTypesList {
-			itemType = strings.TrimSpace(itemType)
-			if !allowedTypes[itemType] {
-				allowedTypesList := make([]string, 0, len(allowedTypes))
-				for t := range allowedTypes {
-					allowedTypesList = append(allowedTypesList, t)
-				}
-				sort.Strings(allowedTypesList)
-
-				c.JSON(http.StatusBadRequest, gin.H{
-					"message": fmt.Sprintf("'%s' is not a valid item type. Allowed types are: %s",
-						itemType, strings.Join(allowedTypesList, ", ")),
-				})
-				return
-			}
-		}
-	}
 
 	jellyfinQueryLimit := c.Query("queryLimit")
 	var queryLimit int
