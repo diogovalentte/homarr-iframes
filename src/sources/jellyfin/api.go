@@ -68,7 +68,7 @@ func (j *Jellyfin) baseRequest(method, url string, body io.Reader, target any) e
 		return fmt.Errorf("error creating request: %w", err)
 	}
 
-	req.Header.Set("Authorization", fmt.Sprintf("MediaBrowser Token=\"%s\", Client=\"HomarrIframes\", Device=\"Server\", DeviceId=\"homarr-iframes\", Version=\"1.0.0\"", j.APIKey))
+	req.Header.Set("Authorization", fmt.Sprintf("MediaBrowser Token=\"%s\"", j.APIKey))
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := client.Do(req)
