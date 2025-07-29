@@ -125,11 +125,11 @@ func (o *Overseerr) baseRequest(method, url string, body io.Reader, target any) 
 	}
 	defer resp.Body.Close()
 
+	resBody, err := io.ReadAll(resp.Body)
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("request status: %s", resp.Status)
+		return fmt.Errorf("request status (%s): %s", resp.Status, string(resBody))
 	}
 
-	resBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("error reading response body: %w", err)
 	}
@@ -154,7 +154,7 @@ func (o *Overseerr) GetIframeData(limit int, filter, sort string, requestedBy in
 			var data IframeRequestData
 			err = o.setMediaData(&request.Media, &data)
 			if err != nil {
-				return nil, fmt.Errorf("error setting media data: %w", err)
+				return nil, fmt.Errorf("error setting media data for request %d: %w", request.ID, err)
 			}
 			data.Request.Username = request.RequestedBy.Username
 			data.Request.AvatarURL = request.RequestedBy.Avatar

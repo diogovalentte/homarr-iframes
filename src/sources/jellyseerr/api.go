@@ -119,11 +119,11 @@ func (j *Jellyseerr) baseRequest(method, url string, body io.Reader, target any)
 	}
 	defer resp.Body.Close()
 
+	resBody, err := io.ReadAll(resp.Body)
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("request status: %s", resp.Status)
+		return fmt.Errorf("request status (%s): %s", resp.Status, string(resBody))
 	}
 
-	resBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("error reading response body: %w", err)
 	}
