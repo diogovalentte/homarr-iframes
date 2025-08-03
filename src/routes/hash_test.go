@@ -6,6 +6,16 @@ import (
 )
 
 func TestGetHashes(t *testing.T) {
+	t.Run("Get Jellyfin Sessions hash", func(t *testing.T) {
+		r, err := requestHelper(http.MethodGet, "/v1/hash/jellyfin/sessions", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if r.Code != http.StatusOK {
+			t.Fatalf("expected status code 200, got %d: %s", r.Code, r.Body.String())
+		}
+	})
 	t.Run("Get Jellyfin Recently Added hash", func(t *testing.T) {
 		r, err := requestHelper(http.MethodGet, "/v1/hash/jellyfin/recently", nil)
 		if err != nil {

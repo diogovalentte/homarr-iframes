@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"regexp"
-
 	"strconv"
 	"text/template"
 	"time"
@@ -15,7 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (j *Jellyfin) GetRecentlyAddediFrame(c *gin.Context) {
+func (j *Jellyfin) GetSessionsiFrame(c *gin.Context) {
 	theme := c.Query("theme")
 	if theme == "" {
 		theme = "light"
@@ -37,6 +35,18 @@ func (j *Jellyfin) GetRecentlyAddediFrame(c *gin.Context) {
 		}
 	}
 
+	activeSince := c.Query("activeWithinSeconds")
+	var activeWithinSeconds int
+	if activeSince == "" {
+		activeWithinSeconds = 0
+	} else {
+		activeWithinSeconds, err = strconv.Atoi(activeSince)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "activeWithinSeconds must be a number"})
+			return
+		}
+	}
+
 	apiURL := c.Query("api_url")
 	if apiURL != "" {
 		_, err = url.ParseRequestURI(apiURL)
@@ -46,66 +56,25 @@ func (j *Jellyfin) GetRecentlyAddediFrame(c *gin.Context) {
 		}
 	}
 
-	userId := c.Query("userId")
-	if userId != "" {
-		match, err := regexp.MatchString(`^[0-9a-fA-F]{32}$`, userId)
-		if err != nil || !match {
-			c.JSON(http.StatusBadRequest, gin.H{"message": "userId must be a valid Jellyfin user ID (32 hexadecimal characters)"})
-			return
-		}
-	}
-
-	parentId := c.Query("parentId")
-	if parentId != "" {
-		match, err := regexp.MatchString(`^[0-9a-fA-F]{32}$`, parentId)
-		if err != nil || !match {
-			c.JSON(http.StatusBadRequest, gin.H{"message": "parentId must be a valid Jellyfin folder/library ID (32 hexadecimal characters)"})
-			return
-		}
-	}
-
-	includeItemTypes := c.Query("includeItemTypes")
-
-	jellyfinQueryLimit := c.Query("queryLimit")
-	var queryLimit int
-	if jellyfinQueryLimit == "" {
-		queryLimit = 0
-	} else {
-		queryLimit, err = strconv.Atoi(jellyfinQueryLimit)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"message": "queryLimit must be a number"})
-			return
-		}
-	}
-
-	items, err := j.GetLatestItems(limit, queryLimit, userId, parentId, includeItemTypes)
+	sessions, err := j.GetSessions(limit, activeWithinSeconds)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("couldn't get items: %s", err.Error())})
 		return
 	}
 
 	var html []byte
-	if len(items) < 1 {
+	if len(sessions) < 1 {
 		var apiURLPath string
 		if apiURL != "" {
-			apiURLPath = apiURL + "/v1/hash/jellyfin/recently?limit=" + strconv.Itoa(limit) + "&theme=" + theme
-			if userId != "" {
-				apiURLPath += "&userId=" + userId
-			}
-			if parentId != "" {
-				apiURLPath += "&parentId=" + parentId
-			}
-			if includeItemTypes != "" {
-				apiURLPath += "&includeItemTypes=" + includeItemTypes
-			}
-			if queryLimit > 0 {
-				apiURLPath += "&queryLimit=" + strconv.Itoa(queryLimit)
+			apiURLPath = apiURL + "/v1/hash/jellyfin/sessions?limit=" + strconv.Itoa(limit) + "&theme=" + theme
+			if activeWithinSeconds > 0 {
+				apiURLPath += "&activeWithinSeconds=" + strconv.Itoa(activeWithinSeconds)
 			}
 		}
 		backgroundImgURL := "https://avatars.githubusercontent.com/u/45698031?s=280&v=4"
 		html = sources.GetBaseNothingToShowiFrame(theme, backgroundImgURL, "center", "cover", "brightness(0.3)", apiURLPath)
 	} else {
-		html, err = j.getItemsiFrame(items, theme, apiURL, limit, userId, parentId, includeItemTypes, queryLimit)
+		html, err = j.getSessionsiFrame(sessions, theme, apiURL, limit, activeWithinSeconds)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("couldn't create HTML code: %s", err.Error())})
 			return
@@ -115,7 +84,7 @@ func (j *Jellyfin) GetRecentlyAddediFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func (j *Jellyfin) getItemsiFrame(items []*Item, theme, apiURL string, limit int, userId, parentId, includeItemTypes string, queryLimit int) ([]byte, error) {
+func (j *Jellyfin) getSessionsiFrame(sessions []*Session, theme, apiURL string, limit, activeWithinSeconds int) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -125,7 +94,7 @@ func (j *Jellyfin) getItemsiFrame(items []*Item, theme, apiURL string, limit int
     <meta name="referrer" content="no-referrer"> <!-- If not set, can't load some images when behind a domain or reverse proxy -->
     <meta name="color-scheme" content="{{ .Theme }}">
     <script src="https://kit.fontawesome.com/3f763b063a.js" crossorigin="anonymous"></script>
-    <title>Jellyfin Recently Added</title>
+    <title>Jellyfin Sessions</title>
     <style>
       ::-webkit-scrollbar {
         width: 7px;
@@ -229,21 +198,48 @@ func (j *Jellyfin) getItemsiFrame(items []*Item, theme, apiURL string, limit int
             text-decoration: underline;
         }
 
-        .type-label {
+        .episode-info {
+            font-size: 0.85em;
+            color: #99b6bb;
+            font-weight: normal;
+            margin-left: 5px;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+              Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji,
+              Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+            font-feature-settings: normal;
+            font-variation-settings: normal;
+            text-decoration: none;
+        }
+
+        .episode-info:hover {
+            text-decoration: underline;
+        }
+        
+        /* User avatar styles */
+        .user-avatar {
+            object-fit: cover;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            margin: 0 10px;
+        }
+        
+        .user-container {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+        
+        .username {
             text-decoration: none;
             font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
               Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji,
               Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
             font-feature-settings: normal;
             font-variation-settings: normal;
-            font-weight: 700;
-            font-size: 0.6875rem;
-            line-height: calc(1.125rem);
-            text-transform: uppercase;
-            padding: 0px calc(0.666667rem) 0px calc(0.666667rem) !important;
-            display:inline-block;
-            border-radius: 1rem;
-            padding: 0.1rem 0.5rem;
+            font-weight: 600;
+            color: #99b6bb;
+            font-size: 0.9rem;
         }
     </style>
 
@@ -252,7 +248,7 @@ func (j *Jellyfin) getItemsiFrame(items []*Item, theme, apiURL string, limit int
 
         async function fetchData() {
             try {
-                var url = '{{ .APIURL }}/v1/hash/jellyfin/recently?limit={{ .APILimit }}{{ if .UserId }}&userId={{ .UserId }}{{ end }}{{ if .ParentId }}&parentId={{ .ParentId }}{{ end }}{{ if .IncludeItemTypes }}&includeItemTypes={{ .IncludeItemTypes }}{{ end }}{{ if .QueryLimit }}&queryLimit={{ .QueryLimit }}{{ end }}';
+                var url = '{{ .APIURL }}/v1/hash/jellyfin/sessions?limit={{ .APILimit }}{{ if .ActiveWithinSeconds }}&activeWithinSeconds={{ .ActiveWithinSeconds }}{{ end }}';
                 const response = await fetch(url);
                 const data = await response.json();
 
@@ -271,7 +267,7 @@ func (j *Jellyfin) getItemsiFrame(items []*Item, theme, apiURL string, limit int
 
         function fetchAndUpdate() {
             fetchData();
-            setTimeout(fetchAndUpdate, 10000); // 10 seconds
+            setTimeout(fetchAndUpdate, 3000); // 3 seconds
         }
 
         {{ if .APIURL }}
@@ -281,24 +277,55 @@ func (j *Jellyfin) getItemsiFrame(items []*Item, theme, apiURL string, limit int
 
 </head>
 <body>
-{{ range .Items }}
+{{ range .Sessions }}
+    {{ if .NowPlayingItem }}
     <div class="items-container">
-        <div class="background-image" style="background-image: url('{{ .BackdropImageURL }}');"></div>
+        <div class="background-image" style="background-image: url('{{ .NowPlayingItem.BackdropImageURL }}');"></div>
         <img
             class="item-cover"
-            src="{{ .PrimaryImageURL }}"
+            src="{{ .NowPlayingItem.PrimaryImageURL }}"
             alt="Media Item Cover"
         />
 
         <div class="text-wrap">
-            <a href="{{ .ItemURL }}" target="_blank" class="item-title" title="{{ .Name }}">{{ .Name }}</a>
+            {{ if and (eq .NowPlayingItem.Type "Episode") .NowPlayingItem.SeriesName }}
+                <a href="{{ .NowPlayingItem.ItemURL }}" target="_blank" class="item-title" title="{{ .NowPlayingItem.SeriesName }}">
+                    {{ .NowPlayingItem.SeriesName }}
+                </a>
+                {{ if and .NowPlayingItem.SeasonNumber .NowPlayingItem.EpisodeNumber }}
+                    <a href="{{ .NowPlayingItem.EpisodeURL }}" target="_blank" class="episode-info" title="Go to episode">
+                        S{{ printf "%02d" .NowPlayingItem.SeasonNumber }}E{{ printf "%02d" .NowPlayingItem.EpisodeNumber }}
+                    </a>
+                {{ end }}
+            {{ else }}
+                <a href="{{ .NowPlayingItem.ItemURL }}" target="_blank" class="item-title" title="{{ .NowPlayingItem.Name }}">{{ .NowPlayingItem.Name }}</a>
+            {{ end }}
+            
             <div class="labels-div">
-                {{ if .Year }}
-                    <span class="info-label"><i class="fa-solid fa-calendar-days"></i> {{ .Year }}</span>
+                {{ if and .PlayState.PositionTicks .NowPlayingItem.RunTimeTicks }}
+                    <span class="info-label">
+                        {{ if .PlayState.IsPaused }}
+                            <i class="fa-solid fa-pause"></i>
+                        {{ else }}
+                            <i class="fa-solid fa-play"></i>
+                        {{ end }}
+                        {{ formatTime .PlayState.PositionTicks }}/{{ formatTime .NowPlayingItem.RunTimeTicks }}
+                    </span>
                 {{ end }}
             </div>
         </div>
+        
+        <div class="user-container">
+            <img 
+                class="user-avatar"
+                src="{{ .UserAvatarURL }}"
+                alt="{{ .UserName }} Avatar"
+                onerror="this.onerror=null; this.src='https://avatars.githubusercontent.com/u/45698031?s=280&v=4';"
+            />
+            <span class="username">{{ .UserName }}</span>
+        </div>
     </div>
+    {{ end }}
 {{ end }}
 
 `
@@ -310,20 +337,29 @@ func (j *Jellyfin) getItemsiFrame(items []*Item, theme, apiURL string, limit int
 		scrollbarTrackBackgroundColor = "rgba(37, 40, 53, 1)"
 	}
 
-	templateData := iframeTemplateData{
-		Items:                         items,
+	templateData := sessionsiframeTemplateData{
+		Sessions:                      sessions,
 		Theme:                         theme,
 		APIURL:                        apiURL,
 		APILimit:                      limit,
-		UserId:                        userId,
-		ParentId:                      parentId,
-		IncludeItemTypes:              includeItemTypes,
-		QueryLimit:                    queryLimit,
+		ActiveWithinSeconds:           activeWithinSeconds,
 		ScrollbarThumbBackgroundColor: scrollbarThumbBackgroundColor,
 		ScrollbarTrackBackgroundColor: scrollbarTrackBackgroundColor,
 	}
 
-	tmpl := template.Must(template.New("items").Parse(html))
+	funcMap := template.FuncMap{
+		"formatTime": func(ticks int64) string {
+			totalSeconds := ticks / 10000000
+
+			hours := totalSeconds / 3600
+			minutes := (totalSeconds % 3600) / 60
+			seconds := totalSeconds % 60
+
+			return fmt.Sprintf("%02d:%02d:%02d", hours, minutes, seconds)
+		},
+	}
+
+	tmpl := template.Must(template.New("sessions").Funcs(funcMap).Parse(html))
 
 	var buf bytes.Buffer
 	err := tmpl.Execute(&buf, &templateData)
@@ -334,20 +370,17 @@ func (j *Jellyfin) getItemsiFrame(items []*Item, theme, apiURL string, limit int
 	return buf.Bytes(), nil
 }
 
-type iframeTemplateData struct {
+type sessionsiframeTemplateData struct {
 	Theme                         string
-	Items                         []*Item
+	Sessions                      []*Session
 	APIURL                        string
 	ScrollbarThumbBackgroundColor string
 	ScrollbarTrackBackgroundColor string
-	UserId                        string
-	ParentId                      string
-	IncludeItemTypes              string
 	APILimit                      int
-	QueryLimit                    int
+	ActiveWithinSeconds           int
 }
 
-func (j *Jellyfin) GetItemsHash(c *gin.Context) {
+func (j *Jellyfin) GetSessionsHash(c *gin.Context) {
 	frameQueryLimit := c.Query("limit")
 	var limit int
 	var err error
@@ -361,29 +394,25 @@ func (j *Jellyfin) GetItemsHash(c *gin.Context) {
 		}
 	}
 
-	userId := c.Query("userId")
-	parentId := c.Query("parentId")
-	includeItemTypes := c.Query("includeItemTypes")
-
-	jellyfinQueryLimit := c.Query("queryLimit")
-	var queryLimit int
-	if jellyfinQueryLimit == "" {
-		queryLimit = 0
+	activeWithinSecondsStr := c.Query("activeWithinSeconds")
+	var activeWithinSeconds int
+	if activeWithinSecondsStr == "" {
+		activeWithinSeconds = 0
 	} else {
-		queryLimit, err = strconv.Atoi(jellyfinQueryLimit)
+		activeWithinSeconds, err = strconv.Atoi(activeWithinSecondsStr)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"message": "queryLimit must be a number"})
+			c.JSON(http.StatusBadRequest, gin.H{"message": "activeWithinSeconds must be a number"})
 			return
 		}
 	}
 
-	items, err := j.GetLatestItems(limit, queryLimit, userId, parentId, includeItemTypes)
+	sessions, err := j.GetSessions(limit, activeWithinSeconds)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
-	hash := sources.GetHash(items, time.Now().Format("2006-01-02"))
+	hash := sources.GetHash(sessions, time.Now().Format("2006-01-02"))
 
 	c.JSON(http.StatusOK, gin.H{"hash": fmt.Sprintf("%x", hash)})
 }

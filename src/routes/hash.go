@@ -26,13 +26,29 @@ func HashRoutes(group *gin.RouterGroup) {
 	group.GET("/uptimekuma", UptimeKumaHashHandler)
 	group.GET("/alarms", AlarmsHashHandler)
 	group.GET("/jellyfin/recently", JellyfinRecentlyHashHandler)
+	group.GET("/jellyfin/sessions", JellyfinSessionsHashHandler)
 }
 
-// @Summary Get the hash of the Jellyfin bookmarks
+// @Summary Get the hash of the Jellyfin sessions
+// @Description Get the hash of the Jellyfin active sessions. Used by the iFrames to check updates and reload the iframe.
+// @Success 200 {object} hashResponse
+// @Produce json
+// @Param limit query int false "Limits the number of items in the iFrame." Example(20)
+// @Param activeWithinSeconds query int false "Only include sessions that have been active within this many seconds. Defaults to 60 if not specified or less than 1." Example(300)
+// @Router /hash/jellyfin/sessions [get]
+func JellyfinSessionsHashHandler(c *gin.Context) {
+	j, err := jellyfin.New()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	j.GetSessionsHash(c)
+}
+
+// @Summary Get the hash of the Jellyfin Recently Added items
 // @Description Get the hash of the Jellyfin Recently Added items. Used by the iFrames to check updates and reload the iframe.
 // @Success 200 {object} hashResponse
 // @Produce json
-// @Param theme query string false "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white." Example(light)
 // @Param limit query int false "Limits the number of items in the iFrame." Example(20)
 // @Param userId query string false "Jellyfin user ID to get items for. You can get the user ID by going to the admin users page. The ID should be on the URL when clicking on a user. The given user should have access to each library you want data to be fetched from. Defaults to environment JELLYFIN_ADMIN_USER_ID" Example(n6dcfgwiwh1m4c2vhjjm52101vrp01a5)
 // @Param parentId query string false "Jellyfin parent/library ID to filter items. You can get the user ID by going to the library page. The ID should be on the URL. The given user in userId should have access to each library you want data to be fetched from." Example(op2xj0l1qejb9g5c5z0f199tigksn1ei)
@@ -45,7 +61,7 @@ func JellyfinRecentlyHashHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
-	j.GetHash(c)
+	j.GetItemsHash(c)
 }
 
 // @Summary Get the hash of the Linkwarden bookmarks

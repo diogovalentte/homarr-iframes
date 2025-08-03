@@ -61,6 +61,60 @@ func (j *Jellyfin) GetLatestItems(limit, queryLimit int, userId, parentId, inclu
 	return latestItems, nil
 }
 
+func (j *Jellyfin) GetSessions(limit, activeWithinSeconds int) ([]*Session, error) {
+	var jellyfinURL string = j.InternalAddress + "/Sessions"
+
+	if activeWithinSeconds < 1 {
+		activeWithinSeconds = 60
+	}
+
+	querySeconds := strconv.Itoa(activeWithinSeconds)
+	queryParams := "?activeWithinSeconds=" + querySeconds
+
+	jellyfinURL = jellyfinURL + queryParams
+
+	var sessions []*Session
+	if err := j.baseRequest(http.MethodGet, jellyfinURL, nil, &sessions); err != nil {
+		return nil, fmt.Errorf("error getting sessions: %w", err)
+	}
+
+	for _, session := range sessions {
+		session.UserAvatarURL = fmt.Sprintf("%s/Users/%s/Images/Primary",
+			j.InternalAddress, session.UserID)
+
+		if session.NowPlayingItem != nil {
+			itemID := session.NowPlayingItem.ID
+
+			if session.NowPlayingItem.SeriesID != "" {
+				itemID = session.NowPlayingItem.SeriesID
+
+				session.NowPlayingItem.BackdropImageURL = fmt.Sprintf("%s/Items/%s/Images/Backdrop",
+					j.InternalAddress, itemID)
+
+				session.NowPlayingItem.EpisodeURL = fmt.Sprintf("%s/web/#/details?id=%s&serverId=%s",
+					j.Address, session.NowPlayingItem.ID, session.NowPlayingItem.ServerId)
+			} else if len(session.NowPlayingItem.BackdropImageTags) > 0 {
+				session.NowPlayingItem.BackdropImageURL = fmt.Sprintf("%s/Items/%s/Images/Backdrop?tag=%s",
+					j.InternalAddress, itemID, session.NowPlayingItem.BackdropImageTags[0])
+			}
+
+			if primaryTag, hasPrimary := session.NowPlayingItem.ImageTags["Primary"]; hasPrimary {
+				session.NowPlayingItem.PrimaryImageURL = fmt.Sprintf("%s/Items/%s/Images/Primary?tag=%s",
+					j.InternalAddress, itemID, primaryTag)
+			}
+
+			session.NowPlayingItem.ItemURL = fmt.Sprintf("%s/web/#/details?id=%s&serverId=%s",
+				j.Address, itemID, session.NowPlayingItem.ServerId)
+		}
+	}
+
+	if limit > 0 && len(sessions) > limit {
+		sessions = sessions[:limit]
+	}
+
+	return sessions, nil
+}
+
 func (j *Jellyfin) baseRequest(method, url string, body io.Reader, target any) error {
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, body)

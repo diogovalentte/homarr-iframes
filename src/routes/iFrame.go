@@ -19,6 +19,7 @@ import (
 
 func IFrameRoutes(group *gin.RouterGroup) {
 	group = group.Group("/iframe")
+	group.GET("/jellyfin/sessions", JellyfinSessionsiFrameHandler)
 	group.GET("/jellyfin/recently", JellyfinRecentlyiFrameHandler)
 	group.GET("/linkwarden", LinkwardeniFrameHandler)
 	group.GET("/cinemark", CinemarkiFrameHandler)
@@ -30,6 +31,24 @@ func IFrameRoutes(group *gin.RouterGroup) {
 	group.GET("/uptimekuma", UptimeKumaiFrameHandler)
 	group.GET("/alarms", AlarmsiFrameHandler)
 	group.GET("/netdata", NetdataiFrameHandler)
+}
+
+// @Summary Jellyfin active sessions iFrame
+// @Description Returns an iFrame with Jellyfin active user sessions.
+// @Success 200 {string} string "HTML content"
+// @Produce html
+// @Param theme query string false "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white." Example(light)
+// @Param limit query int false "Limits the number of items in the iFrame." Example(20)
+// @Param api_url query string true "API URL used by your browser. Used by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload." Example(https://sub.domain.com)
+// @Param activeWithinSeconds query int false "Only show sessions active within this many seconds" Example(60)
+// @Router /iframe/jellyfin/sessions [get]
+func JellyfinSessionsiFrameHandler(c *gin.Context) {
+	j, err := jellyfin.New()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	j.GetSessionsiFrame(c)
 }
 
 // @Summary Jellyfin recently added media iFrame

@@ -33,6 +33,16 @@ func TestMain(m *testing.M) {
 }
 
 func TestGetIFrames(t *testing.T) {
+	t.Run("Get JellyfinSessions iFrame", func(t *testing.T) {
+		r, err := requestHelper(http.MethodGet, "/v1/iframe/jellyfin/sessions", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if r.Code != http.StatusOK {
+			t.Fatalf("expected status code 200, got %d: %s", r.Code, r.Body.String())
+		}
+	})
 	t.Run("Get JellyfinRecently iFrame", func(t *testing.T) {
 		r, err := requestHelper(http.MethodGet, "/v1/iframe/jellyfin/recently", nil)
 		if err != nil {

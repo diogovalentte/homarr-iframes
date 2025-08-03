@@ -44,3 +44,23 @@ func TestGetLatestItems(t *testing.T) {
 		t.Logf("First item: %+v", items[0])
 	}
 }
+
+func TestGetSessions(t *testing.T) {
+	j, err := New()
+	if err != nil {
+		t.Fatalf("error creating Jellyfin instance: %v", err)
+	}
+
+	sessions, err := j.GetSessions(20, 3600)
+	if err != nil {
+		t.Fatalf("error getting sessions: %v", err)
+	}
+
+	t.Logf("Retrieved %d active sessions from Jellyfin", len(sessions))
+	if len(sessions) > 0 {
+		t.Logf("First session: %+v", sessions[0])
+		if sessions[0].NowPlayingItem != nil {
+			t.Logf("Now playing item: %+v", sessions[0].NowPlayingItem)
+		}
+	}
+}
