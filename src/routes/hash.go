@@ -119,7 +119,7 @@ func UptimeKumaHashHandler(c *gin.Context) {
 // @Description Get the hash of the alarms. Used by the iFrames to check updates and reload the iframe.
 // @Success 200 {object} hashResponse
 // @Produce json
-// @Param alarms query string true "Alarms to show. Available values: netdata, radarr, lidarr, sonarr, prowlarr, speedtest-tracker, pihole, kavita, kaizoku, changedetectionio, backrest" Example(netdata,radarr,sonarr)
+// @Param alarms query string true "Alarms to show. Available values: netdata, radarr, lidarr, sonarr, prowlarr, speedtest-tracker, pihole, kavita, kaizoku, changedetectionio, backrest, openarchiver" Example(netdata,radarr,sonarr)
 // @Param sort_desc query bool false "Sort alarms in descending order. Defaults to false." Example(false)
 // @Param regex_include query bool false "Show only alarms that match or not the regex. Default to true." Example(false)
 // @Param changedetectionio_show_viewed query bool false "Show viewed alarms from changedetection.io. Defaults to true." Example(false)

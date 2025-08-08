@@ -26,7 +26,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "example": "netdata,radarr,sonarr",
-                        "description": "Alarms to show. Available values: netdata, radarr, lidarr, sonarr, prowlarr, speedtest-tracker, pihole, kavita, kaizoku, changedetectionio, backrest",
+                        "description": "Alarms to show. Available values: netdata, radarr, lidarr, sonarr, prowlarr, speedtest-tracker, pihole, kavita, kaizoku, changedetectionio, backrest, openarchiver",
                         "name": "alarms",
                         "in": "query",
                         "required": true
@@ -327,7 +327,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "example": "netdata,radarr,sonarr",
-                        "description": "Alarms to show. Available values: netdata, radarr, lidarr, sonarr, prowlarr, speedtest-tracker, pihole, kavita, kaizoku, changedetectionio, backrest",
+                        "description": "Alarms to show. Available values: netdata, radarr, lidarr, sonarr, prowlarr, speedtest-tracker, pihole, kavita, kaizoku, changedetectionio, backrest, openarchiver",
                         "name": "alarms",
                         "in": "query",
                         "required": true

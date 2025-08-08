@@ -19,7 +19,7 @@ paths:
       parameters:
       - description: 'Alarms to show. Available values: netdata, radarr, lidarr, sonarr,
           prowlarr, speedtest-tracker, pihole, kavita, kaizoku, changedetectionio,
-          backrest'
+          backrest, openarchiver'
         example: netdata,radarr,sonarr
         in: query
         name: alarms
@@ -252,7 +252,7 @@ paths:
         type: string
       - description: 'Alarms to show. Available values: netdata, radarr, lidarr, sonarr,
           prowlarr, speedtest-tracker, pihole, kavita, kaizoku, changedetectionio,
-          backrest'
+          backrest, openarchiver'
         example: netdata,radarr,sonarr
         in: query
         name: alarms
