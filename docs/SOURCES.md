@@ -1,12 +1,12 @@
 # Sources
 
-- Each source is a route of the API that returns an iFrame.
+- Each source is a route of the API that returns an iframe.
 
 - Some sources need some environment variables to work.
 
-- Most sources have two environment variables for the address. One will be used in the iFrame links that you can click. The other will be used by this project to get the data (with the prefix `INTERNAL_`). If you don't provide the second one, the first one will be used in both cases.
+- Most sources have two environment variables for the address. One will be used in the iframe links that you can click. The other will be used by this project to get the data (with the prefix `INTERNAL_`). If you don't provide the second one, the first one will be used in both cases.
 
-  - **Example**: You access a service using the domain `service.com` and there is an authentication system in front of it. You set the first address environment variable to `service.com` and the second one (`INTERNAL_`) to the service's docker container name or any other internal address that this project can use to connect to the service without passing by the authentication system.
+  - **Example**: You access a service using the domain `service.com`, and there is an authentication system in front of it. You set the first address environment variable to `service.com` and the second one (`INTERNAL_`) to the service's Docker container name or any other internal address that this project can use to connect to the service without passing by the authentication system.
 
 - Most sources have query arguments that can be provided in the URL. These arguments change the iframe behavior and can be very useful for customization. You can check the [API docs](https://github.com/diogovalentte/homarr-iframes/tree/main?tab=readme-ov-file#api-docs) for query arguments.
   - Some sources **require** query arguments to work.
@@ -17,7 +17,7 @@
 
 # Linkwarden
 
-This source creates an iFrame with your bookmarks from your [Linkwarden](https://github.com/linkwarden/linkwarden) instance. It has links to the bookmark link and the bookmark Linkwarden collection.
+This source creates an iframe with your bookmarks from your [Linkwarden](https://github.com/linkwarden/linkwarden) instance. It has links to the bookmark link and the Bookmark Linkwarden collection.
 
 ![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/90271b2c-dc4f-4ee7-a6d3-f256e12cad81)
 
@@ -30,9 +30,9 @@ To use this source, you'll need to provide the following environment variables:
 
 # Vikunja
 
-This source creates an iFrame with links to the tasks from your [Vikunja](https://github.com/go-vikunja/vikunja) instance.
+This source creates an iframe with links to the tasks from your [Vikunja](https://github.com/go-vikunja/vikunja) instance.
 
-- It automatically sorts the tasks by **due date** (ascendent), **end date** (ascendent), and **created date** (descendent), and also filters to return only tasks that are **not done**.
+- It automatically sorts the tasks by **due date** (ascending), **end date** (ascending), and **created date** (descending), and also filters to return only tasks that are **not done**.
 
 ![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/787ff13a-a81f-42b4-a3a4-9f0892ca815f)
 
@@ -48,7 +48,7 @@ To use this source, you'll need to provide the following environment variables:
 
 # Media Requests
 
-This source creates an iFrame with your media requests from your [Overseerr](https://github.com/sct/overseerr) and [Jellyseerr](https://github.com/Fallenbagel/jellyseerr) instances.
+This source creates an iframe with your media requests from your [Overseerr](https://github.com/sct/overseerr) and [Jellyseerr](https://github.com/Fallenbagel/jellyseerr) instances.
 
 ![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/7f374beb-e392-4ee9-94fc-4d1556f65e7c)
 
@@ -66,14 +66,14 @@ To use this source, you'll need to provide the following environment variables:
 
 # Media Releases
 
-This source creates an iFrame with media that is released today. There is also an indicator of whether the media is downloaded (_for Lidarr, it shows how many tracks of an album are downloaded_).
+This source creates an iframe with media that is released today. There is also an indicator of whether the media is downloaded (_for Lidarr, it shows how many tracks of an album are downloaded_).
 
 - It gets the media from [Sonarr](https://github.com/Sonarr/Sonarr), [Radarr](https://github.com/Radarr/Radarr), and [Lidarr](https://github.com/Lidarr/Lidarr).
 - Set the same timezone to your media containers and this project for a better result.
 
 ![image](https://github.com/user-attachments/assets/461249d2-7979-47bd-913e-2247c31c8e2e)
 
-To use this source, you'll need to provide the environment variables below, but you don't need to provide all of them, you can specify only the Sonarr variables for example.
+To use this source, you'll need to provide the environment variables below, but you don't need to provide all of them; you can specify only the Sonarr variables, for example.
 
 - `SONARR_ADDRESS`: your Sonarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `INTERNAL_SONARR_ADDRESS`: your Sonarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
@@ -89,7 +89,7 @@ To use this source, you'll need to provide the environment variables below, but 
 
 # Uptime Kuma
 
-This source creates an iFrame with the number of UP and DOWN sites from a [Uptime Kuma]() status page.
+This source creates an iframe with the number of UP and DOWN sites from a [Uptime Kuma](https://github.com/louislam/uptime-kuma) status page.
 
 ![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/7b0e2cfc-2edc-41d4-9551-72df189591d4)
 
@@ -99,7 +99,7 @@ To use this source, you'll need to provide the following environment variables:
 
 # Cinemark Brasil
 
-This source gets on display movies of specific Cinemark theaters (only in Brazil) and creates an iFrame. It shows some info about the films and has links to their pages.
+This source gets on display movies of specific Cinemark theaters (only in Brazil) and creates an iframe. It shows some info about the films and has links to their pages.
 
 - You have to specify which theaters to get movies from. I recommend specifying all the theaters in your city.
 
@@ -211,3 +211,4 @@ Shows [OpenArchiver](https://github.com/LogicLabs-OU/OpenArchiver) ingestion sou
 - `OPENARCHIVER_ADDRESS`: your OpenArchiver instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `INTERNAL_OPENARCHIVER_ADDRESS`: your OpenArchiver instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `OPENARCHIVER_SUPER_API_KEY`: your super API key configured in your instance.
+
