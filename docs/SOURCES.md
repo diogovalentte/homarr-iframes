@@ -189,12 +189,12 @@ Shows warnings if there are failed jobs in your [Kaizoku](https://github.com/oae
 
 ## ChangeDetection.io
 
-Shows cards for your watches' errors and changes from your [ChangeDetection.io](https://github.com/dgtlmoon/changedetection.io) instance. It'll show on the left if the change was viewed or not. A change is considered viewed by ChangeDetection.io when you look at the change's history (_to check the diffs between the last change and the actual_).
+Shows cards for your watches' errors and changes from your [ChangeDetection.io](https://github.com/dgtlmoon/changedetection.io) instance. It'll show on the left if the change was viewed or not. A change is considered "viewed" by ChangeDetection.io when you look at the change's history (_to check the diffs between the last change and the actual_).
 
 - `CHANGEDETECTIONIO_ADDRESS`: your ChangeDetection.io instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `INTERNAL_CHANGEDETECTIONIO_ADDRESS`: your ChangeDetection.io instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `CHANGEDETECTIONIO_API_KEY`: an access API key used to access your ChangeDetection.io instance API. You can get it by going to **Settings -> API -> Generate API Key button**.
-- `CHANGEDETECTIONIO_CHANGED_LAST_HOURS`: number of hours to indicate if the iframe should show a watch change. If the watch's last changed time is within the last `x` hours, it'll show the watch, else no. Defaults to 24.
+- `CHANGEDETECTIONIO_CHANGED_LAST_HOURS`: number of hours to indicate if the iframe should show a watch change. If the watch's last changed time is within the last `x` hours, it'll show the watch; else no. Defaults to 24.
 
 ## Backrest
 Show [Backrest](https://github.com/garethgeorge/backrest) backup plans with error or warning status in the last 24 hours. Username and password are only required if you activated Backrest authentication.
@@ -203,3 +203,11 @@ Show [Backrest](https://github.com/garethgeorge/backrest) backup plans with erro
 - `INTERNAL_BACKREST_ADDRESS`: your Backrest instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `BACKREST_USERNAME`: your Backrest username.
 - `BACKREST_PASSWORD`: your Backrest password.
+
+## OpenArchiver
+
+Shows [OpenArchiver](https://github.com/LogicLabs-OU/OpenArchiver) ingestion sources with error status in cards.
+
+- `OPENARCHIVER_ADDRESS`: your OpenArchiver instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+- `INTERNAL_OPENARCHIVER_ADDRESS`: your OpenArchiver instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+- `OPENARCHIVER_SUPER_API_KEY`: your super API key configured in your instance.
