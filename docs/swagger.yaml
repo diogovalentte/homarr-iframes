@@ -286,9 +286,8 @@ paths:
       description: Returns an iFrame with the on display movies in specific Cinemark
         theaters. I recommend you to get the movies from the theaters of your city.
       parameters:
-      - description: 'The theater IDs to get movies from. It used to be easy to get,
-          but now it''s harder. To get it, you need to access the cinemark site, select
-          a theater, open your browser developer console, go to the '
+      - description: 'The theater IDs to get movies from. Access the cinemark site,
+          select a theater, open your browser developer console, go to the '
         example: 715, 1222, 4555
         in: query
         name: theaterIds

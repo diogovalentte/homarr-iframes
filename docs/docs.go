@@ -375,7 +375,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "example": "715, 1222, 4555",
-                        "description": "The theater IDs to get movies from. It used to be easy to get, but now it's harder. To get it, you need to access the cinemark site, select a theater, open your browser developer console, go to the ",
+                        "description": "The theater IDs to get movies from. Access the cinemark site, select a theater, open your browser developer console, go to the ",
                         "name": "theaterIds",
                         "in": "query",
                         "required": true
