@@ -62,7 +62,7 @@ func (l *Lidarr) GetCalendar(unmonitored bool, startDate, endDate time.Time) ([]
 	endDate = time.Date(endDate.Year(), endDate.Month(), endDate.Day(), 23, 59, 59, int(time.Second-time.Nanosecond), endDate.Location())
 
 	var entries []*GetLidarrCalendarEntryResponse
-	err := baseRequest("GET", fmt.Sprintf("%s/api/v1/calendar?start=%s&end=%s&unmonitored=%v&includeArtist=true", l.InternalAddress, startDate.Format("2006-01-02"), endDate.Format("2006-01-02"), unmonitored), nil, &entries)
+	err := baseRequest("GET", fmt.Sprintf("%s/api/v1/calendar?start=%s&end=%s&unmonitored=%v&includeArtist=true", l.InternalAddress, startDate.Format("2006-01-02T15:04:05.000Z07:00"), endDate.Format("2006-01-02T15:04:05.000Z07:00"), unmonitored), nil, &entries)
 	if err != nil {
 		return nil, err
 	}
@@ -87,9 +87,9 @@ type GetLidarrCalendarEntryResponse struct {
 	}
 }
 
-func (r *Lidarr) GetHealth() ([]*HealthEntry, error) {
+func (l *Lidarr) GetHealth() ([]*HealthEntry, error) {
 	var entries []*HealthEntry
-	err := baseRequest("GET", fmt.Sprintf("%s/api/v1/health", r.InternalAddress), nil, &entries)
+	err := baseRequest("GET", fmt.Sprintf("%s/api/v1/health", l.InternalAddress), nil, &entries)
 	if err != nil {
 		return nil, err
 	}
