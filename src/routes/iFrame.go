@@ -19,6 +19,7 @@ import (
 func IFrameRoutes(group *gin.RouterGroup) {
 	group = group.Group("/iframe")
 	group.GET("/linkwarden", LinkwardeniFrameHandler)
+	group.DELETE("/linkwarden/delete_link", LinkwardenDeleteLinkHandler)
 	group.GET("/cinemark", CinemarkiFrameHandler)
 	group.GET("/vikunja", VikunjaiFrameHandler)
 	group.PATCH("/vikunja/set_task_done", VikunjaSetTaskDoneHandler)
@@ -41,6 +42,7 @@ func IFrameRoutes(group *gin.RouterGroup) {
 // @Param background_position query string false "Background position of each bookmark card. Use '%25' in place of '%', like '50%25 47.2%25' to get '50% 47.2%'. Defaults to 50% 47.2%." Example(top)
 // @Param background_size query string false "Background size of each bookmark card. Use '%25' in place of '%'. Defaults to cover." Example(cover)
 // @Param background_filter query string false "Background filter of each bookmark card. Use '%25' in place of '%'. Defaults to brightness(0.3)." Example(blur(5px))
+// @Param showDeleteButton query bool false "Wheter to show a button to delete the bookmarks or not. Defaults to 'false'" Example(true)
 // @Router /iframe/linkwarden [get]
 func LinkwardeniFrameHandler(c *gin.Context) {
 	l, err := linkwarden.New()
@@ -49,6 +51,33 @@ func LinkwardeniFrameHandler(c *gin.Context) {
 		return
 	}
 	l.GetiFrame(c)
+}
+
+// @Summary Linkwarden delete bookmark
+// @Description Deletes a Linkwarden bookmark. After deleting, the iFrame will reload if the `api_url` query parameter is provided.
+// @Success 200 {object} messsageResponse "Bookmark deleted"
+// @Produce json
+// @Param linkId query int true "The bookmark ID to delete." Example(1)
+// @Router /iframe/linkwarden/delete_link [delete]
+func LinkwardenDeleteLinkHandler(c *gin.Context) {
+	linkID := c.Query("linkId")
+	if linkID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "linkId is required"})
+		return
+	}
+
+	l, err := linkwarden.New()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	err = l.DeleteLink(linkID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Bookmark deleted"})
 }
 
 // @Summary Cinemark Brazil iFrame

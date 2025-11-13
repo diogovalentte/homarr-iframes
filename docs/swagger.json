@@ -459,6 +459,13 @@
                         "description": "Background filter of each bookmark card. Use '%25' in place of '%'. Defaults to brightness(0.3).",
                         "name": "background_filter",
                         "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Wheter to show a button to delete the bookmarks or not. Defaults to 'false'",
+                        "name": "showDeleteButton",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -466,6 +473,33 @@
                         "description": "HTML content",
                         "schema": {
                             "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/iframe/linkwarden/delete_link": {
+            "delete": {
+                "description": "Deletes a Linkwarden bookmark. After deleting, the iFrame will reload if the `api_url` query parameter is provided.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Linkwarden delete bookmark",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "description": "The bookmark ID to delete.",
+                        "name": "linkId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bookmark deleted",
+                        "schema": {
+                            "$ref": "#/definitions/routes.messsageResponse"
                         }
                     }
                 }

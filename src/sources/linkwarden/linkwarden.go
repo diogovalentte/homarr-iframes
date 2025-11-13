@@ -93,6 +93,11 @@ func (l *Linkwarden) GetiFrame(c *gin.Context) {
 	}
 
 	collectionID := c.Query("collectionId")
+	showDeleteButtonStr := c.Query("showDeleteButton")
+	showDeleteButton := false
+	if showDeleteButtonStr == "true" {
+		showDeleteButton = true
+	}
 
 	backgroundPosition := c.Query("background_position")
 	if backgroundPosition == "" {
@@ -130,7 +135,7 @@ func (l *Linkwarden) GetiFrame(c *gin.Context) {
 		}
 		html = sources.GetBaseNothingToShowiFrame(theme, l.BackgroundImgURL, "center", "cover", backgroundFilter, apiURLPath)
 	} else {
-		html, err = l.getLinksiFrame(links, theme, l.BackgroundImgURL, backgroundPosition, backgroundSize, backgroundFilter, apiURL, collectionID, limit)
+		html, err = l.getLinksiFrame(links, theme, l.BackgroundImgURL, backgroundPosition, backgroundSize, backgroundFilter, apiURL, collectionID, showDeleteButton, limit)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("couldn't create HTML code: %s", err.Error()).Error()})
 			return
@@ -140,7 +145,7 @@ func (l *Linkwarden) GetiFrame(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html", []byte(html))
 }
 
-func (l *Linkwarden) getLinksiFrame(links []*Link, theme, backgroundImgURL, backgroundPosition, backgroundSize, backgroundFilter, apiURL, collectionID string, limit int) ([]byte, error) {
+func (l *Linkwarden) getLinksiFrame(links []*Link, theme, backgroundImgURL, backgroundPosition, backgroundSize, backgroundFilter, apiURL, collectionID string, showDeleteButton bool, limit int) ([]byte, error) {
 	html := `
 <!doctype html>
 <html lang="en">
@@ -253,7 +258,63 @@ func (l *Linkwarden) getLinksiFrame(links []*Link, theme, backgroundImgURL, back
         a.info-label:hover {
             text-decoration: underline;
         }
+
+        .delete-button-container {
+            display: inline-block;
+            padding: 8px 10px;
+            margin: 10px 10px;
+            background-color: transparent;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .delete-link-button {
+            color: white;
+            background-color: #971010;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid #971010;
+            font-weight: bold;
+        }
     </style>
+
+	<script>
+      function deleteLink(linkID) {
+        try {
+            var xhr = new XMLHttpRequest();
+            var url = '{{ .APIURL }}/v1/iframe/linkwarden/delete_link?linkId=' + linkID;
+            xhr.open('DELETE', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+
+            xhr.onload = function () {
+              if (xhr.status >= 200 && xhr.status < 300) {
+                console.log('Request to delete bookmark finished with success:', xhr.responseText);
+                location.reload();
+              } else {
+                console.log('Request to delete bookmark failed:', xhr.responseText);
+			    handleDeleteLinkError("link-" + linkID);
+              }
+            };
+
+            xhr.onerror = function () {
+              console.log('Request to delete bookmark failed:', xhr.responseText);
+			  handleDeleteLinkError("link-" + linkID);
+            };
+
+            xhr.send();
+        } catch (error) {
+            console.log('Request to delete bookmark failed:', xhr.responseText);
+            handleDeleteLinkError("link-" + linkID);
+        }
+      }
+
+      function handleDeleteLinkError(buttonId) {
+        var button = document.getElementById(buttonId);
+        button.textContent = "! ERROR !";
+        button.style.backgroundColor = "red";
+        button.style.borderColor = "red";
+      }
+	</script>
 
     <script>
         let lastHash = null;
@@ -316,8 +377,13 @@ func (l *Linkwarden) getLinksiFrame(links []*Link, theme, backgroundImgURL, back
                     {{ end }}
                 {{ end }}
             </div>
-        </div>
 
+        </div>
+		{{ with . }}{{ if $.ShowDeleteButton }}
+			<div class="delete-button-container">
+				<button id="link-{{ .ID }}" onclick="deleteLink('{{ .ID }}')" class="delete-link-button" onmouseenter="this.style.cursor='pointer';">Delete</button>
+			</div>
+		{{ end }}{{ end }}
     </div>
 {{ end }}
 </body>
@@ -344,6 +410,7 @@ func (l *Linkwarden) getLinksiFrame(links []*Link, theme, backgroundImgURL, back
 		ScrollbarThumbBackgroundColor: scrollbarThumbBackgroundColor,
 		ScrollbarTrackBackgroundColor: scrollbarTrackBackgroundColor,
 		CollectionID:                  collectionID,
+		ShowDeleteButton:              showDeleteButton,
 	}
 
 	templateFuncs := template.FuncMap{
@@ -395,6 +462,7 @@ type iframeTemplateData struct {
 	CollectionID                  string
 	Links                         []*Link
 	APILimit                      int
+	ShowDeleteButton              bool
 }
 
 // GetHash returns the hash of the bookmarks

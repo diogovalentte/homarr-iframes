@@ -368,6 +368,12 @@ paths:
         in: query
         name: background_filter
         type: string
+      - description: Wheter to show a button to delete the bookmarks or not. Defaults
+          to 'false'
+        example: true
+        in: query
+        name: showDeleteButton
+        type: boolean
       produces:
       - text/html
       responses:
@@ -376,6 +382,25 @@ paths:
           schema:
             type: string
       summary: Linkwarden  bookmarks iFrame
+  /iframe/linkwarden/delete_link:
+    delete:
+      description: Deletes a Linkwarden bookmark. After deleting, the iFrame will
+        reload if the `api_url` query parameter is provided.
+      parameters:
+      - description: The bookmark ID to delete.
+        example: 1
+        in: query
+        name: linkId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Bookmark deleted
+          schema:
+            $ref: '#/definitions/routes.messsageResponse'
+      summary: Linkwarden delete bookmark
   /iframe/media_releases:
     get:
       description: Returns an iFrame with the media releases of today. The media releases
