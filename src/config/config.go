@@ -28,6 +28,7 @@ type Configs struct {
 	Pihole                  piholeConfigs
 	Kavita                  kavitaConfigs
 	Kaizoku                 kaizokuConfigs
+	Jellyfin                jellyfinConfigs
 	Jellyseerr              jellyseerrConfigs
 	ChangeDetectionIO       changedetectionIOConfigs
 	Backrest                BackrestConfigs
@@ -119,6 +120,13 @@ type kaizokuConfigs struct {
 	InternalAddress string
 }
 
+type jellyfinConfigs struct {
+	Address         string
+	InternalAddress string
+	APIKey          string
+	UserId          string
+}
+
 type jellyseerrConfigs struct {
 	Address         string
 	InternalAddress string
@@ -169,6 +177,11 @@ func SetConfigs(filePath string) error {
 	GlobalConfigs.Overseerr.Address = os.Getenv("OVERSEERR_ADDRESS")
 	GlobalConfigs.Overseerr.InternalAddress = os.Getenv("INTERNAL_OVERSEERR_ADDRESS")
 	GlobalConfigs.Overseerr.APIKey = os.Getenv("OVERSEERR_API_KEY")
+
+	GlobalConfigs.Jellyfin.Address = os.Getenv("JELLYFIN_ADDRESS")
+	GlobalConfigs.Jellyfin.InternalAddress = os.Getenv("INTERNAL_JELLYFIN_ADDRESS")
+	GlobalConfigs.Jellyfin.APIKey = os.Getenv("JELLYFIN_API_KEY")
+	GlobalConfigs.Jellyfin.UserId = os.Getenv("JELLYFIN_ADMIN_USER_ID")
 
 	GlobalConfigs.Jellyseerr.Address = os.Getenv("JELLYSEERR_ADDRESS")
 	GlobalConfigs.Jellyseerr.InternalAddress = os.Getenv("INTERNAL_JELLYSEERR_ADDRESS")

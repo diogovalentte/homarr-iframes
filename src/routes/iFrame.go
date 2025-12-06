@@ -9,6 +9,7 @@ import (
 	"github.com/diogovalentte/homarr-iframes/src/config"
 	"github.com/diogovalentte/homarr-iframes/src/sources/alarms"
 	"github.com/diogovalentte/homarr-iframes/src/sources/cinemark"
+	"github.com/diogovalentte/homarr-iframes/src/sources/jellyfin"
 	"github.com/diogovalentte/homarr-iframes/src/sources/linkwarden"
 	"github.com/diogovalentte/homarr-iframes/src/sources/media"
 	mediarequets "github.com/diogovalentte/homarr-iframes/src/sources/media-requets"
@@ -18,6 +19,8 @@ import (
 
 func IFrameRoutes(group *gin.RouterGroup) {
 	group = group.Group("/iframe")
+	group.GET("/jellyfin/sessions", JellyfinSessionsiFrameHandler)
+	group.GET("/jellyfin/recently", JellyfinRecentlyiFrameHandler)
 	group.GET("/linkwarden", LinkwardeniFrameHandler)
 	group.DELETE("/linkwarden/delete_link", LinkwardenDeleteLinkHandler)
 	group.GET("/cinemark", CinemarkiFrameHandler)
@@ -29,6 +32,45 @@ func IFrameRoutes(group *gin.RouterGroup) {
 	group.GET("/uptimekuma", UptimeKumaiFrameHandler)
 	group.GET("/alarms", AlarmsiFrameHandler)
 	group.GET("/netdata", NetdataiFrameHandler)
+}
+
+// @Summary Jellyfin active sessions iFrame
+// @Description Returns an iFrame with Jellyfin active user sessions.
+// @Success 200 {string} string "HTML content"
+// @Produce html
+// @Param theme query string false "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white." Example(light)
+// @Param limit query int false "Limits the number of items in the iFrame." Example(20)
+// @Param api_url query string true "API URL used by your browser. Used by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload." Example(https://sub.domain.com)
+// @Param activeWithinSeconds query int false "Only show sessions active within this many seconds" Example(60)
+// @Router /iframe/jellyfin/sessions [get]
+func JellyfinSessionsiFrameHandler(c *gin.Context) {
+	j, err := jellyfin.New()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	j.GetSessionsiFrame(c)
+}
+
+// @Summary Jellyfin recently added media iFrame
+// @Description Returns an iFrame with Jellyfin recently added media.
+// @Success 200 {string} string "HTML content"
+// @Produce html
+// @Param theme query string false "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white." Example(light)
+// @Param limit query int false "Limits the number of items in the iFrame." Example(20)
+// @Param api_url query string true "API URL used by your browser. Used by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload." Example(https://sub.domain.com)
+// @Param userId query string false "Jellyfin user ID to get items for. You can get the user ID by going to the admin users page. The ID should be on the URL when clicking on a user. The given user should have access to each library you want data to be fetched from. Defaults to environment JELLYFIN_ADMIN_USER_ID" Example(n6dcfgwiwh1m4c2vhjjm52101vrp01a5)
+// @Param parentId query string false "Jellyfin parent/library ID to filter items. You can get the user ID by going to the library page. The ID should be on the URL. The given user in userId should have access to each library you want data to be fetched from." Example(op2xj0l1qejb9g5c5z0f199tigksn1ei)
+// @Param includeItemTypes query string false "Filter by media types. Available types can be read here https://api.jellyfin.org/#tag/UserLibrary/operation/GetLatestMedia. Defaults to Movie,Series." Example(Movie,Series)
+// @Param queryLimit query int false "Maximum number of items beeing queried from Jellyfin, when fetching Series data each episode counts as one. Defaults to 100." Example(100)
+// @Router /iframe/jellyfin/recently [get]
+func JellyfinRecentlyiFrameHandler(c *gin.Context) {
+	j, err := jellyfin.New()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	j.GetRecentlyAddediFrame(c)
 }
 
 // @Summary Linkwarden  bookmarks iFrame
