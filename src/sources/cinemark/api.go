@@ -104,6 +104,8 @@ func getMovieAgeRatingColor(rating string) string {
 	switch rating {
 	case "L":
 		return "#00bb22"
+	case "6", "A6":
+		return "#e53194"
 	case "10", "A10":
 		return "#5891cd"
 	case "12", "A12":
