@@ -6,6 +6,8 @@ import (
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/diogovalentte/homarr-iframes/src/config"
 )
 
 func (o *Overseerr) GetRequests(limit int, filter, sort string, requestedBy int) ([]Request, error) {
@@ -211,7 +213,7 @@ func (o *Overseerr) setMediaData(media *Media, iframe *IframeRequestData) error 
 	if mediaInfo.PosterPath != "" {
 		iframe.Media.PosterURL = TMDBPosterImageBasePath + mediaInfo.PosterPath
 	} else {
-		iframe.Media.PosterURL = DefaultBackgroundImageURL
+		iframe.Media.PosterURL = config.DefaultBackgroundImageURL
 	}
 
 	if mediaInfo.BackdropPath != "" {

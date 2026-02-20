@@ -12,6 +12,7 @@ import (
 var (
 	GlobalConfigs                            *Configs
 	defaultChangeDetectionIOChangedLastHours = 24
+	DefaultBackgroundImageURL                = "https://i.imgur.com/jMy7evE.jpeg"
 )
 
 type Configs struct {

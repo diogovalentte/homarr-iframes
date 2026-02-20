@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/diogovalentte/homarr-iframes/src/config"
 	"github.com/diogovalentte/homarr-iframes/src/sources/overseerr"
 )
 
@@ -209,7 +210,7 @@ func (j *Jellyseerr) setMediaData(media *overseerr.Media, iframe *overseerr.Ifra
 	if mediaInfo.PosterPath != "" {
 		iframe.Media.PosterURL = overseerr.TMDBPosterImageBasePath + mediaInfo.PosterPath
 	} else {
-		iframe.Media.PosterURL = overseerr.DefaultBackgroundImageURL
+		iframe.Media.PosterURL = config.DefaultBackgroundImageURL
 	}
 
 	if mediaInfo.BackdropPath != "" {

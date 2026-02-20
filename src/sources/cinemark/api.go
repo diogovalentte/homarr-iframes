@@ -6,6 +6,8 @@ import (
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/diogovalentte/homarr-iframes/src/config"
 )
 
 var (
@@ -38,9 +40,16 @@ func (c *Cinemark) GetOnDisplayByTheater(theaterIDs []int, limit int, limitProvi
 					movieURL = movieURL + "?city=true"
 				}
 
+				coverImgURL := ""
+				if len(movie.Assets) == 0 {
+					coverImgURL = config.DefaultBackgroundImageURL
+				} else {
+					coverImgURL = movie.Assets[0].URL
+				}
+
 				moviesSlice = append(moviesSlice, Movie{
 					Name:           movie.Name,
-					CoverImgURL:    movie.Assets[0].URL,
+					CoverImgURL:    coverImgURL,
 					URL:            movieURL,
 					AgeRating:      movie.AgeIndication,
 					AgeRatingColor: getMovieAgeRatingColor(movie.AgeIndication),
