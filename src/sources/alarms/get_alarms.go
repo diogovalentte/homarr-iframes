@@ -15,6 +15,7 @@ import (
 	"github.com/diogovalentte/homarr-iframes/src/sources/kavita"
 	"github.com/diogovalentte/homarr-iframes/src/sources/lidarr"
 	"github.com/diogovalentte/homarr-iframes/src/sources/netdata"
+	"github.com/diogovalentte/homarr-iframes/src/sources/openarchiver"
 	"github.com/diogovalentte/homarr-iframes/src/sources/pihole"
 	"github.com/diogovalentte/homarr-iframes/src/sources/prowlarr"
 	"github.com/diogovalentte/homarr-iframes/src/sources/radarr"
@@ -22,7 +23,7 @@ import (
 	speedtesttracker "github.com/diogovalentte/homarr-iframes/src/sources/speedtest-tracker"
 )
 
-var validAlarmNames = []string{"netdata", "prowlarr", "sonarr", "radarr", "lidarr", "speedtest-tracker", "pihole", "kavita", "kaizoku", "changedetectionio", "backrest"}
+var validAlarmNames = []string{"netdata", "prowlarr", "sonarr", "radarr", "lidarr", "speedtest-tracker", "pihole", "kavita", "kaizoku", "changedetectionio", "backrest", "openarchiver"}
 
 func (a *Alarms) GetAlarms(alarmNames []string, desc bool, regex *regexp.Regexp, regexInclude, changedetectionioShowViewed bool) ([]Alarm, error) {
 	var alarms []Alarm
@@ -95,6 +96,12 @@ func (a *Alarms) GetAlarms(alarmNames []string, desc bool, regex *regexp.Regexp,
 				return nil, fmt.Errorf("failed to get Backrest alarms: %w", err)
 			}
 			alarms = append(alarms, backrestAlarms...)
+		case "openarchiver":
+			openArchiverAlarms, err := getOpenArchiverAlarms()
+			if err != nil {
+				return nil, fmt.Errorf("failed to get OpenArchiver alarms: %w", err)
+			}
+			alarms = append(alarms, openArchiverAlarms...)
 		default:
 			return nil, fmt.Errorf("invalid alarm name: %s", alarmName)
 		}
@@ -615,6 +622,50 @@ func getBackrestAlarms() ([]Alarm, error) {
 				Status:          status,
 				Property:        durationFormated,
 				Time:            timestamp,
+			})
+		}
+	}
+
+	return alarms, nil
+}
+
+func getOpenArchiverAlarms() ([]Alarm, error) {
+	o, err := openarchiver.New()
+	if err != nil {
+		return nil, err
+	}
+
+	ingestionSources, err := o.GetIngestionSources(-1)
+	if err != nil {
+		return nil, err
+	}
+
+	alarms := []Alarm{}
+	for _, source := range ingestionSources {
+		if source.Status == "error" {
+			message := source.LastSyncStatusMessage
+			slices := strings.Split(message, "\n")
+			if len(slices) > 1 {
+				message = slices[1]
+			}
+			slices = strings.Split(message, ": ")
+			if len(slices) > 1 {
+				message = slices[1]
+			}
+
+			lastSyncFinishedAt, err := time.Parse(time.RFC3339, source.LastSyncFinishedAt)
+			if err != nil {
+				return nil, fmt.Errorf("failed to parse LastSyncFinishedAt for source %s: %w", source.Name, err)
+			}
+
+			alarms = append(alarms, Alarm{
+				Source:          "OpenArchiver",
+				Summary:         message,
+				URL:             o.Address + "/dashboard/ingestions",
+				Status:          "ERROR",
+				Property:        source.Name,
+				Time:            lastSyncFinishedAt,
+				BackgroundColor: "black",
 			})
 		}
 	}

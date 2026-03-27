@@ -33,6 +33,17 @@ func (l *Linkwarden) GetLinks(limit int, collectionID string) ([]*Link, error) {
 	return links, nil
 }
 
+func (l *Linkwarden) DeleteLink(linkId string) error {
+	linkwardenURL := l.InternalAddress + "/api/v1/links/" + linkId
+
+	err := l.baseRequest(http.MethodDelete, linkwardenURL, nil, nil)
+	if err != nil {
+		return fmt.Errorf("error while doing API request: %w", err)
+	}
+
+	return nil
+}
+
 func (l *Linkwarden) baseRequest(method, url string, body io.Reader, target any) error {
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, body)
@@ -49,17 +60,19 @@ func (l *Linkwarden) baseRequest(method, url string, body io.Reader, target any)
 	}
 	defer resp.Body.Close()
 
+	resBody, err := io.ReadAll(resp.Body)
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("error: %s", resp.Status)
+		return fmt.Errorf("request status (%s): %s", resp.Status, string(resBody))
 	}
 
-	resBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("error reading response body: %w", err)
 	}
 
-	if err := json.Unmarshal(resBody, target); err != nil {
-		return fmt.Errorf("error unmarshaling JSON: %s\nreponse text: %s", err.Error(), string(resBody))
+	if target != nil {
+		if err := json.Unmarshal(resBody, target); err != nil {
+			return fmt.Errorf("error unmarshaling JSON: %s\nreponse text: %s", err.Error(), string(resBody))
+		}
 	}
 
 	return nil

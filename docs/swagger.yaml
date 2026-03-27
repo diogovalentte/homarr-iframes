@@ -19,7 +19,7 @@ paths:
       parameters:
       - description: 'Alarms to show. Available values: netdata, radarr, lidarr, sonarr,
           prowlarr, speedtest-tracker, pihole, kavita, kaizoku, changedetectionio,
-          backrest'
+          backrest, openarchiver'
         example: netdata,radarr,sonarr
         in: query
         name: alarms
@@ -252,7 +252,7 @@ paths:
         type: string
       - description: 'Alarms to show. Available values: netdata, radarr, lidarr, sonarr,
           prowlarr, speedtest-tracker, pihole, kavita, kaizoku, changedetectionio,
-          backrest'
+          backrest, openarchiver'
         example: netdata,radarr,sonarr
         in: query
         name: alarms
@@ -286,9 +286,8 @@ paths:
       description: Returns an iFrame with the on display movies in specific Cinemark
         theaters. I recommend you to get the movies from the theaters of your city.
       parameters:
-      - description: 'The theater IDs to get movies from. It used to be easy to get,
-          but now it''s harder. To get it, you need to access the cinemark site, select
-          a theater, open your browser developer console, go to the '
+      - description: 'The theater IDs to get movies from. Access the cinemark site,
+          select a theater, open your browser developer console, go to the '
         example: 715, 1222, 4555
         in: query
         name: theaterIds
@@ -369,6 +368,12 @@ paths:
         in: query
         name: background_filter
         type: string
+      - description: Wheter to show a button to delete the bookmarks or not. Defaults
+          to 'false'
+        example: true
+        in: query
+        name: showDeleteButton
+        type: boolean
       produces:
       - text/html
       responses:
@@ -377,6 +382,25 @@ paths:
           schema:
             type: string
       summary: Linkwarden  bookmarks iFrame
+  /iframe/linkwarden/delete_link:
+    delete:
+      description: Deletes a Linkwarden bookmark. After deleting, the iFrame will
+        reload if the `api_url` query parameter is provided.
+      parameters:
+      - description: The bookmark ID to delete.
+        example: 1
+        in: query
+        name: linkId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Bookmark deleted
+          schema:
+            $ref: '#/definitions/routes.messsageResponse'
+      summary: Linkwarden delete bookmark
   /iframe/media_releases:
     get:
       description: Returns an iFrame with the media releases of today. The media releases

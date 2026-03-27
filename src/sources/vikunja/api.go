@@ -15,11 +15,18 @@ import (
 // The project_id is the id of the project to get the tasks from. Empty gets all tasks from all projects.
 func (v *Vikunja) GetTasks(limit int, projectID int, excludeProjectIDs []*int) ([]*Task, error) {
 	var tasks []*Task
-	var err error
-	if isGreater, err := v.IsVikunjaVersionGreaterOrEqualTo("0.24.0"); err != nil {
+
+	isGreater, err := v.IsVikunjaVersionGreaterOrEqualTo("0.24.0")
+	if err != nil {
 		return nil, err
-	} else if isGreater {
-		tasks, err = v.getTasksV2(limit, projectID)
+	}
+
+	if isGreater {
+		isGreater, err = v.IsVikunjaVersionGreaterOrEqualTo("2.0.0")
+		if err != nil {
+			return nil, err
+		}
+		tasks, err = v.getTasksV2(limit, projectID, isGreater)
 	} else {
 		tasks, err = v.getTasksV1(limit, projectID)
 	}
@@ -56,14 +63,18 @@ func (v *Vikunja) GetTasks(limit int, projectID int, excludeProjectIDs []*int) (
 	return tasks, nil
 }
 
-func (v *Vikunja) getTasksV2(limit int, projectID int) ([]*Task, error) {
+func (v *Vikunja) getTasksV2(limit int, projectID int, isGreaterVersion2 bool) ([]*Task, error) {
 	target := []*Task{}
 
 	var path string
 	if projectID > 0 {
 		path = fmt.Sprintf("/api/v1/projects/%d/tasks", projectID)
 	} else {
-		path = "/api/v1/tasks/all"
+		if isGreaterVersion2 {
+			path = "/api/v1/tasks"
+		} else {
+			path = "/api/v1/tasks/all"
+		}
 	}
 	path = path + "?sort_by=due_date&order_by=asc&sort_by=end_date&order_by=asc&sort_by=priority&order_by=desc&sort_by=created&order_by=desc&filter=done=false"
 	if limit > 0 {
@@ -177,11 +188,11 @@ func (v *Vikunja) baseRequest(method, url string, body io.Reader, target any) er
 	}
 	defer resp.Body.Close()
 
+	resBody, err := io.ReadAll(resp.Body)
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("error: %s", resp.Status)
+		return fmt.Errorf("request status (%s): %s", resp.Status, string(resBody))
 	}
 
-	resBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("error reading response body: %w", err)
 	}

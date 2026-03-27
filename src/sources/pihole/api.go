@@ -58,7 +58,7 @@ func (p *Pihole) baseRequest(method, url string, body io.Reader, target any, una
 				return p.baseRequest(method, url, body, target, unauthorizedRetries-1)
 			}
 		}
-		return fmt.Errorf("error: %s / Response body: %s", resp.Status, string(resBody))
+		return fmt.Errorf("request status (%s): %s", resp.Status, string(resBody))
 	}
 
 	if err != nil {

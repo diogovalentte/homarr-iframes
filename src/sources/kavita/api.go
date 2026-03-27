@@ -22,7 +22,9 @@ func (k *Kavita) baseRequest(method, url string, body io.Reader, target any) err
 	if err != nil {
 		return fmt.Errorf("error sending request: %w", err)
 	}
+	defer resp.Body.Close()
 
+	resBody, err := io.ReadAll(resp.Body)
 	if resp.StatusCode == http.StatusUnauthorized {
 		err := k.RefreshCurrentToken()
 		if err != nil {
@@ -31,15 +33,12 @@ func (k *Kavita) baseRequest(method, url string, body io.Reader, target any) err
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", k.Token))
 		resp, err = client.Do(req)
 		if err != nil {
-			return fmt.Errorf("error sending request: %w", err)
+			return fmt.Errorf("request status (%s): %s", resp.Status, string(resBody))
 		}
 	} else if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("error: %s", resp.Status)
+		return fmt.Errorf("request status (%s): %s", resp.Status, string(resBody))
 	}
 
-	defer resp.Body.Close()
-
-	resBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("error reading response body: %w", err)
 	}

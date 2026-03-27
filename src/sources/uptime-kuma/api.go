@@ -48,17 +48,17 @@ func (u *UptimeKuma) baseRequest(url string, target any) error {
 	}
 	defer resp.Body.Close()
 
+	resBody, err := io.ReadAll(resp.Body)
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("error: %s", resp.Status)
+		return fmt.Errorf("request status (%s): %s", resp.Status, string(resBody))
 	}
 
-	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("error reading response body: %w", err)
 	}
 
-	if err := json.Unmarshal(body, target); err != nil {
-		return fmt.Errorf("error unmarshaling JSON: %s\nreponse text: %s", err.Error(), string(body))
+	if err := json.Unmarshal(resBody, target); err != nil {
+		return fmt.Errorf("error unmarshaling JSON: %s\nreponse text: %s", err.Error(), string(resBody))
 	}
 
 	return nil

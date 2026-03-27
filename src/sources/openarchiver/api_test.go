@@ -1,4 +1,4 @@
-package alarms
+package openarchiver
 
 import (
 	"fmt"
@@ -28,12 +28,22 @@ func TestMain(m *testing.M) {
 	os.Exit(exitCode)
 }
 
-func TestGetAlarms(t *testing.T) {
-	alarms := Alarms{}
-	t.Run("get alarms", func(t *testing.T) {
-		_, err := alarms.GetAlarms([]string{"netdata", "prowlarr", "radarr", "lidarr", "sonarr", "speedtest-tracker", "kavita", "pihole", "changedetectionio", "kaizoku", "backrest", "openarchiver"}, false, config.GlobalConfigs.IFrames.AlarmsRegex, true, true)
+func TestGetLinks(t *testing.T) {
+	o, err := New()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Run("get links", func(t *testing.T) {
+		ingestionSources, err := o.GetIngestionSources(-1)
 		if err != nil {
 			t.Fatal(err)
+		}
+
+		for _, ingestionSource := range ingestionSources {
+			if ingestionSource.ID == "" {
+				t.Fatal("ingestion source ID is empty")
+			}
 		}
 	})
 }

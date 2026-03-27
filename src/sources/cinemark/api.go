@@ -6,6 +6,8 @@ import (
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/diogovalentte/homarr-iframes/src/config"
 )
 
 var (
@@ -38,9 +40,16 @@ func (c *Cinemark) GetOnDisplayByTheater(theaterIDs []int, limit int, limitProvi
 					movieURL = movieURL + "?city=true"
 				}
 
+				coverImgURL := ""
+				if len(movie.Assets) == 0 {
+					coverImgURL = config.DefaultBackgroundImageURL
+				} else {
+					coverImgURL = movie.Assets[0].URL
+				}
+
 				moviesSlice = append(moviesSlice, Movie{
 					Name:           movie.Name,
-					CoverImgURL:    movie.Assets[0].URL,
+					CoverImgURL:    coverImgURL,
 					URL:            movieURL,
 					AgeRating:      movie.AgeIndication,
 					AgeRatingColor: getMovieAgeRatingColor(movie.AgeIndication),
@@ -83,11 +92,11 @@ func (Cinemark) baseRequest(method, url string, body io.Reader, target any) erro
 	}
 	defer resp.Body.Close()
 
+	resBody, err := io.ReadAll(resp.Body)
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("non-200 status code from Cinemark API: %s", resp.Status)
+		return fmt.Errorf("request status (%s): %s", resp.Status, string(resBody))
 	}
 
-	resBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("error reading response body: %w", err)
 	}
@@ -104,6 +113,8 @@ func getMovieAgeRatingColor(rating string) string {
 	switch rating {
 	case "L":
 		return "#00bb22"
+	case "6", "A6":
+		return "#e53194"
 	case "10", "A10":
 		return "#5891cd"
 	case "12", "A12":

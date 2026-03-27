@@ -89,7 +89,7 @@ func GetiFrame(c *gin.Context) {
 	var html []byte
 	html, err = getMediaReleasesiFrame(iframeRequestData, theme, apiURL, showUnmonitored, showEpisodeHours, inCinemas, physical, digital)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, fmt.Errorf("couldn't create iFrame: %s", err.Error()))
+		c.JSON(http.StatusInternalServerError, fmt.Errorf("couldn't create iFrame: %s", err.Error()).Error())
 		return
 	}
 

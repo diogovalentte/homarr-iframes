@@ -26,7 +26,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "example": "netdata,radarr,sonarr",
-                        "description": "Alarms to show. Available values: netdata, radarr, lidarr, sonarr, prowlarr, speedtest-tracker, pihole, kavita, kaizoku, changedetectionio, backrest",
+                        "description": "Alarms to show. Available values: netdata, radarr, lidarr, sonarr, prowlarr, speedtest-tracker, pihole, kavita, kaizoku, changedetectionio, backrest, openarchiver",
                         "name": "alarms",
                         "in": "query",
                         "required": true
@@ -327,7 +327,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "example": "netdata,radarr,sonarr",
-                        "description": "Alarms to show. Available values: netdata, radarr, lidarr, sonarr, prowlarr, speedtest-tracker, pihole, kavita, kaizoku, changedetectionio, backrest",
+                        "description": "Alarms to show. Available values: netdata, radarr, lidarr, sonarr, prowlarr, speedtest-tracker, pihole, kavita, kaizoku, changedetectionio, backrest, openarchiver",
                         "name": "alarms",
                         "in": "query",
                         "required": true
@@ -375,7 +375,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "example": "715, 1222, 4555",
-                        "description": "The theater IDs to get movies from. It used to be easy to get, but now it's harder. To get it, you need to access the cinemark site, select a theater, open your browser developer console, go to the ",
+                        "description": "The theater IDs to get movies from. Access the cinemark site, select a theater, open your browser developer console, go to the ",
                         "name": "theaterIds",
                         "in": "query",
                         "required": true
@@ -470,6 +470,13 @@ const docTemplate = `{
                         "description": "Background filter of each bookmark card. Use '%25' in place of '%'. Defaults to brightness(0.3).",
                         "name": "background_filter",
                         "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Wheter to show a button to delete the bookmarks or not. Defaults to 'false'",
+                        "name": "showDeleteButton",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -477,6 +484,33 @@ const docTemplate = `{
                         "description": "HTML content",
                         "schema": {
                             "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/iframe/linkwarden/delete_link": {
+            "delete": {
+                "description": "Deletes a Linkwarden bookmark. After deleting, the iFrame will reload if the ` + "`" + `api_url` + "`" + ` query parameter is provided.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Linkwarden delete bookmark",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "description": "The bookmark ID to delete.",
+                        "name": "linkId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bookmark deleted",
+                        "schema": {
+                            "$ref": "#/definitions/routes.messsageResponse"
                         }
                     }
                 }

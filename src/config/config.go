@@ -12,6 +12,7 @@ import (
 var (
 	GlobalConfigs                            *Configs
 	defaultChangeDetectionIOChangedLastHours = 24
+	DefaultBackgroundImageURL                = "https://i.imgur.com/jMy7evE.jpeg"
 )
 
 type Configs struct {
@@ -32,6 +33,7 @@ type Configs struct {
 	Jellyseerr              jellyseerrConfigs
 	ChangeDetectionIO       changedetectionIOConfigs
 	Backrest                BackrestConfigs
+	OpenArchiver            OpenArchiverConfigs
 	IFrames                 iframesConfigs
 }
 
@@ -146,6 +148,12 @@ type BackrestConfigs struct {
 	Password        string
 }
 
+type OpenArchiverConfigs struct {
+	Address         string
+	InternalAddress string
+	SuperAPIKey     string
+}
+
 func SetConfigs(filePath string) error {
 	GlobalConfigs = &Configs{}
 
@@ -237,6 +245,10 @@ func SetConfigs(filePath string) error {
 	GlobalConfigs.Backrest.InternalAddress = os.Getenv("INTERNAL_BACKREST_ADDRESS")
 	GlobalConfigs.Backrest.Username = os.Getenv("BACKREST_USERNAME")
 	GlobalConfigs.Backrest.Password = os.Getenv("BACKREST_PASSWORD")
+
+	GlobalConfigs.OpenArchiver.Address = os.Getenv("OPENARCHIVER_ADDRESS")
+	GlobalConfigs.OpenArchiver.InternalAddress = os.Getenv("INTERNAL_OPENARCHIVER_ADDRESS")
+	GlobalConfigs.OpenArchiver.SuperAPIKey = os.Getenv("OPENARCHIVER_SUPER_API_KEY")
 
 	alarmsRegex := os.Getenv("ALARMS_REGEX")
 	if alarmsRegex != "" {

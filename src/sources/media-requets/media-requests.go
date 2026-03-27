@@ -94,7 +94,7 @@ func GetiFrame(c *gin.Context) {
 	var html []byte
 	html, err = getRequestsiFrame(iframeRequestData, theme, apiURL, limit, filter, sort, requestedByOverseerr, requestedByJellyseerr, showMedia)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, fmt.Errorf("couldn't create HTML code: %s", err.Error()))
+		c.JSON(http.StatusInternalServerError, fmt.Errorf("couldn't create HTML code: %s", err.Error()).Error())
 		return
 	}
 

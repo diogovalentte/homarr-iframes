@@ -1,27 +1,56 @@
 # Sources
 
-- Each source is a route of the API that returns an iFrame.
+- Each **source** corresponds to an API route that returns an iFrame.
+- Some sources require environment variables to function.
 
-- Some sources need some environment variables to work.
+Most sources define two address variables:
 
-- Most sources have two environment variables for the address. One will be used in the iFrame links that you can click. The other will be used by this project to get the data (with the prefix `INTERNAL_`). If you don't provide the second one, the first one will be used in both cases.
+- A public address (used in clickable links inside the iFrame)
+- An internal address (prefixed with `INTERNAL_`) used by this project to fetch data
 
-  - **Example**: You access a service using the domain `service.com` and there is an authentication system in front of it. You set the first address environment variable to `service.com` and the second one (`INTERNAL_`) to the service's docker container name or any other internal address that this project can use to connect to the service without passing by the authentication system.
+If the internal address is not provided, the public address is used for both.
 
-- Most sources have query arguments that can be provided in the URL. These arguments change the iframe behavior and can be very useful for customization. You can check the [API docs](https://github.com/diogovalentte/homarr-iframes/tree/main?tab=readme-ov-file#api-docs) for query arguments.
-  - Some sources **require** query arguments to work.
-- This project doesn't have any authentication system, so anyone who can access the API will be able to get all information from all sources, like your Vikunja tasks, Linkwarden bookmarks, etc. You can add an authentication portal like Authelia or [Authentik](https://github.com/goauthentik/authentik) in front of the API to secure it, this is how I do it.
-- Some iFrames display date information; set the Docker container timezone to get a better result.
+**Example**
+
+You access a service via `service.com`, but it is protected by an authentication proxy.
+
+You would configure:
+
+- Public address → `service.com`
+- Internal address → Docker container hostname or internal network address
+
+This allows the API to fetch data directly without going through the authentication layer.
+
+---
+
+# Query Parameters
+
+Many sources support URL query parameters that modify behavior and appearance. Some sources require them.
+
+See the [API documentation](https://github.com/diogovalentte/homarr-iframes/tree/main?tab=readme-ov-file#api-documentation).
+
+# Security Notice
+
+This project has no built-in authentication.
+
+Anyone who can access the API can read all exposed data (tasks, bookmarks, media info, etc.). You should place an authentication gateway (e.g., [Authelia](https://github.com/authelia/authelia) or [Authentik](https://github.com/goauthentik/authentik)) in front of the API.
+
+# Timezone
+
+Some iFrames display dates. Set the Docker container timezone to match your system for accurate results.
 
 ---
 
 # Linkwarden
 
-This source creates an iFrame with your bookmarks from your [Linkwarden](https://github.com/linkwarden/linkwarden) instance. It has links to the bookmark link and the bookmark Linkwarden collection.
+Displays bookmarks from a [Linkwarden](https://github.com/linkwarden/linkwarden) instance, including:
+
+- A link to the original bookmark
+- A link to the bookmark collection inside Linkwarden
 
 ![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/90271b2c-dc4f-4ee7-a6d3-f256e12cad81)
 
-To use this source, you'll need to provide the following environment variables:
+**Environment variables**
 
 - `LINKWARDEN_ADDRESS`: your Linkwarden instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
 - `INTERNAL_LINKWARDEN_ADDRESS`: your Linkwarden instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
@@ -30,176 +59,217 @@ To use this source, you'll need to provide the following environment variables:
 
 # Vikunja
 
-This source creates an iFrame with links to the tasks from your [Vikunja](https://github.com/go-vikunja/vikunja) instance.
+Displays tasks from a [Vikunja](https://github.com/go-vikunja/vikunja) instance.
 
-- It automatically sorts the tasks by **due date** (ascendent), **end date** (ascendent), and **created date** (descendent), and also filters to return only tasks that are **not done**.
+- It automatically sorts the tasks by **due date** (ascending), **end date** (ascending), and **created date** (descending), and also filters to return only tasks that are **not done**.
+
+Tasks are automatically:
+
+- Filtered to only **not done**
+- Sorted by:
+  - Due date (ascending)
+  - End date (ascending)
+  - Created date (descending)
 
 ![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/787ff13a-a81f-42b4-a3a4-9f0892ca815f)
 
-To use this source, you'll need to provide the following environment variables:
+**Environment variables**
 
-- `VIKUNJA_ADDRESS`: your Vikunja instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `INTERNAL_VIKUNJA_ADDRESS`: your Vikunja instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `VIKUNJA_TOKEN`: an access token used to access your Vikunja instance API to get your tasks. You can get it by going to **Settings -> API Tokens -> Create a Token -> In "Tasks", select "Read One" and "Read All"; In "Projects", select "Read One" and "Read All" -> Create Token**.
+- `VIKUNJA_ADDRESS`
+- `INTERNAL_VIKUNJA_ADDRESS`
+- `VIKUNJA_TOKEN`
 
-  - If you want to add a button to set the task as done in the iframe, add the permission **Update**.
+Token permissions:
 
-- `VIKUNJA_BACKGROUND_IMG_URL`: an image URL to be used as the background of each task card.
+- Tasks → Read One, Read All
+- Projects → Read One, Read All
+
+Optional:
+
+- Add **Update** permission to allow a “mark as done” button in the iFrame
+- `VIKUNJA_BACKGROUND_IMG_URL` — background image URL for task cards
 
 # Media Requests
 
-This source creates an iFrame with your media requests from your [Overseerr](https://github.com/sct/overseerr) and [Jellyseerr](https://github.com/Fallenbagel/jellyseerr) instances.
+Displays media requests from:
+- [Overseerr](https://github.com/sct/overseerr)
+- [Jellyseerr](https://github.com/Fallenbagel/jellyseerr)
 
 ![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/7f374beb-e392-4ee9-94fc-4d1556f65e7c)
 
-To use this source, you'll need to provide the following environment variables:
+**Overseerr variables**
 
-- `OVERSEERR_ADDRESS`: your Overseerr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`. It'll be used in the links in the iframe. If `INTERNAL_OVERSEERR_ADDRESS` is not provided, it'll also be used by the API to get the data from Overseerr.
-- `INTERNAL_OVERSEERR_ADDRESS`: your Overseerr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`. It'll be used by the API to get the data from Overseerr.
+- `OVERSEERR_ADDRESS`
+- `INTERNAL_OVERSEERR_ADDRESS`
+- `OVERSEERR_API_KEY`: (Settings -> General -> API Key).
 
-- `OVERSEERR_API_KEY`: an API key used to access your Overseerr instance API to get your media requests. You can get it by going to **Settings -> General -> API Key**.
+**Jellyseerr variables**
 
-- `JELLYSEERR_ADDRESS`: your Jellyseerr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`. It'll be used in the links in the iframe. If `INTERNAL_JELLYSEERR_ADDRESS` is not provided, it'll also be used by the API to get the data from Jellyseerr.
-- `INTERNAL_JELLYSEERR_ADDRESS`: your Jellyseerr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`. It'll be used by the API to get the data from Jellyseerr.
-
-- `JELLYSEERR_API_KEY`: an API key used to access your Jellyseerr instance API to get your media requests. You can get it by going to **Settings -> General -> API Key**.
+- `JELLYSEERR_ADDRESS`
+- `INTERNAL_JELLYSEERR_ADDRESS`
+- `JELLYSEERR_API_KEY`: (Settings → General → API Key)
 
 # Media Releases
 
-This source creates an iFrame with media that is released today. There is also an indicator of whether the media is downloaded (_for Lidarr, it shows how many tracks of an album are downloaded_).
+Shows media releasing today and whether it is downloaded. For Lidarr, it shows how many tracks of an album are downloaded.
 
-- It gets the media from [Sonarr](https://github.com/Sonarr/Sonarr), [Radarr](https://github.com/Radarr/Radarr), and [Lidarr](https://github.com/Lidarr/Lidarr).
-- Set the same timezone to your media containers and this project for a better result.
+Sources:
+
+- [Sonarr](https://github.com/Sonarr/Sonarr)
+- [Radarr](https://github.com/Radarr/Radarr)
+- [Lidarr](https://github.com/Lidarr/Lidarr)
+
+Use the same timezone as your media containers for best results.
+
+You may configure only the services you use.
 
 ![image](https://github.com/user-attachments/assets/461249d2-7979-47bd-913e-2247c31c8e2e)
 
-To use this source, you'll need to provide the environment variables below, but you don't need to provide all of them, you can specify only the Sonarr variables for example.
+**Environment variables**
 
-- `SONARR_ADDRESS`: your Sonarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `INTERNAL_SONARR_ADDRESS`: your Sonarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `SONARR_API_KEY`: an access API key used to access your Sonarr instance API to get your media. You can get it by going to **Settings -> General -> API Key**.
+- `SONARR_ADDRESS`
+- `INTERNAL_SONARR_ADDRESS`
+- `SONARR_API_KEY`: (API keys: Settings → General → API Key)
 
-- `RADARR_ADDRESS`: your Radarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `INTERNAL_RADARR_ADDRESS`: your Radarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `RADARR_API_KEY`: an access API key used to access your Radarr instance API to get your media. You can get it by going to **Settings -> General -> API Key**.
+- `RADARR_ADDRESS`
+- `INTERNAL_RADARR_ADDRESS`
+- `RADARR_API_KEY`: (API keys: Settings → General → API Key)
 
-- `LIDARR_ADDRESS`: your Lidarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `INTERNAL_LIDARR_ADDRESS`: your Lidarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `LIDARR_API_KEY`: an access API key used to access your Lidarr instance API to get your media. You can get it by going to **Settings -> General -> API Key**.
+- `LIDARR_ADDRESS`
+- `INTERNAL_LIDARR_ADDRESS`
+- `LIDARR_API_KEY`: (API keys: Settings → General → API Key)
 
 # Uptime Kuma
 
-This source creates an iFrame with the number of UP and DOWN sites from a [Uptime Kuma]() status page.
+Displays the number of UP and DOWN monitors from an [Uptime Kuma](https://github.com/louislam/uptime-kuma) status page.
 
 ![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/7b0e2cfc-2edc-41d4-9551-72df189591d4)
 
-To use this source, you'll need to provide the following environment variables:
+**Environment variables**
 
-- `UPTIMEKUMA_ADDRESS`: your Uptime Kuma instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+- `UPTIMEKUMA_ADDRESS`
 
 # Cinemark Brasil
 
-This source gets on display movies of specific Cinemark theaters (only in Brazil) and creates an iFrame. It shows some info about the films and has links to their pages.
+Displays currently showing movies for selected Cinemark theaters in Brazil and links to their pages.
 
-- You have to specify which theaters to get movies from. I recommend specifying all the theaters in your city.
+You must specify which theaters to fetch (recommended: all theaters in your city).
 
 ![image](https://github.com/user-attachments/assets/aafe4a96-8b48-471d-8046-a189492e4137)
 
 # Alarms
 
-This source shows **alarms** (_warnings, errors, notifications you don't want to miss, etc._) from multiple services in one central place.
+Aggregates alerts and warnings from multiple services into one dashboard view.
 
 ![image](https://github.com/user-attachments/assets/15e26b24-8d4b-4243-b239-e6f4c5056712)
 
-To use this source, you must provide environment variables for each service from which you want to show alarms. You also need to specify the services' names in the iframe URL query parameter `alarms`.
+You must:
 
-Below are the available services that you can use in this iframe and the required environment variables:
+1. Configure environment variables for each service.
+2. Pass service names in the iFrame query parameter:
 
-## Alarms regex filter
-You can add a regex filter to the alarms iframe, it'll match the regex with the concatenated attributes of each alarm using the style `source summary URL status property value`, but without the spaces.
+```
+alarms=<service1,service2,...>
+```
+
+## Regex Filtering
+
+You can filter alarms using the `ALARMS_REGEX` environment variable.
+
+The regex matches a concatenated string (*without spaces*):
+
+```
+source summary URL status property value
+```
 
 **Example**: "NetdataSystem requires reboot after package updateshttps://netdata.domain.comWARNINGOS / System1 status" for the alarm below:
 
 ![image](https://github.com/user-attachments/assets/fbfc8053-e688-40e0-82fd-7be6a224cf89)
 
-- The regex is provided using the environment variable `ALARMS_REGEX`.
-- The alarms iframe query argument `regex_include` can have the values `true` or `false` (`true` by default). If `true` shows only alarms that match the regex. If `false` only alarms that don't match the regex.
+**Query parameter**
+
+```
+regex_include=true|false
+```
+
+- `true` → show only matching alarms (default)
+- `false` → hide matching alarms
 
 ## Netdata
 
-Shows [Netdata](https://github.com/netdata/netdata) alerts, such as high RAM/CPU usage alerts.
+Shows alerts (CPU, RAM, etc.) from [Netdata](https://github.com/netdata/netdata)
 
-- `NETDATA_ADDRESS`: your Netdata instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+- `NETDATA_ADDRESS`
+- `INTERNAL_NETDATA_ADDRESS`
+- `NETDATA_TOKEN`: see how to get it [here](https://learn.netdata.cloud/docs/netdata-cloud/authentication-&-authorization/api-tokens).
 
-- `INTERNAL_NETDATA_ADDRESS`: your Netdata instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `NETDATA_TOKEN`: an access token used to access your Netdata instance API to get your alarms. See how to get it [here](https://learn.netdata.cloud/docs/netdata-cloud/authentication-&-authorization/api-tokens).
+## Sonarr / Radarr / Lidarr / Prowlarr Health
 
-## Radarr, Sonarr, Lidarr, and Prowlarr
+Shows health warnings such as indexer failures or download client connection problems.
 
-Shows health messages from your [Sonarr](https://github.com/Sonarr/Sonarr), [Radarr](https://github.com/Radarr/Radarr), [Lidarr](https://github.com/Lidarr/Lidarr), and [Prowlarr](https://github.com/Prowlarr/Prowlarr) instances, like when an index fails or Sonarr can't connect to a download client.
+Each requires:
 
-- `SONARR_ADDRESS`: your Sonarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `INTERNAL_SONARR_ADDRESS`: your Sonarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `SONARR_API_KEY`: an access API key used to access your Sonarr instance API to get your media. You can get it by going to **Settings -> General -> API Key**.
+- `<SERVICE>_ADDRESS`
+- `INTERNAL_<SERVICE>_ADDRESS`
+- `<SERVICE>_API_KEY`: (API keys: Settings → General → API Key)
 
-- `RADARR_ADDRESS`: your Radarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `INTERNAL_RADARR_ADDRESS`: your Radarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `RADARR_API_KEY`: an access API key used to access your Radarr instance API to get your media. You can get it by going to **Settings -> General -> API Key**.
-
-- `LIDARR_ADDRESS`: your Lidarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `INTERNAL_LIDARR_ADDRESS`: your Lidarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `LIDARR_API_KEY`: an access API key used to access your Lidarr instance API to get your media. You can get it by going to **Settings -> General -> API Key**.
-
-- `PROWLARR_ADDRESS`: your Prowlarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `INTERNAL_PROWLARR_ADDRESS`: your Prowlarr instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `PROWLARR_API_KEY`: an access API key used to access your Prowlarr instance API. You can get it by going to **Settings -> General -> API Key**.
+(Sonarr, Radarr, Lidarr, Prowlarr)
 
 ## Speedtest Tracker
 
-Shows a warning if the last speed test from your [Speedtest Tracker](https://github.com/alexjustesen/speedtest-tracker) instance failed.
+Warns when the last speed test failed from your [Speedtest Tracker](https://github.com/alexjustesen/speedtest-tracker) instance.
 
-- `SPEEDTEST_TRACKER_ADDRESS`: your Speedtest Tracker instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `INTERNAL_SPEEDTEST_TRACKER_ADDRESS`: your Speedtest Tracker instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `SPEEDTEST_TRACKER_TOKEN`: your API token used to access your Speedtest Tracker instance. You can get it by going to **Settings -> API Tokens -> Create API Token button**.
+- `SPEEDTEST_TRACKER_ADDRESS`
+- `INTERNAL_SPEEDTEST_TRACKER_ADDRESS`
+- `SPEEDTEST_TRACKER_TOKEN`: (API token: Settings -> API Tokens -> Create API Token button)
 
 ## Pi-hole
 
-Shows [Pi-hole](https://github.com/pi-hole/pi-hole) diagnostic messages, like a high load.
+Displays [Pi-hole](https://github.com/pi-hole/pi-hole) diagnostic messages.
 
-- `PIHOLE_ADDRESS`: your Pihole instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `INTERNAL_PIHOLE_ADDRESS`: your Pihole instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `PIHOLE_PASSWORD`: a password to access your Pi-hole instance API in Pi-hole versions after v6.0. It can be the password you use to log in to the Pi-hole interface, but I recommend using the **app password**, as it's the only one that works if you enable **2FA**. You can get the app password on **Settings -> Web interface / API**. Make sure you're on the **Expert** mode, and click on **Configure app password**.
+- `PIHOLE_ADDRESS`
+- `INTERNAL_PIHOLE_ADDRESS`
+- `PIHOLE_PASSWORD`: a password to access your Pi-hole instance API in Pi-hole versions after `v6.0`. It can be the password you use to log in to the Pi-hole interface, but I recommend using the **app password**, as it's the only one that works if you enable **2FA**. You can get the app password on **Settings -> Web interface / API**. Make sure you're on the **Expert** mode, and click on **Configure app password**.
 - `PIHOLE_TOKEN`: a token to access your Pi-hole instance API in Pi-hole versions previous to v6.0. You can get it by going to **Settings -> API -> Show API Token button**.
 
 ## Kavita
 
-Shows your [Kavita](https://github.com/Kareadita/Kavita) instance [media issues](https://wiki.kavitareader.com/troubleshooting/media-errors) that Kavita detects when analyzing your media, like corrupted files.
+Shows [media issues](https://wiki.kavitareader.com/troubleshooting/media-errors) detected by [Kavita](https://github.com/Kareadita/Kavita) (e.g., corrupted files).
 
-- `KAVITA_ADDRESS`: your Kavita instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `INTERNAL_KAVITA_ADDRESS`: your Kavita instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `KAVITA_USERNAME`: your Kavita username.
-- `KAVITA_PASSWORD`: your Kavita password.
+- `KAVITA_ADDRESS`
+- `INTERNAL_KAVITA_ADDRESS`
+- `KAVITA_USERNAME`
+- `KAVITA_PASSWORD`
 
 ## Kaizoku
 
-Shows warnings if there are failed jobs in your [Kaizoku](https://github.com/oae/kaizoku) queues.
+Shows failed job warnings from [Kaizoku](https://github.com/oae/kaizoku).
 
-- `KAIZOKU_ADDRESS`: your Kaizoku instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `INTERNAL_KAIZOKU_ADDRESS`: your Kaizoku instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
+- `KAIZOKU_ADDRESS`
+- `INTERNAL_KAIZOKU_ADDRESS`
 
 ## ChangeDetection.io
 
-Shows cards for your watches' errors and changes from your [ChangeDetection.io](https://github.com/dgtlmoon/changedetection.io) instance. It'll show on the left if the change was viewed or not. A change is considered viewed by ChangeDetection.io when you look at the change's history (_to check the diffs between the last change and the actual_).
+Shows errors and detected page changes.s from your [ChangeDetection.io](https://github.com/dgtlmoon/changedetection.io) instance.
 
-- `CHANGEDETECTIONIO_ADDRESS`: your ChangeDetection.io instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `INTERNAL_CHANGEDETECTIONIO_ADDRESS`: your ChangeDetection.io instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `CHANGEDETECTIONIO_API_KEY`: an access API key used to access your ChangeDetection.io instance API. You can get it by going to **Settings -> API -> Generate API Key button**.
-- `CHANGEDETECTIONIO_CHANGED_LAST_HOURS`: number of hours to indicate if the iframe should show a watch change. If the watch's last changed time is within the last `x` hours, it'll show the watch, else no. Defaults to 24.
+- `CHANGEDETECTIONIO_ADDRESS`
+- `INTERNAL_CHANGEDETECTIONIO_ADDRESS`
+- `CHANGEDETECTIONIO_API_KEY`: (API key: Settings -> API -> Generate API Key button)
+- `CHANGEDETECTIONIO_CHANGED_LAST_HOURS`: If the watch's last changed time is within the last `x` hours, it'll show the watch. Defaults to 24.
 
 ## Backrest
-Show [Backrest](https://github.com/garethgeorge/backrest) backup plans with error or warning status in the last 24 hours. Username and password are only required if you activated Backrest authentication.
 
-- `BACKREST_ADDRESS`: your Backrest instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `INTERNAL_BACKREST_ADDRESS`: your Backrest instance address, like `https://sub.domain.com` or `http://192.168.1.45:8080`.
-- `BACKREST_USERNAME`: your Backrest username.
-- `BACKREST_PASSWORD`: your Backrest password.
+Displays backup plans with warning or error status in the last 24 hours from your [Backrest](https://github.com/garethgeorge/backrest) instance.
+
+- `BACKREST_ADDRESS`
+- `INTERNAL_BACKREST_ADDRESS`
+- `BACKREST_USERNAME`
+- `BACKREST_PASSWORD`
+
+## OpenArchiver
+
+Shows ingestion sources with error status from your [OpenArchiver](https://github.com/LogicLabs-OU/OpenArchiver) instance.
+
+- `OPENARCHIVER_ADDRESS`
+- `INTERNAL_OPENARCHIVER_ADDRESS`
+- `OPENARCHIVER_SUPER_API_KEY`

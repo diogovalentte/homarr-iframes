@@ -2,78 +2,158 @@
 
 ![image](https://github.com/diogovalentte/homarr-iframes/assets/49578155/8df579cb-9cc9-4bad-a1da-f0cf015e741b)
 
-This project connects to multiple self-hosted applications (called **sources** here) and creates an iFrame to be used in any dashboard (*not only [Homarr](https://github.com/ajnart/homarr), despite the project's name*).
+This project connects to multiple self-hosted applications (referred to as sources) and exposes their data through embeddable iFrames.
 
-The iFrames will be available under the project's API routes, like `/v1/iframe/linkwarden`. These routes accept query parameters to change the iFrame, like limiting the number of items or specifying whether you want the iFrames to check for updates automatically (*the iframe reloads if the source contents change (like adding new bookmarks on Linkwarden)*).
+Despite the name, the generated iFrames can be used in any dashboard, not only [Homarr](https://github.com/ajnart/homarr).
 
-- You can check all query parameters in the API docs.
+Each source is exposed through an API route such as:
+
+```
+/v1/iframe/linkwarden
+```
+
+These routes accept query parameters that allow you to:
+
+- Limit the number of displayed items.
+- Enable automatic update checks (the iFrame reloads if the source data changes).
+- Customize appearance (when supported by the source).
+
+All available query parameters are documented in the API documentation.
+
+---
 
 # Sources
 
-The API can create iFrames for multiple sources, like the **Vikunja** source that creates an iFrame with your tasks, or the **Linkwarden** source that creates an iFrame with your bookmarks.
+The API supports multiple sources. Examples:
 
-The sources may require environment variables with specific information like the application address or credentials. The way you provide these environment variables depends on how you run the API.
+- Vikunja — displays your tasks.
+- Linkwarden — displays your bookmarks.
 
-- A list of the sources can be found [here](/docs/SOURCES.md).
+Each source may require specific environment variables, such as:
 
-# API docs
+- Application URL
+- API tokens
+- Credentials
 
-The API docs are under the path `/v1/swagger/index.html`, like `http://192.168.1.44/v1/swagger/index.html` or `https://sub.domain.com/v1/swagger/index.html`, depending on how you access the API.
+How you provide these variables depends on how you run the API (Docker, Docker Compose, or manually).
+
+A complete list of supported sources is available [here](/docs/SOURCES.md):
+
+# API Documentation
+
+Swagger documentation is available at:
+
+```
+/v1/swagger/index.html
+```
+
+Examples:
+
+- `http://192.168.1.44/v1/swagger/index.html`
+- `https://sub.domain.com/v1/swagger/index.html`
+
+The exact URL depends on how and where the API is hosted.
+
+---
 
 # Notes
 
-## How to add the iframe to your dashboard
+## Adding the iFrame to Homarr
 
-1. In your Homarr dashboard, click on **Enter edit mode -> Add a tile -> Widgets -> iFrame**.
-2. Click to edit the new iFrame widget.
-3. Add the API URL (`http://192.168.1.15:8080`) + the source path (`/v1/iframe/linkwarden`) + query parameters, like `http://192.168.1.15:8080/v1/iframe/linkwarden?collectionId=1&limit=3&theme=dark`.
+1. Enter edit mode.
+2. Add a new item.
+3. Select the iFrame item and add it.
+4. Configure the widget with:
 
-## How accessing the iframes works
-
-When you add an iFrame to your dashboard, it's **>your<** web browser that fetches the iFrame from the API and shows it to you, not your dashboard application running on your server. So your browser needs to be able to access the API, that's how an iFrame works.
-
-- **Examples**:
-  - If you run this project on your server under port 5000, your browser needs to use your server's IP address + port 5000.
-  - If you're accessing your dashboard with a domain and using HTTPS, you also need to access this project's API with a domain and using HTTPS. If you try to use HTTP + HTTPS, your browser will likely block the iFrame.
-
-## No built-in authentication system
-
-This project doesn't have any built-in authentication system, so anyone who can access the API will be able to get all information from the API routes, like your Vikunja tasks, Linkwarden bookmarks, etc. You can add an authentication portal like [Authelia](https://github.com/authelia/authelia) or [Authentik](https://github.com/goauthentik/authentik) in front of the project to secure it, that's how I do it.
-
-# How to run:
-
-- **For Docker and Docker Compose**: by default, the API will be available on port `8080` and is not accessible by other machines. To be accessible by other machines, you need to run the API behind a reverse proxy or run the container in [host network mode](https://docs.docker.com/network/drivers/host/).
-
-- You can change the API port using the environment variable `PORT`.
-  - Depending on the port you choose, you need to run the container with user `root` instead of the user `1000` used in the examples and the `docker-compose.yml` file.
-
-## Using Docker:
-
-1. Run the latest version:
-
-```sh
-docker run --name homarr-iframes -p 8080:8080 -e VARIABLE_NAME=VARIABLE_VALUE -e VARIABLE_NAME=VARIABLE_VALUE ghcr.io/diogovalentte/homarr-iframes:latest
+```
+<API_URL>/v1/iframe/<source>?<query_parameters>
 ```
 
-## Using Docker Compose:
+Example:
 
-1. There is a `docker-compose.yml` file in this repository. You can clone this repository to use this file or create one yourself.
-2. Create a `.env` file with the environment variables you want to provide to the API. It should be like the `.env.example` file and be in the same directory as the `docker-compose.yml` file.
-3. Start the container by running:
+```
+http://192.168.1.15:8080/v1/iframe/linkwarden?collectionId=1&limit=3&theme=dark
+```
+
+## How iFrame Access Works
+
+When you add the iFrame to your dashboard:
+
+- Your browser requests the iFrame directly from this API.
+- The dashboard server does not proxy the request.
+
+This means:
+
+- Your browser must be able to access the API.
+- The protocol must match.
+
+Examples:
+
+- If the API runs on port 5000, access it via `http://SERVER_IP:5000`.
+- If your dashboard uses HTTPS, the API must also be served over HTTPS.
+  Mixing HTTP and HTTPS will cause the browser to block the iFrame.
+
+## No Built-in Authentication
+
+This project does not provide authentication.
+
+Anyone who can access the API can retrieve data from all configured sources.
+
+To secure it, place an authentication layer in front of the API, such as:
+
+- [Authelia](https://github.com/authelia/authelia)
+- [Authentik](https://github.com/goauthentik/authentik)
+
+---
+
+# Running
+
+## Docker and Docker Compose
+
+By default:
+
+- The API runs on port `8080`.
+- It is not accessible externally unless configured.
+
+To make it accessible from other machines:
+
+- Run it behind a reverse proxy, or
+- Use [host network mode](https://docs.docker.com/network/drivers/host/).
+
+You can change the port using the `PORT` environment variable.
+
+## Using Docker
+
+1. Run the latest image:
+
+```sh
+docker run \
+  --name homarr-iframes \
+  -p 8080:8080 \
+  -e VARIABLE_NAME=VARIABLE_VALUE \
+  ghcr.io/diogovalentte/homarr-iframes:latest
+```
+
+## Using Docker Compose
+
+1. Use the provided `docker-compose.yml` or create your own.
+2. Create a `.env` file (based on `.env.example`) in the same directory.
+3. Start the service:
 
 ```sh
 docker compose up
 ```
 
-## Manually:
+## Running Manually
 
-1. Install the dependencies:
+1. Install dependencies:
 
 ```sh
 go mod download
 ```
-2. Export the environment variables.
-3. Run:
+
+2. Export the required environment variables.
+3. Run the API:
 
 ```sh
 go run main.go

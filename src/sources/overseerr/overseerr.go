@@ -11,7 +11,6 @@ var (
 	o                         *Overseerr
 	TMDBPosterImageBasePath   = "https://image.tmdb.org/t/p/w600_and_h900_bestv2/"
 	TMDBBackdropImageBasePath = "https://image.tmdb.org/t/p/original/"
-	DefaultBackgroundImageURL = "https://i.imgur.com/jMy7evE.jpeg"
 )
 
 type Overseerr struct {

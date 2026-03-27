@@ -31,15 +31,15 @@ func (b *Backrest) baseRequest(method, url string, body io.Reader, target any) e
 	defer resp.Body.Close()
 
 	resBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("error reading response body: %w", err)
-	}
-
 	if resp.StatusCode != http.StatusOK {
 		if string(resBody) == "Unauthorized (No Authorization Header)\n" {
 			return fmt.Errorf("error: %s. Authentication is enabled. Set BACKREST_USERNAME and BACKREST_PASSWORD variables", resp.Status)
 		}
-		return fmt.Errorf("error: %s", resp.Status)
+		return fmt.Errorf("request status (%s): %s", resp.Status, string(resBody))
+	}
+
+	if err != nil {
+		return fmt.Errorf("error reading response body: %w", err)
 	}
 
 	if err := json.Unmarshal(resBody, target); err != nil {
