@@ -123,7 +123,12 @@ func (k *Kavita) RefreshCurrentToken() error {
 		return fmt.Errorf("error sending request: %w", err)
 	}
 
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode == http.StatusUnauthorized {
+		err := k.Login()
+		if err != nil {
+			return fmt.Errorf("error logging in: %w", err)
+		}
+	} else if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("error: %s", resp.Status)
 	}
 
