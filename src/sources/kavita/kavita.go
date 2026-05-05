@@ -61,13 +61,17 @@ func (k *Kavita) Init() error {
 }
 
 func (k *Kavita) GetMediaErrors() ([]*MediaError, error) {
-	var errors []*MediaError
+	var errors MediaErrorResults
 	err := k.baseRequest("GET", fmt.Sprintf("%s/api/Server/media-errors", k.InternalAddress), nil, &errors)
 	if err != nil {
 		return nil, err
 	}
 
-	return errors, nil
+	return errors.Results, nil
+}
+
+type MediaErrorResults struct {
+	Results []*MediaError `json:"results"`
 }
 
 type MediaError struct {
