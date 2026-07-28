@@ -90,6 +90,10 @@ func (k *Kavita) Login() error {
 		return fmt.Errorf("error unmarshaling JSON: %s\n. Reponse body: %s", err.Error(), string(resBody))
 	}
 
+	if loginResponse.Token == "" || loginResponse.RefreshToken == "" {
+		return fmt.Errorf("login failed: token or refresh token is empty, response body: %s", string(resBody))
+	}
+
 	k.Token = loginResponse.Token
 	k.RefreshToken = loginResponse.RefreshToken
 
