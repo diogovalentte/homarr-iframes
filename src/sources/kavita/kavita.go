@@ -20,6 +20,27 @@ type Kavita struct {
 	Password        string
 	Token           string
 	RefreshToken    string
+
+	// tokensMutex guards Token and RefreshToken, they're read and written from
+	// the goroutines of concurrent requests
+	tokensMutex sync.RWMutex
+	// refreshMutex serializes the whole refresh/login operation, so concurrent
+	// requests getting a 401 at the same time don't refresh on top of each other
+	refreshMutex sync.Mutex
+}
+
+func (k *Kavita) getTokens() (string, string) {
+	k.tokensMutex.RLock()
+	defer k.tokensMutex.RUnlock()
+
+	return k.Token, k.RefreshToken
+}
+
+func (k *Kavita) setTokens(token, refreshToken string) {
+	k.tokensMutex.Lock()
+	defer k.tokensMutex.Unlock()
+
+	k.Token, k.RefreshToken = token, refreshToken
 }
 
 // newMutex serializes New() calls, otherwise concurrent requests can each
