@@ -3,6 +3,7 @@ package kavita
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/diogovalentte/homarr-iframes/src/config"
 )
@@ -21,7 +22,14 @@ type Kavita struct {
 	RefreshToken    string
 }
 
+// newMutex serializes New() calls, otherwise concurrent requests can each
+// build their own instance and race on the package singleton
+var newMutex sync.Mutex
+
 func New() (*Kavita, error) {
+	newMutex.Lock()
+	defer newMutex.Unlock()
+
 	if k != nil {
 		return k, nil
 	}

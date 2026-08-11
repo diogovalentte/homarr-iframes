@@ -3,6 +3,7 @@ package netdata
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/diogovalentte/homarr-iframes/src/config"
 )
@@ -18,7 +19,14 @@ type Netdata struct {
 	Token           string
 }
 
+// newMutex serializes New() calls, otherwise concurrent requests can each
+// build their own instance and race on the package singleton
+var newMutex sync.Mutex
+
 func New() (*Netdata, error) {
+	newMutex.Lock()
+	defer newMutex.Unlock()
+
 	if n != nil {
 		return n, nil
 	}

@@ -3,6 +3,7 @@ package prowlarr
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/diogovalentte/homarr-iframes/src/config"
 )
@@ -18,7 +19,14 @@ type Prowlarr struct {
 	APIKey          string
 }
 
+// newMutex serializes New() calls, otherwise concurrent requests can each
+// build their own instance and race on the package singleton
+var newMutex sync.Mutex
+
 func New() (*Prowlarr, error) {
+	newMutex.Lock()
+	defer newMutex.Unlock()
+
 	if p != nil {
 		return p, nil
 	}

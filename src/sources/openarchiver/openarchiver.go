@@ -3,6 +3,7 @@ package openarchiver
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/diogovalentte/homarr-iframes/src/config"
 )
@@ -19,7 +20,14 @@ type OpenArchiver struct {
 	BackgroundImgURL string
 }
 
+// newMutex serializes New() calls, otherwise concurrent requests can each
+// build their own instance and race on the package singleton
+var newMutex sync.Mutex
+
 func New() (*OpenArchiver, error) {
+	newMutex.Lock()
+	defer newMutex.Unlock()
+
 	if o != nil {
 		return o, nil
 	}

@@ -3,6 +3,7 @@ package backrest
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/diogovalentte/homarr-iframes/src/config"
 )
@@ -16,7 +17,14 @@ type Backrest struct {
 	password        string
 }
 
+// newMutex serializes New() calls, otherwise concurrent requests can each
+// build their own instance and race on the package singleton
+var newMutex sync.Mutex
+
 func New() (*Backrest, error) {
+	newMutex.Lock()
+	defer newMutex.Unlock()
+
 	if b != nil {
 		return b, nil
 	}

@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 	"unicode"
 
@@ -29,7 +30,14 @@ type Linkwarden struct {
 	BackgroundImgURL string
 }
 
+// newMutex serializes New() calls, otherwise concurrent requests can each
+// build their own instance and race on the package singleton
+var newMutex sync.Mutex
+
 func New() (*Linkwarden, error) {
+	newMutex.Lock()
+	defer newMutex.Unlock()
+
 	if l != nil {
 		return l, nil
 	}

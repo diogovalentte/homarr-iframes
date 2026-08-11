@@ -3,6 +3,7 @@ package radarr
 import (
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/diogovalentte/homarr-iframes/src/config"
@@ -19,7 +20,14 @@ type Radarr struct {
 	APIKey          string
 }
 
+// newMutex serializes New() calls, otherwise concurrent requests can each
+// build their own instance and race on the package singleton
+var newMutex sync.Mutex
+
 func New() (*Radarr, error) {
+	newMutex.Lock()
+	defer newMutex.Unlock()
+
 	if r != nil {
 		return r, nil
 	}

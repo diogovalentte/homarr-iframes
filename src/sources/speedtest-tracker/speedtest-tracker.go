@@ -3,6 +3,7 @@ package speedtesttracker
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/diogovalentte/homarr-iframes/src/config"
 )
@@ -15,7 +16,14 @@ type SpeedTestTracker struct {
 	token           string
 }
 
+// newMutex serializes New() calls, otherwise concurrent requests can each
+// build their own instance and race on the package singleton
+var newMutex sync.Mutex
+
 func New() (*SpeedTestTracker, error) {
+	newMutex.Lock()
+	defer newMutex.Unlock()
+
 	if s != nil {
 		return s, nil
 	}

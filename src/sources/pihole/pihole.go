@@ -3,6 +3,7 @@ package pihole
 import (
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/diogovalentte/homarr-iframes/src/config"
@@ -22,7 +23,14 @@ type Pihole struct {
 	ValidityTime    time.Time
 }
 
+// newMutex serializes New() calls, otherwise concurrent requests can each
+// build their own instance and race on the package singleton
+var newMutex sync.Mutex
+
 func New() (*Pihole, error) {
+	newMutex.Lock()
+	defer newMutex.Unlock()
+
 	if p != nil {
 		return p, nil
 	}
