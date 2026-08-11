@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -26,7 +27,14 @@ type Alarms struct {
 	Regex *regexp.Regexp
 }
 
+// newMutex serializes New() calls, otherwise concurrent requests can each
+// build their own instance and race on the package singleton
+var newMutex sync.Mutex
+
 func New() (*Alarms, error) {
+	newMutex.Lock()
+	defer newMutex.Unlock()
+
 	if a != nil {
 		return a, nil
 	}

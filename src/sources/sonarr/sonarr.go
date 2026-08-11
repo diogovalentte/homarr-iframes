@@ -3,6 +3,7 @@ package sonarr
 import (
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/diogovalentte/homarr-iframes/src/config"
@@ -20,7 +21,14 @@ type Sonarr struct {
 	APIKey          string
 }
 
+// newMutex serializes New() calls, otherwise concurrent requests can each
+// build their own instance and race on the package singleton
+var newMutex sync.Mutex
+
 func New() (*Sonarr, error) {
+	newMutex.Lock()
+	defer newMutex.Unlock()
+
 	if s != nil {
 		return s, nil
 	}

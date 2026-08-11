@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -27,7 +28,14 @@ type Vikunja struct {
 	BackgroundImgURL string
 }
 
+// newMutex serializes New() calls, otherwise concurrent requests can each
+// build their own instance and race on the package singleton
+var newMutex sync.Mutex
+
 func New() (*Vikunja, error) {
+	newMutex.Lock()
+	defer newMutex.Unlock()
+
 	if v != nil {
 		return v, nil
 	}
