@@ -18,6 +18,9 @@ func (k *Kavita) baseRequest(method, url string, body io.Reader, target any) err
 			return fmt.Errorf("error reading request body: %w", err)
 		}
 	}
+	// the token used by the request, so the retry below only refreshes the token
+	// it actually failed with
+	var usedToken string
 	newRequest := func() (*http.Request, error) {
 		var payload io.Reader
 		if reqBody != nil {
@@ -27,8 +30,9 @@ func (k *Kavita) baseRequest(method, url string, body io.Reader, target any) err
 		if err != nil {
 			return nil, fmt.Errorf("error creating request: %w", err)
 		}
+		usedToken, _ = k.getTokens()
 		req.Header.Set("Content-Type", "application/json")
-		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", k.Token))
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", usedToken))
 
 		return req, nil
 	}
@@ -51,7 +55,7 @@ func (k *Kavita) baseRequest(method, url string, body io.Reader, target any) err
 	}
 
 	if resp.StatusCode == http.StatusUnauthorized {
-		if err := k.RefreshCurrentToken(); err != nil {
+		if err := k.refreshToken(usedToken); err != nil {
 			return fmt.Errorf("error refreshing token: %w", err)
 		}
 
@@ -129,21 +133,37 @@ func (k *Kavita) Login() error {
 		return fmt.Errorf("login failed: token or refresh token is empty, response body: %s", string(resBody))
 	}
 
-	k.Token = loginResponse.Token
-	k.RefreshToken = loginResponse.RefreshToken
+	k.setTokens(loginResponse.Token, loginResponse.RefreshToken)
 
 	return nil
 }
 
+// RefreshCurrentToken refreshes the current token, logging in again if the
+// refresh token is gone or no longer accepted.
 func (k *Kavita) RefreshCurrentToken() error {
-	if k.RefreshToken == "" || k.Token == "" {
+	return k.refreshToken("")
+}
+
+// refreshToken refreshes the current token. If staleToken isn't empty and the
+// current token is already a different one, another request refreshed it in the
+// meantime and there is nothing to do.
+func (k *Kavita) refreshToken(staleToken string) error {
+	k.refreshMutex.Lock()
+	defer k.refreshMutex.Unlock()
+
+	token, refreshToken := k.getTokens()
+	if staleToken != "" && token != staleToken {
+		return nil
+	}
+
+	if refreshToken == "" || token == "" {
 		// nothing to refresh with, fall back to a full login so the client can
 		// recover on its own instead of staying broken until a restart
 		return k.Login()
 	}
 	loginBody := map[string]string{
-		"token":        k.Token,
-		"refreshToken": k.RefreshToken,
+		"token":        token,
+		"refreshToken": refreshToken,
 	}
 	jsonData, err := json.Marshal(loginBody)
 	if err != nil {
@@ -196,8 +216,7 @@ func (k *Kavita) RefreshCurrentToken() error {
 		return nil
 	}
 
-	k.Token = loginResponse.Token
-	k.RefreshToken = loginResponse.RefreshToken
+	k.setTokens(loginResponse.Token, loginResponse.RefreshToken)
 
 	return nil
 }
