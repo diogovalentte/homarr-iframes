@@ -11,25 +11,46 @@ import (
 )
 
 func (p *Pihole) baseRequest(method, url string, body io.Reader, target any, unauthorizedRetries int) error {
+	// buffer the body so the retry below can replay it
+	var reqBody []byte
+	if body != nil {
+		var err error
+		reqBody, err = io.ReadAll(body)
+		if err != nil {
+			return fmt.Errorf("error reading request body: %w", err)
+		}
+	}
+
+	return p.doRequest(method, url, reqBody, target, unauthorizedRetries)
+}
+
+func (p *Pihole) doRequest(method, url string, reqBody []byte, target any, unauthorizedRetries int) error {
 	client := &http.Client{}
-	req, err := http.NewRequest(method, url, body)
+	var payload io.Reader
+	if reqBody != nil {
+		payload = bytes.NewReader(reqBody)
+	}
+	req, err := http.NewRequest(method, url, payload)
 	if err != nil {
 		return fmt.Errorf("error creating request: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	if p.SID != "" {
-		if time.Now().After(p.ValidityTime) {
-			err = p.Logout()
-			if err != nil {
+
+	// the session used by the request, so the retry below only renews the
+	// session it actually failed with. Empty when authenticating with a <v6.0
+	// token, which has no session at all.
+	var usedSID string
+	if p.Password != "" {
+		sid, validityTime := p.getSession()
+		if sid == "" || time.Now().After(validityTime) {
+			if err := p.renewSession(sid); err != nil {
 				return err
 			}
-			err = p.Login()
-			if err != nil {
-				return err
-			}
+			sid, _ = p.getSession()
 		}
-		req.Header.Set("X-FTL-SID", p.SID)
+		usedSID = sid
+		req.Header.Set("X-FTL-SID", sid)
 	}
 
 	resp, err := client.Do(req)
@@ -39,6 +60,10 @@ func (p *Pihole) baseRequest(method, url string, body io.Reader, target any, una
 	defer resp.Body.Close()
 
 	resBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("error reading response body: %w", err)
+	}
+
 	if resp.StatusCode != http.StatusOK {
 		var jsonErr struct {
 			Error struct {
@@ -47,22 +72,13 @@ func (p *Pihole) baseRequest(method, url string, body io.Reader, target any, una
 		}
 		if err := json.Unmarshal(resBody, &jsonErr); err == nil {
 			if jsonErr.Error.Message == "Unauthorized" && unauthorizedRetries > 0 {
-				err = p.Logout()
-				if err != nil {
+				if err := p.renewSession(usedSID); err != nil {
 					return err
 				}
-				err = p.Login()
-				if err != nil {
-					return err
-				}
-				return p.baseRequest(method, url, body, target, unauthorizedRetries-1)
+				return p.doRequest(method, url, reqBody, target, unauthorizedRetries-1)
 			}
 		}
 		return fmt.Errorf("request status (%s): %s", resp.Status, string(resBody))
-	}
-
-	if err != nil {
-		return fmt.Errorf("error reading response body: %w", err)
 	}
 
 	if err := json.Unmarshal(resBody, target); err != nil {
@@ -118,8 +134,7 @@ func (p *Pihole) Login() error {
 		return fmt.Errorf("authentication failed: invalid session")
 	}
 
-	p.SID = loginResponse.Session.SID
-	p.ValidityTime = time.Now().Add(time.Duration(loginResponse.Session.Validity-5) * time.Second)
+	p.setSession(loginResponse.Session.SID, time.Now().Add(time.Duration(loginResponse.Session.Validity-5)*time.Second))
 
 	return nil
 }
@@ -131,8 +146,9 @@ func (p *Pihole) Logout() error {
 		return fmt.Errorf("error creating request: %w", err)
 	}
 
+	sid, _ := p.getSession()
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-FTL-SID", p.SID)
+	req.Header.Set("X-FTL-SID", sid)
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -160,8 +176,7 @@ func (p *Pihole) Logout() error {
 		}
 	}
 
-	p.SID = ""
-	p.ValidityTime = time.Time{}
+	p.setSession("", time.Time{})
 
 	return nil
 }

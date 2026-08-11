@@ -21,6 +21,50 @@ type Pihole struct {
 	SID             string
 	Password        string
 	ValidityTime    time.Time
+
+	// sessionMutex guards SID and ValidityTime, they're read and written from
+	// the goroutines of concurrent requests
+	sessionMutex sync.RWMutex
+	// renewMutex serializes the logout/login pair, otherwise a request can log
+	// out of the session another one just created
+	renewMutex sync.Mutex
+}
+
+func (p *Pihole) getSession() (string, time.Time) {
+	p.sessionMutex.RLock()
+	defer p.sessionMutex.RUnlock()
+
+	return p.SID, p.ValidityTime
+}
+
+func (p *Pihole) setSession(sid string, validityTime time.Time) {
+	p.sessionMutex.Lock()
+	defer p.sessionMutex.Unlock()
+
+	p.SID, p.ValidityTime = sid, validityTime
+}
+
+// renewSession logs out and logs in again. If staleSID isn't empty and the
+// current SID is already a different one, another request renewed the session in
+// the meantime and there is nothing to do.
+func (p *Pihole) renewSession(staleSID string) error {
+	p.renewMutex.Lock()
+	defer p.renewMutex.Unlock()
+
+	sid, _ := p.getSession()
+	if staleSID != "" && sid != staleSID {
+		return nil
+	}
+
+	if sid != "" {
+		// a failing logout must not stop the login below, otherwise a session the
+		// server no longer accepts would leave the client stuck until a restart
+		if err := p.Logout(); err != nil {
+			p.setSession("", time.Time{})
+		}
+	}
+
+	return p.Login()
 }
 
 // newMutex serializes New() calls, otherwise concurrent requests can each
