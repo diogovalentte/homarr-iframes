@@ -26,7 +26,7 @@ func (l *Linkwarden) GetLinks(limit int, collectionID string) ([]*Link, error) {
 		return nil, fmt.Errorf("no 'response' field in API response")
 	}
 
-	if limit >= 0 {
+	if limit >= 0 && len(links) > limit {
 		links = links[:limit]
 	}
 
