@@ -128,5 +128,6 @@ func (m *MediaErrorResults) UnmarshalJSON(data []byte) error {
 
 type MediaError struct {
 	Comment    string `json:"comment"`
+	FilePath   string `json:"filePath"`
 	CreatedUTC string `json:"createdUtc"`
 }

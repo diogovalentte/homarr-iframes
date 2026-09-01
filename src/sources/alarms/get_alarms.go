@@ -437,6 +437,7 @@ func getKavitaAlarms() ([]Alarm, error) {
 			BackgroundImgURL:  kavita.BackgroundImgURL,
 			BackgroundImgSize: 100,
 			Summary:           error.Comment,
+			Property:          error.FilePath,
 			Time:              timestamp,
 			URL:               url,
 			Status:            "ERROR",
