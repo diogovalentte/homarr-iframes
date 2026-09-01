@@ -1,6 +1,8 @@
 package kavita
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"sync"
@@ -99,8 +101,29 @@ func (k *Kavita) GetMediaErrors() ([]*MediaError, error) {
 	return errors.Results, nil
 }
 
+// MediaErrorResults is the media-errors response. Kavita changed the shape of
+// this endpoint on 0.9.1: it used to return a paginated object with the errors
+// under "results", now it returns the errors as a plain array. Both are
+// accepted so the iframe works with old and new Kavita versions.
 type MediaErrorResults struct {
 	Results []*MediaError `json:"results"`
+}
+
+func (m *MediaErrorResults) UnmarshalJSON(data []byte) error {
+	trimmed := bytes.TrimLeft(data, " \t\r\n")
+	if len(trimmed) > 0 && trimmed[0] == '[' {
+		return json.Unmarshal(data, &m.Results)
+	}
+
+	// the alias avoids recursing into this method again
+	type mediaErrorResults MediaErrorResults
+	var results mediaErrorResults
+	if err := json.Unmarshal(data, &results); err != nil {
+		return err
+	}
+	*m = MediaErrorResults(results)
+
+	return nil
 }
 
 type MediaError struct {
