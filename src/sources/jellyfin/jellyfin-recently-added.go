@@ -383,7 +383,20 @@ func (j *Jellyfin) GetItemsHash(c *gin.Context) {
 		return
 	}
 
-	hash := sources.GetHash(items, time.Now().Format("2006-01-02"))
+	hash := getItemsHash(items)
 
 	c.JSON(http.StatusOK, gin.H{"hash": fmt.Sprintf("%x", hash)})
+}
+
+// getItemsHash returns a hash built only from the item IDs, so it only changes when
+// the list of recently added items changes. Hashing []*Item directly would hash
+// memory addresses, because GetHash formats with %v.
+// The IDs are not sorted, as the order is what the iframe displays.
+func getItemsHash(items []*Item) [32]byte {
+	ids := make([]string, 0, len(items))
+	for _, item := range items {
+		ids = append(ids, item.ID)
+	}
+
+	return sources.GetHash(ids, time.Now().Format("2006-01-02"))
 }

@@ -44,12 +44,12 @@ func (j *Jellyfin) GetLatestItems(limit, queryLimit int, userId, parentId, inclu
 	for _, item := range latestItems {
 		if primaryTag, hasPrimary := item.ImageTags["Primary"]; hasPrimary {
 			item.PrimaryImageURL = fmt.Sprintf("%s/Items/%s/Images/Primary?tag=%s",
-				j.InternalAddress, item.ID, primaryTag)
+				j.Address, item.ID, primaryTag)
 		}
 
 		if len(item.BackdropImageTags) > 0 {
 			item.BackdropImageURL = fmt.Sprintf("%s/Items/%s/Images/Backdrop?tag=%s",
-				j.InternalAddress, item.ID, item.BackdropImageTags[0])
+				j.Address, item.ID, item.BackdropImageTags[0])
 		}
 
 		item.ItemURL = fmt.Sprintf("%s/web/#/details?id=%s&serverId=%s", j.Address, item.ID, item.ServerId)
@@ -91,7 +91,7 @@ func (j *Jellyfin) GetSessions(limit, activeWithinSeconds int, excludedUsers map
 		}
 
 		session.UserAvatarURL = fmt.Sprintf("%s/Users/%s/Images/Primary",
-			j.InternalAddress, session.UserID)
+			j.Address, session.UserID)
 
 		itemID := session.NowPlayingItem.ID
 
@@ -99,18 +99,18 @@ func (j *Jellyfin) GetSessions(limit, activeWithinSeconds int, excludedUsers map
 			itemID = session.NowPlayingItem.SeriesID
 
 			session.NowPlayingItem.BackdropImageURL = fmt.Sprintf("%s/Items/%s/Images/Backdrop",
-				j.InternalAddress, itemID)
+				j.Address, itemID)
 
 			session.NowPlayingItem.EpisodeURL = fmt.Sprintf("%s/web/#/details?id=%s&serverId=%s",
 				j.Address, session.NowPlayingItem.ID, session.NowPlayingItem.ServerId)
 		} else if len(session.NowPlayingItem.BackdropImageTags) > 0 {
 			session.NowPlayingItem.BackdropImageURL = fmt.Sprintf("%s/Items/%s/Images/Backdrop?tag=%s",
-				j.InternalAddress, itemID, session.NowPlayingItem.BackdropImageTags[0])
+				j.Address, itemID, session.NowPlayingItem.BackdropImageTags[0])
 		}
 
 		if primaryTag, hasPrimary := session.NowPlayingItem.ImageTags["Primary"]; hasPrimary {
 			session.NowPlayingItem.PrimaryImageURL = fmt.Sprintf("%s/Items/%s/Images/Primary?tag=%s",
-				j.InternalAddress, itemID, primaryTag)
+				j.Address, itemID, primaryTag)
 		}
 
 		session.NowPlayingItem.ItemURL = fmt.Sprintf("%s/web/#/details?id=%s&serverId=%s",
