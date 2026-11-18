@@ -97,6 +97,100 @@ const docTemplate = `{
                 }
             }
         },
+        "/hash/jellyfin/recently": {
+            "get": {
+                "description": "Get the hash of the Jellyfin Recently Added items. Used by the iFrames to check updates and reload the iframe.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get the hash of the Jellyfin Recently Added items",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 20,
+                        "description": "Limits the number of items in the iFrame.",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "n6dcfgwiwh1m4c2vhjjm52101vrp01a5",
+                        "description": "Jellyfin user ID to get items for. You can get the user ID by going to the admin users page. The ID should be on the URL when clicking on a user. The given user should have access to each library you want data to be fetched from. Defaults to environment JELLYFIN_ADMIN_USER_ID",
+                        "name": "userId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "op2xj0l1qejb9g5c5z0f199tigksn1ei",
+                        "description": "Jellyfin parent/library ID to filter items. You can get the user ID by going to the library page. The ID should be on the URL. The given user in userId should have access to each library you want data to be fetched from.",
+                        "name": "parentId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "Movie,Series",
+                        "description": "Filter by media types. Available types can be read here https://api.jellyfin.org/#tag/UserLibrary/operation/GetLatestMedia. Defaults to Movie,Series.",
+                        "name": "includeItemTypes",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 100,
+                        "description": "Maximum number of items beeing queried from Jellyfin, when fetching Series data each episode counts as one. Defaults to 100.",
+                        "name": "queryLimit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/routes.hashResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/hash/jellyfin/sessions": {
+            "get": {
+                "description": "Get the hash of the Jellyfin active sessions. Used by the iFrames to check updates and reload the iframe.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get the hash of the Jellyfin sessions",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 20,
+                        "description": "Limits the number of items in the iFrame.",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 300,
+                        "description": "Only include sessions that have been active within this many seconds. Defaults to 60 if not specified or less than 1.",
+                        "name": "activeWithinSeconds",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "admin,test",
+                        "description": "Comma-separated list of usernames whose sessions are hidden (case-insensitive).",
+                        "name": "excludedUsers",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/routes.hashResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/hash/linkwarden": {
             "get": {
                 "description": "Get the hash of the Linkwarden bookmarks. Used by the iFrames to check updates and reload the iframe.",
@@ -401,6 +495,130 @@ const docTemplate = `{
                         "name": "api_url",
                         "in": "query",
                         "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/iframe/jellyfin/recently": {
+            "get": {
+                "description": "Returns an iFrame with Jellyfin recently added media.",
+                "produces": [
+                    "text/html"
+                ],
+                "summary": "Jellyfin recently added media iFrame",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "light",
+                        "description": "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white.",
+                        "name": "theme",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 20,
+                        "description": "Limits the number of items in the iFrame.",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "https://sub.domain.com",
+                        "description": "API URL used by your browser. Used by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload.",
+                        "name": "api_url",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "n6dcfgwiwh1m4c2vhjjm52101vrp01a5",
+                        "description": "Jellyfin user ID to get items for. You can get the user ID by going to the admin users page. The ID should be on the URL when clicking on a user. The given user should have access to each library you want data to be fetched from. Defaults to environment JELLYFIN_ADMIN_USER_ID",
+                        "name": "userId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "op2xj0l1qejb9g5c5z0f199tigksn1ei",
+                        "description": "Jellyfin parent/library ID to filter items. You can get the user ID by going to the library page. The ID should be on the URL. The given user in userId should have access to each library you want data to be fetched from.",
+                        "name": "parentId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "Movie,Series",
+                        "description": "Filter by media types. Available types can be read here https://api.jellyfin.org/#tag/UserLibrary/operation/GetLatestMedia. Defaults to Movie,Series.",
+                        "name": "includeItemTypes",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 100,
+                        "description": "Maximum number of items beeing queried from Jellyfin, when fetching Series data each episode counts as one. Defaults to 100.",
+                        "name": "queryLimit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/iframe/jellyfin/sessions": {
+            "get": {
+                "description": "Returns an iFrame with Jellyfin active user sessions.",
+                "produces": [
+                    "text/html"
+                ],
+                "summary": "Jellyfin active sessions iFrame",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "light",
+                        "description": "Homarr theme, defaults to light. If it's different from your Homarr theme, the background turns white.",
+                        "name": "theme",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 20,
+                        "description": "Limits the number of items in the iFrame.",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "https://sub.domain.com",
+                        "description": "API URL used by your browser. Used by the iFrames to check any update, if there is an update, the iFrame reloads. If not specified, the iFrames will never try to reload.",
+                        "name": "api_url",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 60,
+                        "description": "Only show sessions active within this many seconds",
+                        "name": "activeWithinSeconds",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "admin,test",
+                        "description": "Comma-separated list of usernames whose sessions are hidden (case-insensitive).",
+                        "name": "excludedUsers",
+                        "in": "query"
                     }
                 ],
                 "responses": {

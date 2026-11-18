@@ -74,6 +74,81 @@ paths:
           schema:
             $ref: '#/definitions/routes.hashResponse'
       summary: Get the hash of the Cinemark movies
+  /hash/jellyfin/recently:
+    get:
+      description: Get the hash of the Jellyfin Recently Added items. Used by the
+        iFrames to check updates and reload the iframe.
+      parameters:
+      - description: Limits the number of items in the iFrame.
+        example: 20
+        in: query
+        name: limit
+        type: integer
+      - description: Jellyfin user ID to get items for. You can get the user ID by
+          going to the admin users page. The ID should be on the URL when clicking
+          on a user. The given user should have access to each library you want data
+          to be fetched from. Defaults to environment JELLYFIN_ADMIN_USER_ID
+        example: n6dcfgwiwh1m4c2vhjjm52101vrp01a5
+        in: query
+        name: userId
+        type: string
+      - description: Jellyfin parent/library ID to filter items. You can get the user
+          ID by going to the library page. The ID should be on the URL. The given
+          user in userId should have access to each library you want data to be fetched
+          from.
+        example: op2xj0l1qejb9g5c5z0f199tigksn1ei
+        in: query
+        name: parentId
+        type: string
+      - description: Filter by media types. Available types can be read here https://api.jellyfin.org/#tag/UserLibrary/operation/GetLatestMedia.
+          Defaults to Movie,Series.
+        example: Movie,Series
+        in: query
+        name: includeItemTypes
+        type: string
+      - description: Maximum number of items beeing queried from Jellyfin, when fetching
+          Series data each episode counts as one. Defaults to 100.
+        example: 100
+        in: query
+        name: queryLimit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/routes.hashResponse'
+      summary: Get the hash of the Jellyfin Recently Added items
+  /hash/jellyfin/sessions:
+    get:
+      description: Get the hash of the Jellyfin active sessions. Used by the iFrames
+        to check updates and reload the iframe.
+      parameters:
+      - description: Limits the number of items in the iFrame.
+        example: 20
+        in: query
+        name: limit
+        type: integer
+      - description: Only include sessions that have been active within this many
+          seconds. Defaults to 60 if not specified or less than 1.
+        example: 300
+        in: query
+        name: activeWithinSeconds
+        type: integer
+      - description: Comma-separated list of usernames whose sessions are hidden (case-insensitive).
+        example: admin,test
+        in: query
+        name: excludedUsers
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/routes.hashResponse'
+      summary: Get the hash of the Jellyfin sessions
   /hash/linkwarden:
     get:
       description: Get the hash of the Linkwarden bookmarks. Used by the iFrames to
@@ -320,6 +395,106 @@ paths:
           schema:
             type: string
       summary: Cinemark Brazil iFrame
+  /iframe/jellyfin/recently:
+    get:
+      description: Returns an iFrame with Jellyfin recently added media.
+      parameters:
+      - description: Homarr theme, defaults to light. If it's different from your
+          Homarr theme, the background turns white.
+        example: light
+        in: query
+        name: theme
+        type: string
+      - description: Limits the number of items in the iFrame.
+        example: 20
+        in: query
+        name: limit
+        type: integer
+      - description: API URL used by your browser. Used by the iFrames to check any
+          update, if there is an update, the iFrame reloads. If not specified, the
+          iFrames will never try to reload.
+        example: https://sub.domain.com
+        in: query
+        name: api_url
+        required: true
+        type: string
+      - description: Jellyfin user ID to get items for. You can get the user ID by
+          going to the admin users page. The ID should be on the URL when clicking
+          on a user. The given user should have access to each library you want data
+          to be fetched from. Defaults to environment JELLYFIN_ADMIN_USER_ID
+        example: n6dcfgwiwh1m4c2vhjjm52101vrp01a5
+        in: query
+        name: userId
+        type: string
+      - description: Jellyfin parent/library ID to filter items. You can get the user
+          ID by going to the library page. The ID should be on the URL. The given
+          user in userId should have access to each library you want data to be fetched
+          from.
+        example: op2xj0l1qejb9g5c5z0f199tigksn1ei
+        in: query
+        name: parentId
+        type: string
+      - description: Filter by media types. Available types can be read here https://api.jellyfin.org/#tag/UserLibrary/operation/GetLatestMedia.
+          Defaults to Movie,Series.
+        example: Movie,Series
+        in: query
+        name: includeItemTypes
+        type: string
+      - description: Maximum number of items beeing queried from Jellyfin, when fetching
+          Series data each episode counts as one. Defaults to 100.
+        example: 100
+        in: query
+        name: queryLimit
+        type: integer
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+      summary: Jellyfin recently added media iFrame
+  /iframe/jellyfin/sessions:
+    get:
+      description: Returns an iFrame with Jellyfin active user sessions.
+      parameters:
+      - description: Homarr theme, defaults to light. If it's different from your
+          Homarr theme, the background turns white.
+        example: light
+        in: query
+        name: theme
+        type: string
+      - description: Limits the number of items in the iFrame.
+        example: 20
+        in: query
+        name: limit
+        type: integer
+      - description: API URL used by your browser. Used by the iFrames to check any
+          update, if there is an update, the iFrame reloads. If not specified, the
+          iFrames will never try to reload.
+        example: https://sub.domain.com
+        in: query
+        name: api_url
+        required: true
+        type: string
+      - description: Only show sessions active within this many seconds
+        example: 60
+        in: query
+        name: activeWithinSeconds
+        type: integer
+      - description: Comma-separated list of usernames whose sessions are hidden (case-insensitive).
+        example: admin,test
+        in: query
+        name: excludedUsers
+        type: string
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+      summary: Jellyfin active sessions iFrame
   /iframe/linkwarden:
     get:
       description: Returns an iFrame with Linkwarden bookmarks.
