@@ -89,6 +89,20 @@ Optional:
 - Add **Update** permission to allow a “mark as done” button in the iFrame
 - `VIKUNJA_BACKGROUND_IMG_URL` — background image URL for task cards
 
+# Jellyfin
+
+Two iFrames for [Jellyfin](https://github.com/jellyfin/jellyfin):
+
+- **Recently Added**: the latest movies and episodes added to the server.
+- **Active Streams**: what is being played right now, by whom, and the playback progress.
+
+**Environment variables**
+
+- `JELLYFIN_ADDRESS`
+- `INTERNAL_JELLYFIN_ADDRESS`
+- `JELLYFIN_API_KEY`: (Dashboard → API Keys)
+- `JELLYFIN_ADMIN_USER_ID`: default user for the Recently Added iFrame, can be overridden with the `userId` query parameter. The ID is in the URL when opening the user on the admin users page. The user needs access to the libraries you want to show.
+
 # Media Requests
 
 Displays media requests from:
