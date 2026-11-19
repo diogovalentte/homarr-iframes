@@ -80,7 +80,7 @@ func (j *Jellyfin) GetRecentlyAddediFrame(c *gin.Context) {
 
 	items, err := j.GetLatestItems(limit, queryLimit, userId, parentId, includeItemTypes)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("couldn't get items: %s", err.Error())})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("couldn't get items: %s", err.Error()).Error()})
 		return
 	}
 
@@ -107,7 +107,7 @@ func (j *Jellyfin) GetRecentlyAddediFrame(c *gin.Context) {
 	} else {
 		html, err = j.getItemsiFrame(items, theme, apiURL, limit, userId, parentId, includeItemTypes, queryLimit)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("couldn't create HTML code: %s", err.Error())})
+			c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("couldn't create HTML code: %s", err.Error()).Error()})
 			return
 		}
 	}

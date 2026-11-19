@@ -63,7 +63,7 @@ func (j *Jellyfin) GetSessionsiFrame(c *gin.Context) {
 
 	sessions, err := j.GetSessions(limit, activeWithinSeconds, excludedUsers)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("couldn't get items: %s", err.Error())})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("couldn't get items: %s", err.Error()).Error()})
 		return
 	}
 
@@ -84,7 +84,7 @@ func (j *Jellyfin) GetSessionsiFrame(c *gin.Context) {
 	} else {
 		html, err = j.getSessionsiFrame(sessions, theme, apiURL, limit, activeWithinSeconds, excludedUsersParam)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("couldn't create HTML code: %s", err.Error())})
+			c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Errorf("couldn't create HTML code: %s", err.Error()).Error()})
 			return
 		}
 	}
